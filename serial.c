@@ -48,7 +48,7 @@ int mode = 1; //0-controller, 1-device
 // Initialize Hardware
 void initHw()
 {
-	// Configure HW to work with 16 MHz XTAL, PLL enabled, system clock of 40 MHz
+    // Configure HW to work with 16 MHz XTAL, PLL enabled, system clock of 40 MHz
     SYSCTL_RCC_R = SYSCTL_RCC_XTAL_16MHZ | SYSCTL_RCC_OSCSRC_MAIN | SYSCTL_RCC_USESYSDIV | (4 << SYSCTL_RCC_SYSDIV_S);
 
     // Set GPIO ports to use APB (not needed since default configuration -- for clarity)
@@ -86,25 +86,25 @@ void initHw()
 // Blocking function that writes a serial character when the UART buffer is not full
 void putcUart0(char c)
 {
-	while (UART0_FR_R & UART_FR_TXFF);               // wait if uart0 tx fifo full
-	UART0_DR_R = c;                                  // write character to fifo
+    while (UART0_FR_R & UART_FR_TXFF);               // wait if uart0 tx fifo full
+    UART0_DR_R = c;                                  // write character to fifo
 }
 
 // Blocking function that writes a string when the UART buffer is not full
 void putsUart0(char* str)
 {
-	uint8_t i;
+    uint8_t i;
     for (i = 0; i < strlen(str); i++)
-	  putcUart0(str[i]);
+      putcUart0(str[i]);
 }
 
 // Blocking function that returns with serial data once the buffer is not empty
 char getcUart0()
 {
-	if (!(UART0_FR_R & UART_FR_RXFE))             // wait if uart0 rx fifo empty
-	    return UART0_DR_R & 0xFF;                        // get character from fifo
-	else
-	    return '!';
+    if (!(UART0_FR_R & UART_FR_RXFE))             // wait if uart0 rx fifo empty
+        return UART0_DR_R & 0xFF;                        // get character from fifo
+    else
+        return '!';
 }
 
 
@@ -193,16 +193,18 @@ void clearStr(){
     }
 }
 
+
+
 //-----------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------
 
-int main(void)
+uint8_t main(void)
 {
-	// Initialize hardware
-	initHw();
+    // Initialize hardware
+    initHw();
 
-	// Display greeting
+    // Display greeting
     putsUart0("Command\r\n");
     putsUart0("Enter string followed by new line:\r\n");
     putcUart0('>');
@@ -213,18 +215,18 @@ int main(void)
     // For each received "0", clear the red LED
     while(1)
     {
-    	char c = getcUart0();
-    	if(c != '!'){
+        char c = getcUart0();
+        if(isLetter(c)){
 
-    	    if(c == '\n' || strPos > 38){
+            if(c == '\n' || strPos > 38){
 
-    	        parseCommand(&str);
-    	        clearStr();
-    	        strPos = 0;
-    	    }
-    	    else{
-    	        str[strPos++] = c;
-    	    }
-    	}
+                parseCommand(&str);
+                clearStr();
+                strPos = 0;
+            }
+            else{
+                str[strPos++] = c;
+            }
+        }
     }
 }
