@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <ctype.h>
 #include "tm4c123gh6pm.h"
 
 #define RED_LED      (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 1*4)))
@@ -37,10 +38,13 @@
 
 #define delay4Cycles() __asm(" NOP\n NOP\n NOP\n NOP")
 
-char str[40];
-int strPos = 0;
+char command[10];
+char arg1[10];
+char arg2[10];
+uint8_t enteringField = 0; //0-command, 1-arg1, 2-arg2
+uint8_t pos = 0;
 int maxAddress = 512;
-int mode = 1; //0-controller, 1-device
+uint8_t mode = 1; //0-controller, 1-device
 //-----------------------------------------------------------------------------
 // Subroutines
 //-----------------------------------------------------------------------------
@@ -69,7 +73,7 @@ void initHw()
     GPIO_PORTA_AFSEL_R |= 3;                         // use peripheral to drive PA0, PA1: default, added for clarity
     GPIO_PORTA_PCTL_R &= 0xFFFFFF00;                 // set fields for PA0 and PA1 to zero
     GPIO_PORTA_PCTL_R |= GPIO_PCTL_PA1_U0TX | GPIO_PCTL_PA0_U0RX;
-                                                     // select UART0 to drive pins PA0 and PA1: default, added for clarity
+    // select UART0 to drive pins PA0 and PA1: default, added for clarity
 
     // Configure UART0 to 115200 baud, 8N1 format
     SYSCTL_RCGCUART_R |= SYSCTL_RCGCUART_R0;         // turn-on UART0, leave other UARTs in same status
@@ -80,7 +84,7 @@ void initHw()
     UART0_FBRD_R = 45;                               // round(fract(r)*64)=45
     UART0_LCRH_R = UART_LCRH_WLEN_8 | UART_LCRH_FEN; // configure for 8N1 w/ 16-level FIFO
     UART0_CTL_R = UART_CTL_TXE | UART_CTL_RXE | UART_CTL_UARTEN;
-                                                     // enable TX, RX, and module
+    // enable TX, RX, and module
 }
 
 // Blocking function that writes a serial character when the UART buffer is not full
@@ -95,7 +99,7 @@ void putsUart0(char* str)
 {
     uint8_t i;
     for (i = 0; i < strlen(str); i++)
-      putcUart0(str[i]);
+        putcUart0(str[i]);
 }
 
 // Blocking function that returns with serial data once the buffer is not empty
@@ -104,96 +108,97 @@ char getcUart0()
     if (!(UART0_FR_R & UART_FR_RXFE))             // wait if uart0 rx fifo empty
         return UART0_DR_R & 0xFF;                        // get character from fifo
     else
-        return '!';
+        return '\0';
 }
 
 
 
-void parseCommand(char* s){
+uint8_t parseCommand(){
     if(mode == 0){ //controller mode
-        if(strcmp(s, "device") == 0){
-                putsUart0("Device Mode\n");
-                mode = 1;
+        if(strcmp(command, "device") == 0){
+            putsUart0("Device Mode\n");
+            mode = 1;
+            return 0;
         }
-        else if(strcmp(s, "clear") == 0){
+        else if(strcmp(command, "clear") == 0){
             putsUart0("Cleared\n");
+            return 0;
         }
-        else if(strstr(s, "set") != NULL){
-            s += 4;
-            char *token = strtok(s, ",");
+        else if(strcmp(command, "set") == 0){
             putsUart0("Setting \n");
             putsUart0("Address:");
-            if(token == NULL){
-                putsUart0("Invalid Command\n");
-            }
-            putsUart0(token);
-            token = strtok(NULL, "\n");
+            putsUart0(arg1);
             putsUart0("Value:");
-            if(token == NULL){
-                putsUart0("Invalid Command\n");
-            }
-            putsUart0(token);
+            putsUart0(arg2);
+            return 0;
         }
-        else if(strstr(s, "get") != NULL){
-            s += 4;
-            char *token = strtok(s, "\n");
-            if(token == NULL){
-                putsUart0("Invalid Command\n");
-            }
+        else if(strcmp(command, "get") == 0){
             putsUart0("Getting \n");
             putsUart0("Address:");
-            putsUart0(token);
+            putsUart0(arg1);
+            return 0;
         }
-        else if(strstr(s, "max") != NULL){
-            s += 4;
-            char *token = strtok(s, "\n");
-            if(token == NULL){
-                putsUart0("Invalid Command\n");
-            }
+        else if(strcmp(command, "max") == 0){
             putsUart0("Setting max \n");
-            putsUart0(token);
-            maxAddress = atoi(token);
+            putsUart0(arg1);
+            maxAddress = atoi(arg1);
+            return 0;
         }
-        else if(strcmp(s, "on") == 0){
+        else if(strcmp(command, "on") == 0){
             putsUart0("continuous\n");
+            return 0;
         }
-        else if(strcmp(s, "off") == 0){
+        else if(strcmp(command, "off") == 0){
             putsUart0("continuous off\n");
+            return 0;
         }
 
         else{
-            putsUart0("Invalid Controller Mode Command\n");
+            //putsUart0("Invalid Controller Mode Command\n");
+            return 2;
         }
     }
     else if(mode == 1){
-        if(strstr(s, "address") != NULL){
-            s += 4;
-            char *token = strtok(s, "\n");
-            putsUart0("Device address is \n");
-            putsUart0(token);
+        if(strcmp(command, "address") == 0){
+            putsUart0("Device address is \r\n");
+            //putsUart0(arg1);
+            return 0;
         }
-        else if(strcmp(s, "controller") == 0){
+        else if(strcmp(command, "controller") == 0){
             putsUart0("Controller Mode\n");
             mode = 0;
+            return 0;
         }
         else{
-            putsUart0("Invalid Device Mode Command\n");
+            //putsUart0("Invalid Device Mode Command\n");
+            return 3;
         }
     }
     else{
         putsUart0("Invalid Mode\n");
+        return 1;
     }
 }
 
 
 void clearStr(){
-    int i = 0;
-    for(;i < strPos + 1; ++i){
-        str[i] = '\0';
+    uint8_t i = 0;
+    for(;i < 10; ++i){
+        command[i] = '\0';
+        arg1[i] = '\0';
+        arg2[i] = '\0';
     }
+    pos = 0;
+    enteringField = 0;
 }
 
+bool isLetter(char c){
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
 
+bool isNumber(char c){
+    return (c >= '0' && c <= '9');
+}
 
 //-----------------------------------------------------------------------------
 // Main
@@ -216,17 +221,41 @@ uint8_t main(void)
     while(1)
     {
         char c = getcUart0();
-        if(isLetter(c)){
 
-            if(c == '\n' || strPos > 38){
-
-                parseCommand(&str);
+        if(isLetter(c) && enteringField == 0){
+            command[pos++] = tolower(c);
+        }
+        else if(c == ' '){
+            ++enteringField;
+            pos = 0;
+        }
+        else if(enteringField == 0 && isNumber(c)){
+            putsUart0("\r\nInvalid Device Mode Command\r\n");
+            clearStr();
+        }
+        else if(enteringField == 1){
+            arg1[pos++] = c;
+        }
+        else if(enteringField == 2){
+            arg2[pos++] = c;
+        }
+        else if(c == '\n' || c == '\r'){
+            uint8_t ret = parseCommand();
+            if(ret != 0){
+                putsUart0("\r\nInvalid Command\r\n");
                 clearStr();
-                strPos = 0;
             }
-            else{
-                str[strPos++] = c;
+            else {
+                clearStr();
             }
         }
+        else if(c == '\0'){
+            continue;
+        }
+        else{
+            putsUart0("\r\nInvalid Device Mode Command\r\n");
+            clearStr();
+        }
+
     }
 }
