@@ -38,11 +38,11 @@
 
 #define delay4Cycles() __asm(" NOP\n NOP\n NOP\n NOP")
 
-char command[10];
-char arg1[10];
-char arg2[10];
-uint8_t enteringField = 0; //0-command, 1-arg1, 2-arg2
-uint8_t pos = 0;
+char command[20];
+char arg1[20];
+char arg2[20];
+int8_t enteringField = 0; //0-command, 1-arg1, 2-arg2
+int8_t pos = 0;
 int maxAddress = 512;
 uint8_t mode = 1; //0-controller, 1-device
 //-----------------------------------------------------------------------------
@@ -152,10 +152,13 @@ uint8_t parseCommand(){
             putsUart0("continuous off\n");
             return 0;
         }
-
+        else if(strcmp(command, "controller") == 0){
+            putsUart0("Already in Controller Mode\n");
+            return 0;
+        }
         else{
-            //putsUart0("Invalid Controller Mode Command\n");
-            return 2;
+            putsUart0("Invalid Controller Mode Command\n");
+            return 0;
         }
     }
     else if(mode == 1){
@@ -164,14 +167,18 @@ uint8_t parseCommand(){
             //putsUart0(arg1);
             return 0;
         }
+        else if(strcmp(command, "device") == 0){
+            putsUart0("Already in Device Mode\n");
+            return 0;
+        }
         else if(strcmp(command, "controller") == 0){
             putsUart0("Controller Mode\n");
             mode = 0;
             return 0;
         }
         else{
-            //putsUart0("Invalid Device Mode Command\n");
-            return 3;
+            putsUart0("Invalid Device Mode Command\n");
+            return 0;
         }
     }
     else{
@@ -183,7 +190,7 @@ uint8_t parseCommand(){
 
 void clearStr(){
     uint8_t i = 0;
-    for(;i < 10; ++i){
+    for(;i < 20; ++i){
         command[i] = '\0';
         arg1[i] = '\0';
         arg2[i] = '\0';
@@ -222,6 +229,12 @@ uint8_t main(void)
     {
         char c = getcUart0();
 
+        if(c == '\0'){
+            continue;
+        }
+        if(!(isLetter(c) || isNumber(c) || c == ' ' || c == '\n' || c == '\r' || c == 8)){
+            continue;
+        }
         if(isLetter(c) && enteringField == 0){
             command[pos++] = tolower(c);
         }
@@ -233,10 +246,10 @@ uint8_t main(void)
             putsUart0("\r\nInvalid Device Mode Command\r\n");
             clearStr();
         }
-        else if(enteringField == 1){
+        else if(enteringField == 1 && (isNumber(c) || isLetter(c))){
             arg1[pos++] = c;
         }
-        else if(enteringField == 2){
+        else if(enteringField == 2 && (isNumber(c) || isLetter(c))){
             arg2[pos++] = c;
         }
         else if(c == '\n' || c == '\r'){
@@ -246,11 +259,41 @@ uint8_t main(void)
                 clearStr();
             }
             else {
+                putsUart0("\r\n");
                 clearStr();
             }
         }
-        else if(c == '\0'){
-            continue;
+        else if(c == 8){
+            if(pos > 0){
+                if(enteringField == 2){
+                    arg2[--pos] = '\0';
+                }
+                else if(enteringField == 1){
+                    arg1[--pos] = '\0';
+                }
+                else{
+                    command[--pos] = '\0';
+                }
+
+            }
+            else if(pos == 0){
+                enteringField--;
+                if(enteringField == 1){
+                    pos = strlen(arg1);
+                }
+                else if(enteringField == 0){
+                    pos = strlen(command);
+                }
+                else{
+                    enteringField = 0;
+                    pos = 0;
+                }
+            }
+            else{
+                if(enteringField < 0){
+                    enteringField = 0;
+                }
+            }
         }
         else{
             putsUart0("\r\nInvalid Device Mode Command\r\n");
