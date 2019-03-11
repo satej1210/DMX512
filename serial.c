@@ -44,6 +44,7 @@ char arg2[20];
 int8_t enteringField = 0; //0-command, 1-arg1, 2-arg2
 int8_t pos = 0;
 int maxAddress = 512;
+int deviceModeAddress = 0;
 uint8_t mode = 1; //0-controller, 1-device
 //-----------------------------------------------------------------------------
 // Subroutines
@@ -163,8 +164,9 @@ uint8_t parseCommand(){
     }
     else if(mode == 1){
         if(strcmp(command, "address") == 0){
-            putsUart0("Device address is \r\n");
-            //putsUart0(arg1);
+            putsUart0("Device address set to: ");
+            putsUart0(arg1);
+            deviceModeAddress = atoi(arg1);
             return 0;
         }
         else if(strcmp(command, "device") == 0){
@@ -232,15 +234,19 @@ uint8_t main(void)
         if(c == '\0'){
             continue;
         }
-        if(!(isLetter(c) || isNumber(c) || c == ' ' || c == '\n' || c == '\r' || c == 8)){
+        if(!(isLetter(c) || isNumber(c) || c == ' ' || c == '\n' || c == '\r' || c == 8 || c == ',')){
             continue;
         }
         if(isLetter(c) && enteringField == 0){
             command[pos++] = tolower(c);
         }
-        else if(c == ' '){
+        else if(enteringField == 0 && c == ' '){
             ++enteringField;
             pos = 0;
+        }
+        else if(enteringField == 1 && c == ','){
+            ++enteringField;
+            pos=0;
         }
         else if(enteringField == 0 && isNumber(c)){
             putsUart0("\r\nInvalid Device Mode Command\r\n");
@@ -296,7 +302,7 @@ uint8_t main(void)
             }
         }
         else{
-            putsUart0("\r\nInvalid Device Mode Command\r\n");
+            putsUart0("\r\nInvalid Command\r\n");
             clearStr();
         }
 
