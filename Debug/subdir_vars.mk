@@ -9,27 +9,27 @@ CMD_SRCS += \
 ../tm4c123gh6pm.cmd 
 
 C_SRCS += \
-../serial.c \
+../satej_matthew.c \
 ../tm4c123gh6pm_startup_ccs.c 
 
 C_DEPS += \
-./serial.d \
+./satej_matthew.d \
 ./tm4c123gh6pm_startup_ccs.d 
 
 OBJS += \
-./serial.obj \
+./satej_matthew.obj \
 ./tm4c123gh6pm_startup_ccs.obj 
 
 OBJS__QUOTED += \
-"serial.obj" \
+"satej_matthew.obj" \
 "tm4c123gh6pm_startup_ccs.obj" 
 
 C_DEPS__QUOTED += \
-"serial.d" \
+"satej_matthew.d" \
 "tm4c123gh6pm_startup_ccs.d" 
 
 C_SRCS__QUOTED += \
-"../serial.c" \
+"../satej_matthew.c" \
 "../tm4c123gh6pm_startup_ccs.c" 
 
 

@@ -10,7 +10,7 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
-"./serial.obj" \
+"./satej_matthew.obj" \
 "./tm4c123gh6pm_startup_ccs.obj" \
 "../tm4c123gh6pm.cmd" \
 $(GEN_CMDS__FLAG) \
@@ -155,8 +155,8 @@ DMX512.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "serial.obj" "tm4c123gh6pm_startup_ccs.obj" 
-	-$(RM) "serial.d" "tm4c123gh6pm_startup_ccs.d" 
+	-$(RM) "satej_matthew.obj" "tm4c123gh6pm_startup_ccs.obj" 
+	-$(RM) "satej_matthew.d" "tm4c123gh6pm_startup_ccs.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
