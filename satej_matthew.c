@@ -107,10 +107,13 @@ void initHw()
     UART1_IBRD_R = 10; // r = 40 MHz / (Nx115.2kHz), set floor(r)=21, where N=16
     UART1_FBRD_R = 0;
     UART1_LCRH_R = UART_LCRH_WLEN_8 | UART_LCRH_FEN | UART_LCRH_STP2;
-    UART1_CTL_R = UART_CTL_TXE | UART_CTL_UARTEN;
+    UART1_CTL_R = UART_CTL_TXE | UART_CTL_UARTEN | UART_CTL_EOT;
 
     UART0_IM_R = UART_IM_RXIM;                       // turn-on RX interrupt
     NVIC_EN0_R |= 1 << (INT_UART0 - 16);         // turn-on interrupt 21 (UART0)
+
+    UART1_IM_R = UART_IM_TXIM;
+    NVIC_EN0_R |= 1 << (INT_UART1 - 16);
 //
 //    // Configure Timer 1 for keyboard service
     TIMER1_CTL_R &= ~TIMER_CTL_TAEN;      // turn-off timer before reconfiguring
@@ -123,6 +126,23 @@ void initHw()
 
 }
 
+void Uart1Isr(){
+    if (mode == 0){
+        if (DMXMode - 3 < maxAddress){
+            UART1_DR_R = dmxData[DMXMode - 3];
+            DMXMode++;
+            UART1_ICR_R = UART_ICR_TXIC;
+        }
+        else{
+            GPIO_PORTC_AFSEL_R &= 0x00;
+            GPIO_PORTC_DATA_R &= 0xDF;
+            DMXMode = 0;
+            TIMER1_CTL_R |= TIMER_CTL_TAEN;
+            UART1_ICR_R = UART_ICR_TXIC;
+        }
+    }
+}
+
 void putcUart1(uint8_t i)
 {
     while (UART1_FR_R & UART_FR_TXFF)
@@ -132,11 +152,11 @@ void putcUart1(uint8_t i)
 
 void changeTimerValue(uint32_t us)
 {
-    //TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
+    TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
     TIMER1_TAILR_R = us * 40;             // turn-off timer before reconfiguring
     // reset interrupt
     // set load value to 2e5 for 200 Hz interrupt rate
-    //TIMER1_CTL_R |= TIMER_CTL_TAEN;
+    TIMER1_CTL_R |= TIMER_CTL_TAEN;
 }
 
 void Timer1ISR(void)
@@ -150,44 +170,43 @@ void Timer1ISR(void)
             //Break
             //send nothing
             GPIO_PORTC_AFSEL_R &= 0x00;
-            GPIO_PORTC_DATA_R = 0x00;
+            GPIO_PORTC_DATA_R &= 0xDF;
             //putcUart1(0);
-            changeTimerValue(170); //For Break
+            changeTimerValue(176); //For Break
             DMXMode++;
         }
         else if (DMXMode == 1)
         {
             //Mark After Break
-            GPIO_PORTC_DATA_R = 0xFF;
+            GPIO_PORTC_DATA_R |= 0x20;
             changeTimerValue(12); //For MAB
             DMXMode++;
         }
         else if (DMXMode == 2)
         {
             //Start Code with post start(2 stop bits)
+            TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
             GPIO_PORTC_AFSEL_R |= 0x30;
-            putcUart1(0);
-            changeTimerValue(100);
-
             DMXMode++;
+            putcUart1(0);
+
+
         }
         else
         {
-            DMXMode = 0;
-            TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
-            TIMER1_IMR_R = 0;
-            //changeTimerValue(400504);
-            uint16_t i = 0;
+//            DMXMode = 0;
+//            TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
+//            TIMER1_IMR_R = 0;
+//
+//            GPIO_PORTC_AFSEL_R |= 0x30;
+//            putcUart1(0);
+//            uint16_t i = 0;
+//
+//            for (i = 0; i < 512; ++i)
+//            {
+//                putcUart1(dmxData[i]);
+//            }
 
-            for (i = 0; i < 512; ++i)
-            {
-                putcUart1(dmxData[i]);
-            }
-            GPIO_PORTC_AFSEL_R &= 0x00;
-            GPIO_PORTC_DATA_R = 0x00;
-            //changeTimerValue(170);
-            TIMER1_IMR_R = TIMER_IMR_TATOIM;
-            TIMER1_CTL_R |= TIMER_CTL_TAEN;
 
         }
     }
@@ -397,11 +416,11 @@ void Uart0Isr(void)
         putsUart0("\r\nInvalid Command. Resetting...\r\n");
         clearStr();
     }
-    else if (enteringField == 1 && (isNumber(c) || isLetter(c) || c == ' '))
+    else if (enteringField == 1 && (isNumber(c) || isLetter(c)))
     {
         arg1[pos++] = c;
     }
-    else if (enteringField == 2)
+    else if (enteringField == 2 && (isNumber(c) || isLetter(c)))
     {
         arg2[pos++] = c;
     }

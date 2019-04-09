@@ -56,6 +56,7 @@ extern uint32_t __STACK_TOP;
 //*****************************************************************************
 // To be added by user
 extern void Uart0Isr(void);
+extern void Uart1Isr(void);
 extern void Timer1ISR(void);
 //extern void
 
@@ -92,8 +93,8 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // GPIO Port C
     IntDefaultHandler,                      // GPIO Port D
     IntDefaultHandler,                      // GPIO Port E
-    Uart0Isr,                      // UART0 Rx and Tx
-    IntDefaultHandler,                      // UART1 Rx and Tx
+    Uart0Isr,                               // UART0 Rx and Tx
+    Uart1Isr,                               // UART1 Rx and Tx
     IntDefaultHandler,                      // SSI0 Rx and Tx
     IntDefaultHandler,                      // I2C0 Master and Slave
     IntDefaultHandler,                      // PWM Fault
