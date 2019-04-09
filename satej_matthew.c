@@ -82,8 +82,8 @@ void initHw()
     GPIO_PORTA_PCTL_R |= GPIO_PCTL_PA1_U0TX | GPIO_PCTL_PA0_U0RX;
     // select UART0 to drive pins PA0 and PA1: default, added for clarity
 
-    GPIO_PORTC_DIR_R |= 0x20;
-    GPIO_PORTC_DEN_R |= 0x30;
+    GPIO_PORTC_DIR_R |= 0x60;
+    GPIO_PORTC_DEN_R |= 0x70;
     GPIO_PORTC_AFSEL_R |= 0x30;
     //GPIO_PORTC_PCTL_R &= 0xFFFFFF00;
     GPIO_PORTC_PCTL_R |= GPIO_PCTL_PC5_U1TX | GPIO_PCTL_PC4_U1RX;
@@ -141,48 +141,55 @@ void changeTimerValue(uint32_t us)
 
 void Timer1ISR(void)
 {
-    //using state machine-like interrupt handling
-    //Diagram Used for reference: http://www.etcconnect.com/Support/Articles/DMX-Speed.aspx
-    if (DMXMode == 0)
+    if (mode == 0)
     {
-        //Break
-        //send nothing
-        GPIO_PORTC_AFSEL_R &= 0x00;
-        GPIO_PORTC_DATA_R = 0x00;
-        //putcUart1(0);
-        changeTimerValue(170); //For Break
-        DMXMode++;
-    }
-    else if (DMXMode == 1)
-    {
-        //Mark After Break
-        GPIO_PORTC_DATA_R = 0xFF;
-        changeTimerValue(12); //For MAB
-        DMXMode++;
-    }
-    else if (DMXMode == 2)
-    {
-        //Start Code with post start(2 stop bits)
-        GPIO_PORTC_AFSEL_R |= 0x30;
-        putcUart1(0);
-        changeTimerValue(100);
-
-        DMXMode++;
-    }
-    else
-    {
-        DMXMode = 0;
-
-        changeTimerValue(40000);
-        uint16_t i = 0;
-
-        for (i = 0; i < 512; ++i)
+        //using state machine-like interrupt handling
+        //Diagram Used for reference: http://www.etcconnect.com/Support/Articles/DMX-Speed.aspx
+        if (DMXMode == 0)
         {
-            putcUart1(dmxData[i]);
+            //Break
+            //send nothing
+            GPIO_PORTC_AFSEL_R &= 0x00;
+            GPIO_PORTC_DATA_R = 0x00;
+            //putcUart1(0);
+            changeTimerValue(170); //For Break
+            DMXMode++;
         }
-        GPIO_PORTC_AFSEL_R &= 0x00;
-        GPIO_PORTC_DATA_R = 0x00;
+        else if (DMXMode == 1)
+        {
+            //Mark After Break
+            GPIO_PORTC_DATA_R = 0xFF;
+            changeTimerValue(12); //For MAB
+            DMXMode++;
+        }
+        else if (DMXMode == 2)
+        {
+            //Start Code with post start(2 stop bits)
+            GPIO_PORTC_AFSEL_R |= 0x30;
+            putcUart1(0);
+            changeTimerValue(100);
 
+            DMXMode++;
+        }
+        else
+        {
+            DMXMode = 0;
+            TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
+            TIMER1_IMR_R = 0;
+            //changeTimerValue(400504);
+            uint16_t i = 0;
+
+            for (i = 0; i < 512; ++i)
+            {
+                putcUart1(dmxData[i]);
+            }
+            GPIO_PORTC_AFSEL_R &= 0x00;
+            GPIO_PORTC_DATA_R = 0x00;
+            //changeTimerValue(170);
+            TIMER1_IMR_R = TIMER_IMR_TATOIM;
+            TIMER1_CTL_R |= TIMER_CTL_TAEN;
+
+        }
     }
     TIMER1_ICR_R = TIMER_ICR_TATOCINT;
 }
@@ -234,6 +241,7 @@ uint8_t parseCommand()
             putsUart0(arg1);
             putsUart0("Value:");
             putsUart0(arg2);
+            dmxData[atoi(arg1)] = atoi(arg2);
             return 0;
         }
         else if (strcmp(command, "get") == 0)
@@ -254,6 +262,7 @@ uint8_t parseCommand()
         {
             putsUart0("continuous\n");
             continuous = 1;
+            GPIO_PORTC_DATA_R = 0x40;
             return 0;
         }
         else if (strcmp(command, "off") == 0)
@@ -359,16 +368,7 @@ void waitMicrosecond(uint32_t us)
 void Uart0Isr(void)
 {
     char c = getcUart0();
-    if (mode == 0 && continuous == 1)
-    {
-        RED_LED = 1;
-        //UART1_DR_R = 'w';
-    }
-    else
-    {
-        RED_LED = 0;
-        //UART1_DR_R = 1;
-    }
+
     if (c == '\0')
     {
         return;
@@ -397,11 +397,11 @@ void Uart0Isr(void)
         putsUart0("\r\nInvalid Command. Resetting...\r\n");
         clearStr();
     }
-    else if (enteringField == 1 && (isNumber(c) || isLetter(c)))
+    else if (enteringField == 1 && (isNumber(c) || isLetter(c) || c == ' '))
     {
         arg1[pos++] = c;
     }
-    else if (enteringField == 2 && (isNumber(c) || isLetter(c)))
+    else if (enteringField == 2)
     {
         arg2[pos++] = c;
     }
@@ -470,6 +470,17 @@ void Uart0Isr(void)
         clearStr();
     }
 
+    if (mode == 0 && continuous == 1)
+    {
+        RED_LED = 1;
+        //UART1_DR_R = 'w';
+    }
+    else
+    {
+        RED_LED = 0;
+        //UART1_DR_R = 1;
+    }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -486,9 +497,9 @@ uint8_t main(void)
     GREEN_LED = 0;
     waitMicrosecond(250000);
 
-    dmxData[3] = 255;
-    dmxData[4] = 128;
-    dmxData[500] = 10;
+    dmxData[1] = 0;
+    dmxData[2] = 0;
+    dmxData[3] = 0;
 
     // Display greeting
     putsUart0("\nCommand\r\n");
@@ -500,5 +511,6 @@ uint8_t main(void)
     // For each received "0", clear the red LED
     while (1)
     {
+
     }
 }
