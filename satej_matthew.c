@@ -49,6 +49,8 @@ int deviceModeAddress = 0;
 uint8_t continuous = 0;
 uint8_t mode = 1; //0-controller, 1-device
 uint16_t DMXMode = 0; //0-break, 1-Mark After Break, 3-start
+uint8_t woo = 0;
+
 //-----------------------------------------------------------------------------
 // Subroutines
 //-----------------------------------------------------------------------------
@@ -250,6 +252,13 @@ uint8_t parseCommand()
         {
             putsUart0("Device Mode\n");
             mode = 1;
+            return 0;
+        }
+        else if(strcmp(command, "woo") == 0){
+            if(woo == 1)
+                woo = 0;
+            else
+                woo = 1;
             return 0;
         }
         else if (strcmp(command, "clear") == 0)
@@ -558,7 +567,7 @@ uint8_t main(void)
     uint8_t dec = 0;
     while (1)
     {
-
+if(woo == 1){
         if(i>=255){
             dec = 1;
 
@@ -567,16 +576,17 @@ uint8_t main(void)
             dec = 0;
         }
         if(dec == 0){
-            dmxData[0] = i+=10;
-                                dmxData[1] = i+=10;
-                                dmxData[2] = i+=10;
+            dmxData[0] = i+=5;
+                                dmxData[1] = i+=5;
+                                dmxData[2] = i+=5;
         }
         else{
-        dmxData[0] = i-=10;
-                            dmxData[1] = i-=10;
-                            dmxData[2] = i-=10;
+        dmxData[0] = i-=5;
+                            dmxData[1] = i-=5;
+                            dmxData[2] = i-=5;
         }
         waitMicrosecond(50000);
+}
 
     }
 }
