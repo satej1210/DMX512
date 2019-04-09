@@ -48,7 +48,7 @@ int maxAddress = 512;
 int deviceModeAddress = 0;
 uint8_t continuous = 0;
 uint8_t mode = 1; //0-controller, 1-device
-uint8_t DMXMode = 0; //0-break, 1-Mark After Break, 3-start
+uint16_t DMXMode = 0; //0-break, 1-Mark After Break, 3-start
 //-----------------------------------------------------------------------------
 // Subroutines
 //-----------------------------------------------------------------------------
@@ -134,11 +134,14 @@ void Uart1Isr(){
             UART1_ICR_R = UART_ICR_TXIC;
         }
         else{
+            UART1_ICR_R = UART_ICR_TXIC;
             GPIO_PORTC_AFSEL_R &= 0x00;
             GPIO_PORTC_DATA_R &= 0xDF;
             DMXMode = 0;
+            UART1_CTL_R = 0;
+            changeTimerValue(176);
             TIMER1_CTL_R |= TIMER_CTL_TAEN;
-            UART1_ICR_R = UART_ICR_TXIC;
+
         }
     }
 }
@@ -186,14 +189,15 @@ void Timer1ISR(void)
         {
             //Start Code with post start(2 stop bits)
             TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
+            UART1_CTL_R = UART_CTL_TXE | UART_CTL_UARTEN | UART_CTL_EOT;
             GPIO_PORTC_AFSEL_R |= 0x30;
             DMXMode++;
             putcUart1(0);
 
 
         }
-        else
-        {
+//        else
+//        {
 //            DMXMode = 0;
 //            TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
 //            TIMER1_IMR_R = 0;
@@ -208,7 +212,7 @@ void Timer1ISR(void)
 //            }
 
 
-        }
+       // }
     }
     TIMER1_ICR_R = TIMER_ICR_TATOCINT;
 }
