@@ -67,6 +67,7 @@ void changeTimerValue(uint32_t us);
 uint8_t parseCommand();
 
 
+
 void initHw()
 {
     // Configure HW to work with 16 MHz XTAL, PLL enabled, system clock of 40 MHz
