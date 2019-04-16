@@ -39,6 +39,8 @@
 
 uint8_t dmxData[512];
 
+uint8_t i = 0;
+uint8_t dec = 0;
 char command[20];
 char arg1[20];
 char arg2[20];
@@ -49,11 +51,21 @@ int deviceModeAddress = 0;
 uint8_t continuous = 0;
 uint8_t mode = 1; //0-controller, 1-device
 uint16_t DMXMode = 0; //0-break, 1-Mark After Break, 3-start
+uint8_t woo = 0;
+
 //-----------------------------------------------------------------------------
 // Subroutines
 //-----------------------------------------------------------------------------
 
 // Initialize Hardware
+
+
+void initHw();
+void Uart1Isr();
+void Timer1ISR(void);
+void changeTimerValue(uint32_t us);
+uint8_t parseCommand();
+
 
 void initHw()
 {
@@ -252,8 +264,22 @@ uint8_t parseCommand()
             mode = 1;
             return 0;
         }
+        else if(strcmp(command, "woo") == 0){
+            if(woo == 1)
+                woo = 0;
+            else
+                woo = 1;
+            return 0;
+        }
         else if (strcmp(command, "clear") == 0)
         {
+            uint16_t i = 0;
+
+                     for (i = 0; i < 512; ++i)
+                     {
+                         dmxData[i] = 0;
+                     }
+
             putsUart0("Cleared\n");
             return 0;
         }
@@ -264,7 +290,7 @@ uint8_t parseCommand()
             putsUart0(arg1);
             putsUart0("Value:");
             putsUart0(arg2);
-            dmxData[atoi(arg1)] = atoi(arg2);
+            dmxData[atoi(arg1) - 1] = atoi(arg2);
             return 0;
         }
         else if (strcmp(command, "get") == 0)
@@ -272,6 +298,20 @@ uint8_t parseCommand()
             putsUart0("Getting \n");
             putsUart0("Address:");
             putsUart0(arg1);
+            putsUart0("Value \n");
+            uint8_t num = dmxData[atoi(arg1) - 1];
+            uint8_t i = 2;
+            char ch[] = {0,0,0};
+            while(num > 0){
+                ch[i--] = num % 10;
+                num /= 10;
+                //putcUart0((i+'0'));
+            }
+            for(i = 0; i < 3; ++i){
+                putcUart0(ch[i] + '0');
+            }
+
+
             return 0;
         }
         else if (strcmp(command, "max") == 0)
@@ -506,6 +546,31 @@ void Uart0Isr(void)
 
 }
 
+void animationRamp(){
+    if(woo == 1){
+            if(i>=255){
+                dec = 1;
+
+            }
+            if(i<=0){
+                dec = 0;
+            }
+            if(dec == 0){
+                dmxData[0] = i+=1;
+                                    dmxData[1] = i+=1;
+                                    dmxData[2] = i+=1;
+            }
+            else{
+            dmxData[0] = i-=1;
+                                dmxData[1] = i-=1;
+                                dmxData[2] = i-=1;
+            }
+            waitMicrosecond(80000);
+    }
+
+
+}
+
 //-----------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------
@@ -520,9 +585,10 @@ uint8_t main(void)
     GREEN_LED = 0;
     waitMicrosecond(250000);
 
-    dmxData[1] = 0;
-    dmxData[2] = 0;
-    dmxData[3] = 0;
+    dmxData[0] = 50;
+    dmxData[1] = 100;
+    dmxData[2] = 150;
+
 
     // Display greeting
     putsUart0("\nCommand\r\n");
@@ -532,8 +598,10 @@ uint8_t main(void)
     // For each received character, toggle the green LED
     // For each received "1", set the red LED
     // For each received "0", clear the red LED
+
+
     while (1)
     {
-
+        animationRamp();
     }
 }
