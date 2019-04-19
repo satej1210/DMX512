@@ -121,12 +121,12 @@ void initHw()
     UART1_IBRD_R = 10; // r = 40 MHz / (Nx115.2kHz), set floor(r)=21, where N=16
     UART1_FBRD_R = 0;
     UART1_LCRH_R = UART_LCRH_WLEN_8 | UART_LCRH_FEN | UART_LCRH_STP2;
-    UART1_CTL_R = UART_CTL_TXE | UART_CTL_UARTEN | UART_CTL_EOT;
+    UART1_CTL_R = UART_CTL_RXE | UART_CTL_TXE | UART_CTL_UARTEN | UART_CTL_EOT;
 
     UART0_IM_R = UART_IM_RXIM;                       // turn-on RX interrupt
     NVIC_EN0_R |= 1 << (INT_UART0 - 16);         // turn-on interrupt 21 (UART0)
 
-    UART1_IM_R = UART_IM_TXIM;
+    UART1_IM_R = UART_IM_TXIM | UART_IM_RXIM;
     NVIC_EN0_R |= 1 << (INT_UART1 - 16);
 //
 //    // Configure Timer 1 for keyboard service
@@ -161,14 +161,22 @@ void Uart1Isr(){
     if (mode == 1){
         if (UART1_RSR_R & 0x04 == 0x04){//get break bit){
             rxState = 1;
-            UART1_ECR_R = 0;
+
+            GREEN_LED = 1;
         }
         else if (rxState == 1 && UART1_DR_R == 0){
             rxState = 2;
         }
-        else if (rxState >= 2){
+        else if (rxState >= 2 && rxState < 512){
             dmxData[(rxState++) - 2] = UART1_DR_R;
+            if(rxState == 510){
+                GREEN_LED = 0;
+            }
         }
+        else{
+
+        }
+        UART1_ECR_R = 0;
     }
 }
 
@@ -559,7 +567,15 @@ void Uart0Isr(void)
     }
 
 }
+void wooone()
+{
+    int x =0;
+    for(x=0; x<512; x++)
+    {
+        dmxData[x] = 255;
+    }
 
+}
 void animationRamp(){
     if(woo == 1){
             if(i>=255){
@@ -616,6 +632,7 @@ uint8_t main(void)
 
     while (1)
     {
-        animationRamp();
+        wooone();
+        //animationRamp();
     }
 }
