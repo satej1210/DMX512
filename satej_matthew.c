@@ -31,9 +31,11 @@
 
 #define RED_LED      (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 1*4)))
 #define GREEN_LED    (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 3*4)))
+#define BLUE_LED     (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 2*4)))
 
 #define GREEN_LED_MASK 8
 #define RED_LED_MASK 2
+#define BLUE_LED_MASK 4
 
 #define delay4Cycles() __asm(" NOP\n NOP\n NOP\n NOP")
 
@@ -84,9 +86,9 @@ void initHw()
             | SYSCTL_RCGC2_GPIOF;
 
     // Configure LED pins
-    GPIO_PORTF_DIR_R = GREEN_LED_MASK | RED_LED_MASK; // bits 1 and 3 are outputs
-    GPIO_PORTF_DR2R_R = GREEN_LED_MASK | RED_LED_MASK; // set drive strength to 2mA (not needed since default configuration -- for clarity)
-    GPIO_PORTF_DEN_R = GREEN_LED_MASK | RED_LED_MASK;  // enable LEDs
+    GPIO_PORTF_DIR_R = BLUE_LED_MASK | GREEN_LED_MASK | RED_LED_MASK; // bits 1 and 3 are outputs
+    GPIO_PORTF_DR2R_R = BLUE_LED_MASK | GREEN_LED_MASK | RED_LED_MASK; // set drive strength to 2mA (not needed since default configuration -- for clarity)
+    GPIO_PORTF_DEN_R = BLUE_LED_MASK | GREEN_LED_MASK | RED_LED_MASK;  // enable LEDs
 
     // Configure UART0 pins
     GPIO_PORTA_DIR_R |= 2; // enable output on UART0 TX pin: default, added for clarity
@@ -120,8 +122,8 @@ void initHw()
     UART1_CC_R = UART_CC_CS_SYSCLK;                 // use system clock (40 MHz)
     UART1_IBRD_R = 10; // r = 40 MHz / (Nx115.2kHz), set floor(r)=21, where N=16
     UART1_FBRD_R = 0;
-    UART1_LCRH_R = UART_LCRH_WLEN_8 | UART_LCRH_FEN | UART_LCRH_STP2;
-    UART1_CTL_R = UART_CTL_RXE | UART_CTL_TXE | UART_CTL_UARTEN | UART_CTL_EOT;
+    UART1_LCRH_R = UART_LCRH_WLEN_8  | UART_LCRH_STP2;
+    UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN | UART_CTL_EOT;
 
     UART0_IM_R = UART_IM_RXIM;                       // turn-on RX interrupt
     NVIC_EN0_R |= 1 << (INT_UART0 - 16);         // turn-on interrupt 21 (UART0)
@@ -158,26 +160,37 @@ void Uart1Isr(){
 
         }
     }
-    if (mode == 1){
-        if (UART1_RSR_R & 0x04 == 0x04){//get break bit){
-            rxState = 1;
 
-            GREEN_LED = 1;
+
+
+    if (mode == 1){
+        //if(!(UART1_FR_R & UART_FR_RXFE)){
+
+        uint16_t U1_DR = UART1_DR_R;
+        uint8_t data = U1_DR & 0xFF;
+        if (U1_DR & 0x400 == 0x400){//get break bit){
+            rxState = 1;
+            UART1_ECR_R = 0;
+            BLUE_LED = 1;
         }
-        else if (rxState == 1 && UART1_DR_R == 0){
+        else if (rxState == 1 && data == 0){
             rxState = 2;
         }
-        else if (rxState >= 2 && rxState < 512){
-            dmxData[(rxState++) - 2] = UART1_DR_R;
-            if(rxState == 510){
-                GREEN_LED = 0;
+        else if (rxState >= 2 && rxState<=512){
+            dmxData[(rxState) - 2] = data;
+
+            rxState++;
+            if(rxState == 512){
+                BLUE_LED = 0;
+                rxState = 0;
             }
         }
-        else{
+        UART1_ICR_R = UART_ICR_RXIC;
+       // UART1_ECR_R = 0;
+        //}
 
-        }
-        UART1_ECR_R = 0;
     }
+
 }
 
 void putcUart1(uint8_t i)
@@ -282,6 +295,8 @@ uint8_t parseCommand()
     { //controller mode
         if (strcmp(command, "device") == 0)
         {
+            UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN | UART_CTL_EOT;
+            GPIO_PORTC_AFSEL_R |= 0x30;
             putsUart0("Device Mode\n");
             mode = 1;
             return 0;
@@ -378,6 +393,8 @@ uint8_t parseCommand()
         }
         else if (strcmp(command, "device") == 0)
         {
+            UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN | UART_CTL_EOT;
+                        GPIO_PORTC_AFSEL_R |= 0x30;
             putsUart0("Already in Device Mode\n");
             return 0;
         }
@@ -614,6 +631,7 @@ uint8_t main(void)
     waitMicrosecond(250000);
     GREEN_LED = 0;
     waitMicrosecond(250000);
+    BLUE_LED = 0;
 
     dmxData[0] = 00;
     dmxData[1] = 1;
