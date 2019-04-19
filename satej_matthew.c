@@ -51,6 +51,7 @@ int deviceModeAddress = 0;
 uint8_t continuous = 0;
 uint8_t mode = 1; //0-controller, 1-device
 uint16_t DMXMode = 0; //0-break, 1-Mark After Break, 3-start
+uint16_t rxState = 0;
 uint8_t woo = 0;
 
 //-----------------------------------------------------------------------------
@@ -155,6 +156,18 @@ void Uart1Isr(){
             changeTimerValue(176);
             TIMER1_CTL_R |= TIMER_CTL_TAEN;
 
+        }
+    }
+    if (mode == 1){
+        if (UART1_RSR_R & 0x04 == 0x04){//get break bit){
+            rxState = 1;
+            UART1_ECR_R = 0;
+        }
+        else if (rxState == 1 && UART1_DR_R == 0){
+            rxState = 2;
+        }
+        else if (rxState >= 2){
+            dmxData[(rxState++) - 2] = UART1_DR_R;
         }
     }
 }
@@ -586,9 +599,9 @@ uint8_t main(void)
     GREEN_LED = 0;
     waitMicrosecond(250000);
 
-    dmxData[0] = 50;
-    dmxData[1] = 100;
-    dmxData[2] = 150;
+    dmxData[0] = 00;
+    dmxData[1] = 1;
+    dmxData[2] = 2;
 
 
     // Display greeting
