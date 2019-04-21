@@ -123,12 +123,12 @@ void initHw()
     UART1_IBRD_R = 10; // r = 40 MHz / (Nx115.2kHz), set floor(r)=21, where N=16
     UART1_FBRD_R = 0;
     UART1_LCRH_R = UART_LCRH_WLEN_8  | UART_LCRH_STP2;
-    UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN | UART_CTL_EOT;
+    UART1_CTL_R = UART_CTL_TXE | UART_CTL_UARTEN | UART_CTL_EOT;
 
     UART0_IM_R = UART_IM_RXIM;                       // turn-on RX interrupt
     NVIC_EN0_R |= 1 << (INT_UART0 - 16);         // turn-on interrupt 21 (UART0)
 
-    UART1_IM_R = UART_IM_TXIM | UART_IM_RXIM;
+    UART1_IM_R = UART_IM_RXIM;
     NVIC_EN0_R |= 1 << (INT_UART1 - 16);
 //
 //    // Configure Timer 1 for keyboard service
@@ -144,6 +144,7 @@ void initHw()
 
 void Uart1Isr(){
     if (mode == 0){
+        //UART1_CTL_R = UART_CTL_TXE | UART_CTL_UARTEN | UART_CTL_EOT;
         if (DMXMode - 3 < maxAddress){
             UART1_DR_R = dmxData[DMXMode - 3];
             DMXMode++;
@@ -171,17 +172,19 @@ void Uart1Isr(){
         if (U1_DR & 0x400 == 0x400){//get break bit){
             rxState = 1;
             UART1_ECR_R = 0;
-            BLUE_LED = 1;
+            //BLUE_LED = 1;
+            GREEN_LED = 1;
         }
         else if (rxState == 1 && data == 0){
             rxState = 2;
+            GREEN_LED = 0;
         }
         else if (rxState >= 2 && rxState<=512){
             dmxData[(rxState) - 2] = data;
 
             rxState++;
             if(rxState == 512){
-                BLUE_LED = 0;
+                //BLUE_LED = 0;
                 rxState = 0;
             }
         }
@@ -228,7 +231,8 @@ void Timer1ISR(void)
         else if (DMXMode == 1)
         {
             //Mark After Break
-            GPIO_PORTC_DATA_R |= 0x20;
+
+        GPIO_PORTC_DATA_R |= 0x20;
             changeTimerValue(12); //For MAB
             DMXMode++;
         }
@@ -295,8 +299,10 @@ uint8_t parseCommand()
     { //controller mode
         if (strcmp(command, "device") == 0)
         {
-            UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN | UART_CTL_EOT;
+            UART1_IM_R = UART_IM_RXIM;
             GPIO_PORTC_AFSEL_R |= 0x30;
+            UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN;
+
             putsUart0("Device Mode\n");
             mode = 1;
             return 0;
@@ -373,7 +379,9 @@ uint8_t parseCommand()
         }
         else if (strcmp(command, "controller") == 0)
         {
+            UART1_IM_R = UART_IM_TXIM;
             putsUart0("Already in Controller Mode\n");
+
             return 0;
         }
         else
@@ -393,13 +401,16 @@ uint8_t parseCommand()
         }
         else if (strcmp(command, "device") == 0)
         {
-            UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN | UART_CTL_EOT;
-                        GPIO_PORTC_AFSEL_R |= 0x30;
+            GPIO_PORTC_AFSEL_R |= 0x30;
+            UART1_LCRH_R = UART_LCRH_WLEN_8  | UART_LCRH_STP2 ;
+            UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN;
+            UART1_IM_R = UART_IM_RXIM;
             putsUart0("Already in Device Mode\n");
             return 0;
         }
         else if (strcmp(command, "controller") == 0)
         {
+            UART1_IM_R = UART_IM_TXIM;
             putsUart0("Controller Mode\n");
             mode = 0;
             return 0;
@@ -621,7 +632,6 @@ void animationRamp(){
 //-----------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------
-
 uint8_t main(void)
 {
     // Initialize hardware
@@ -650,7 +660,14 @@ uint8_t main(void)
 
     while (1)
     {
-        wooone();
+        if(woo == 1)
+            wooone();
+        if(dmxData[0] != 0){
+            BLUE_LED=1;
+        }
+        else{
+            BLUE_LED=0;
+        }
         //animationRamp();
     }
 }
