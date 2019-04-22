@@ -62,13 +62,14 @@ uint8_t woo = 0;
 
 // Initialize Hardware
 
-
+void putsUart0(char* str);
 void initHw();
 void Uart1Isr();
 void Timer1ISR(void);
+void putcUart0(char i);
 void changeTimerValue(uint32_t us);
 uint8_t parseCommand();
-
+void putsUart0(char* str);
 
 
 void initHw()
@@ -169,9 +170,11 @@ void Uart1Isr(){
 
         uint16_t U1_DR = UART1_DR_R;
         uint8_t data = U1_DR & 0xFF;
+        putsUart0(data + '0');
+        putcUart0('\n');
         if (U1_DR & 0x400 == 0x400){//get break bit){
             rxState = 1;
-            UART1_ECR_R = 0;
+            //UART1_ECR_R = 0;
             //BLUE_LED = 1;
             GREEN_LED = 1;
         }
@@ -181,6 +184,7 @@ void Uart1Isr(){
         }
         else if (rxState >= 2 && rxState<=512){
             dmxData[(rxState) - 2] = data;
+
 
             rxState++;
             if(rxState == 512){
@@ -271,7 +275,7 @@ void Timer1ISR(void)
 // Blocking function that writes a serial character when the UART buffer is not full
 void putcUart0(char c)
 {
-    while (UART0_FR_R & UART_FR_TXFF)
+    //while (UART0_FR_R & UART_FR_TXFF)
         ;               // wait if uart0 tx fifo full
     UART0_DR_R = c;                                  // write character to fifo
 }
@@ -293,14 +297,19 @@ char getcUart0()
         return '\0';
 }
 
+uint8_t vall = 8;
+uint8_t incr = 1;
+
 uint8_t parseCommand()
 {
     if (mode == 0)
     { //controller mode
         if (strcmp(command, "device") == 0)
         {
+            UART1_IFLS_R = UART_IFLS_RX1_8;
             UART1_IM_R = UART_IM_RXIM;
             GPIO_PORTC_AFSEL_R |= 0x30;
+            UART1_LCRH_R = UART_LCRH_WLEN_8 | UART_LCRH_FEN | UART_LCRH_STP2 ;
             UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN;
 
             putsUart0("Device Mode\n");
@@ -326,6 +335,19 @@ uint8_t parseCommand()
             putsUart0("Cleared\n");
             return 0;
         }
+
+        else if (strcmp(command, "incr") == 0){
+            putsUart0("Setting \n");
+            putsUart0("Incr:");
+            putsUart0(arg1);
+            incr = atoi(arg1);
+        }
+        else if (strcmp(command, "val") == 0){
+                    putsUart0("Setting \n");
+                    putsUart0("val:");
+                    putsUart0(arg1);
+                    vall = atoi(arg1);
+                }
         else if (strcmp(command, "set") == 0)
         {
             putsUart0("Setting \n");
@@ -401,10 +423,14 @@ uint8_t parseCommand()
         }
         else if (strcmp(command, "device") == 0)
         {
-            GPIO_PORTC_AFSEL_R |= 0x30;
-            UART1_LCRH_R = UART_LCRH_WLEN_8  | UART_LCRH_STP2 ;
-            UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN;
+            UART1_IFLS_R = UART_IFLS_RX1_8;
             UART1_IM_R = UART_IM_RXIM;
+            GPIO_PORTC_AFSEL_R |= 0x30;
+            UART1_LCRH_R = UART_LCRH_WLEN_8 | UART_LCRH_FEN | UART_LCRH_STP2 ;
+            UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN;
+
+
+
             putsUart0("Already in Device Mode\n");
             return 0;
         }
@@ -598,9 +624,9 @@ void Uart0Isr(void)
 void wooone()
 {
     int x =0;
-    for(x=0; x<512; x++)
+    for(x=0; x<512; x+=incr)
     {
-        dmxData[x] = 255;
+        dmxData[x] = vall;
     }
 
 }
@@ -644,8 +670,8 @@ uint8_t main(void)
     BLUE_LED = 0;
 
     dmxData[0] = 00;
-    dmxData[1] = 1;
-    dmxData[2] = 2;
+    dmxData[1] = 0;
+    dmxData[2] = 0;
 
 
     // Display greeting
