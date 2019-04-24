@@ -1,7 +1,7 @@
 ******************************************************************************
                   TI ARM Linker PC v18.1.4                     
 ******************************************************************************
->> Linked Sun Apr 21 19:48:49 2019
+>> Linked Wed Apr 24 08:38:40 2019
 
 OUTPUT FILE NAME:   <DMX512.out>
 ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 000012f9
@@ -139,8 +139,8 @@ address   name
 0000139f  C$$EXIT                       
 2000044e  DMXMode                       
 0000138f  ResetISR                      
-000004f7  Timer1ISR                     
-00000c81  Uart0Isr                      
+000004f5  Timer1ISR                     
+00000c8d  Uart0Isr                      
 000003ab  Uart1Isr                      
 20000440  __STACK_END                   
 00000200  __STACK_SIZE                  
@@ -175,13 +175,13 @@ UNDEFED   __mpu_init
 UNDEFED   _system_post_cinit            
 0000139b  _system_pre_init              
 0000139f  abort                         
-00000f33  animationRamp                 
+00000f39  animationRamp                 
 20000200  arg1                          
 20000214  arg2                          
 00001269  atoi                          
 ffffffff  binit                         
-000004cd  changeTimerValue              
-00000a4d  clearStr                      
+000004cb  changeTimerValue              
+00000a59  clearStr                      
 20000228  command                       
 2000044c  continuous                    
 20000441  dec                           
@@ -189,30 +189,30 @@ ffffffff  binit
 20000000  dmxData                       
 20000442  enteringField                 
 00000000  g_pfnVectors                  
-000005f9  getcUart0                     
+00000601  getcUart0                     
 20000440  i                             
 20000454  incr                          
 0000026d  initHw                        
-00000ac5  isLetter                      
-00000b1d  isNumber                      
+00000ad1  isLetter                      
+00000b29  isNumber                      
 00000ff1  main                          
 20000444  maxAddress                    
 000010e9  memcpy                        
 0000118d  memset                        
 2000044d  mode                          
-000006a5  parseCommand                  
+000006b1  parseCommand                  
 20000443  pos                           
-00000585  putcUart0                     
-000004b1  putcUart1                     
-000005ad  putsUart0                     
+00000583  putcUart0                     
+000004af  putcUart1                     
+000005bd  putsUart0                     
 20000450  rxState                       
 00001331  strcmp                        
 00001349  strlen                        
 00001371  tolower                       
 20000453  vall                          
-00000b43  waitMicrosecond               
+00000b4f  waitMicrosecond               
 20000452  woo                           
-00000eff  wooone                        
+00000f0b  wooone                        
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -224,20 +224,20 @@ address   name
 00000200  __STACK_SIZE                  
 0000026d  initHw                        
 000003ab  Uart1Isr                      
-000004b1  putcUart1                     
-000004cd  changeTimerValue              
-000004f7  Timer1ISR                     
-00000585  putcUart0                     
-000005ad  putsUart0                     
-000005f9  getcUart0                     
-000006a5  parseCommand                  
-00000a4d  clearStr                      
-00000ac5  isLetter                      
-00000b1d  isNumber                      
-00000b43  waitMicrosecond               
-00000c81  Uart0Isr                      
-00000eff  wooone                        
-00000f33  animationRamp                 
+000004af  putcUart1                     
+000004cb  changeTimerValue              
+000004f5  Timer1ISR                     
+00000583  putcUart0                     
+000005bd  putsUart0                     
+00000601  getcUart0                     
+000006b1  parseCommand                  
+00000a59  clearStr                      
+00000ad1  isLetter                      
+00000b29  isNumber                      
+00000b4f  waitMicrosecond               
+00000c8d  Uart0Isr                      
+00000f0b  wooone                        
+00000f39  animationRamp                 
 00000ff1  main                          
 000010e9  __aeabi_memcpy                
 000010e9  __aeabi_memcpy4               
