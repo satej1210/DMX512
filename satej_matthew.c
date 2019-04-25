@@ -450,7 +450,7 @@ void getModeEE()
     mode = (uint16_t) EEPROM_EERDWR_R;
     delay6Cycles();
     EEPROM_EEBLOCK_R = 1;
-    EEPROM_EEOFFSET_R = 0;
+    EEPROM_EEOFFSET_R = 2;
     deviceModeAddress = (uint16_t) EEPROM_EERDWR_R;
 //    if(EEPROM_EERDWR_R == 0xFFFFFFFF)
 //    {
@@ -605,7 +605,7 @@ uint8_t parseCommand()
             putsUart0("\n\rDevice address set to: ");
             putsUart0(arg1);
             deviceModeAddress = atoi(arg1);
-            EEWRITE(1, 0, deviceModeAddress);
+            EEWRITE(1, 2, deviceModeAddress);
             return 0;
         }
         else if (strcmp(command, "device") == 0)
@@ -918,7 +918,7 @@ uint8_t main(void)
         GPIO_PORTC_DATA_R &= 0x9F;
         UART1_LCRH_R = UART_LCRH_WLEN_8 | UART_LCRH_STP2;
         UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN;
-        deviceModeAddress = 1;
+        //deviceModeAddress = 0;
 
     }
     else
@@ -927,7 +927,7 @@ uint8_t main(void)
         putsUart0("Controller");
         UART1_IM_R = UART_IM_TXIM;
         GPIO_PORTC_DATA_R &= 0xDF;
-        deviceModeAddress = 1;
+        //deviceModeAddress = 1;
     }
 
     putsUart0("\r\nCurrent Device Mode Address: ");
