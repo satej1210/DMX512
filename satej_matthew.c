@@ -33,11 +33,13 @@
 #define GREEN_LED    (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 3*4)))
 #define BLUE_LED     (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 2*4)))
 #define PUSH_BUTTON  (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 4*4)))
+#define PUSH_BUTTON2  (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 0*4)))
 
 #define GREEN_LED_MASK 8
 #define RED_LED_MASK 2
 #define BLUE_LED_MASK 4
 #define PUSH_BUTTON_MASK 16
+#define PUSH_BUTTON2_MASK 1
 
 #define delay4Cycles() __asm(" NOP\n NOP\n NOP\n NOP")
 #define delay1Cycle() __asm(" NOP\n")
@@ -94,16 +96,22 @@ void initHw()
 
     // Enable GPIO port A for UART0, port C for UART1 and port F peripherals
     SYSCTL_RCGC2_R = SYSCTL_RCGC2_GPIOA | SYSCTL_RCGC2_GPIOC
-            | SYSCTL_RCGC2_GPIOF;
+            | SYSCTL_RCGC2_GPIOF | SYSCTL_RCGC2_GPIOD;
 
     SYSCTL_RCGCEEPROM_R |= SYSCTL_RCGCEEPROM_R0;
 
+    GPIO_PORTF_LOCK_R = GPIO_LOCK_KEY;
+    GPIO_PORTF_CR_R |= 0x00000001;
+
+    GPIO_PORTD_DIR_R |= 0x00000007;
+    GPIO_PORTD_DEN_R |= 0x0000000F;
     // Configure LED pins
     GPIO_PORTF_DIR_R = GREEN_LED_MASK | BLUE_LED_MASK | RED_LED_MASK; // bits 1, 2, and 3 are outputs, other pins are inputs
     GPIO_PORTF_DR2R_R = GREEN_LED_MASK | BLUE_LED_MASK | RED_LED_MASK; // set drive strength to 2mA (not needed since default configuration -- for clarity)
-    GPIO_PORTF_DEN_R = PUSH_BUTTON_MASK | GREEN_LED_MASK | BLUE_LED_MASK
+    GPIO_PORTF_DEN_R = PUSH_BUTTON2_MASK | PUSH_BUTTON_MASK | GREEN_LED_MASK | BLUE_LED_MASK
             | RED_LED_MASK;  // enable LEDs and pushbuttons
-    GPIO_PORTF_PUR_R = PUSH_BUTTON_MASK; // enable internal pull-up for push button
+    GPIO_PORTF_PUR_R = PUSH_BUTTON2_MASK | PUSH_BUTTON_MASK; // enable internal pull-up for push button
+
     // Configure UART0 pins
     GPIO_PORTA_DIR_R |= 2; // enable output on UART0 TX pin: default, added for clarity
     GPIO_PORTA_DEN_R |= 3; // enable digital on UART0 pins: default, added for clarity
@@ -457,6 +465,14 @@ void EEWRITE(uint16_t B, uint16_t offSet, uint16_t val) //write to EEPROM at blo
     EEPROM_EERDWR_R = val;
 }
 
+void clearDMX(){
+    uint16_t i = 0;
+    for (i = 0; i < 512; ++i)
+                {
+                    dmxData[i] = 0;
+                }
+}
+
 uint8_t parseCommand()
 {
     if (mode == 1)
@@ -497,10 +513,7 @@ uint8_t parseCommand()
         {
             uint16_t i = 0;
 
-            for (i = 0; i < 512; ++i)
-            {
-                dmxData[i] = 0;
-            }
+            clearDMX();
 
             putsUart0("\n\rCleared.\n\r");
             return 0;
@@ -903,6 +916,25 @@ uint8_t main(void)
 
     while (1)
     {
+        if (!PUSH_BUTTON2){
+            uint8_t ix = 0;
+            deviceModeAddress = 0;
+            for (ix = 0; ix < 8; ++ix){
+                GPIO_PORTD_DATA_R = ix;
+                waitMicrosecond(100);
+                uint8_t d = GPIO_PORTD_DATA_R & 0x8;
+
+                deviceModeAddress +=  (d >> 3) << ix;
+
+
+            }
+            putsUart0(intToChar(deviceModeAddress));
+
+            putcUart0('\n');
+            putcUart0('\r');
+            waitMicrosecond(250000);
+        }
+
         if (!PUSH_BUTTON)
         {
             RGBMode ^= 1;
@@ -954,6 +986,8 @@ uint8_t main(void)
             animationRamp();
         else if (woo == 1)
             wooone();
+        else
+            clearDMX();
         if (RGBMode)
         {
             GPIO_PORTF_AFSEL_R |= 0x0F;
