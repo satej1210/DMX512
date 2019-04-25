@@ -57,6 +57,7 @@ int8_t pos = 0;
 uint16_t maxAddress = 512;
 uint16_t deviceModeAddress = 0;
 uint8_t continuous = 0;
+uint8_t prevRX = 0;
 uint8_t mode = 0, rxError = 0; //0-device, 1-controller
 uint16_t DMXMode = 0; //0-break, 1-Mark After Break, 3-start
 uint16_t rxState = 0;
@@ -150,7 +151,7 @@ void initHw()
     UART0_IM_R = UART_IM_RXIM;                       // turn-on RX interrupt
     NVIC_EN0_R |= 1 << (INT_UART0 - 16);         // turn-on interrupt 21 (UART0)
 
-    UART1_IM_R = UART_IM_RXIM;
+    UART1_IM_R = UART_IM_RXIM | UART_IM_TXIM;
     NVIC_EN0_R |= 1 << (INT_UART1 - 16);
 //
 //    // Configure Timer 1 for keyboard service
@@ -209,7 +210,7 @@ void initHw()
     // output 4 on PWM0, gen 2a, cmpa
     PWM1_3_GENB_R = PWM_1_GENB_ACTCMPBD_ZERO | PWM_1_GENB_ACTLOAD_ONE;
     // output 5 on PWM0, gen 2b, cmpb
-    PWM1_2_LOAD_R = 256; // set period to 40 MHz sys clock / 2 / 1024 = 19.53125 kHz
+    PWM1_2_LOAD_R = 256; // set period to 40 MHz sys clock / 2 / 256 = 8- kHz
     PWM1_3_LOAD_R = 256;
     PWM1_INVERT_R =
             PWM_INVERT_PWM5INV | PWM_INVERT_PWM6INV | PWM_INVERT_PWM7INV;
@@ -261,28 +262,34 @@ void Uart1Isr()
         }
         if (U1_DR & 0x400)
         {        //get break bit){
-            TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
+            changeTimer1Value(2000000);
+            TIMER1_CTL_R |= TIMER_CTL_TAEN;
+            //TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
             rxState = 1;
             rxError = 0;
+            prevRX = 0;
             //UART1_ECR_R = 0;
             //BLUE_LED = 1;
             GREEN_LED = 1;
         }
         else if (rxState == 1 && data == 0)
         {
+            prevRX = 1;
             rxState = 2;
             GREEN_LED = 0;
+
         }
         else if (rxState >= 2 && rxState <= 514)
         {
             dmxData[(rxState) - 2] = data;
-
+            prevRX = rxState;
             rxState++;
 
             if (rxState == 514)
             {
-                //BLUE_LED = 0;
                 GREEN_LED ^= 1;
+                //BLUE_LED = 0;
+
                 rxState = 0;
             }
         }
@@ -378,6 +385,10 @@ void Timer1ISR(void)
             changeTimer1Value(500000);
             GREEN_LED ^= 1;
 
+        }
+        else if (rxState == 1){
+            rxError = 0;
+            rxState = 0;
         }
     }
     TIMER1_ICR_R = TIMER_ICR_TATOCINT;
@@ -898,11 +909,25 @@ uint8_t main(void)
     putsUart0("\r\n\r\nCurrent Mode: ");
     if (mode == 0)
     {
+        mode = 0;
         putsUart0("Device");
+        TIMER1_CTL_R |= TIMER_CTL_TAEN;
+        UART1_IFLS_R = UART_IFLS_RX1_8;
+        UART1_IM_R = UART_IM_RXIM;
+        GPIO_PORTC_AFSEL_R |= 0x30;
+        GPIO_PORTC_DATA_R &= 0x9F;
+        UART1_LCRH_R = UART_LCRH_WLEN_8 | UART_LCRH_STP2;
+        UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN;
+        deviceModeAddress = 1;
+
     }
     else
     {
+        mode = 1;
         putsUart0("Controller");
+        UART1_IM_R = UART_IM_TXIM;
+        GPIO_PORTC_DATA_R &= 0xDF;
+        deviceModeAddress = 1;
     }
 
     putsUart0("\r\nCurrent Device Mode Address: ");
@@ -921,10 +946,10 @@ uint8_t main(void)
             deviceModeAddress = 0;
             for (ix = 0; ix < 8; ++ix){
                 GPIO_PORTD_DATA_R = ix;
-                waitMicrosecond(100);
+                waitMicrosecond(1000);
                 uint8_t d = GPIO_PORTD_DATA_R & 0x8;
 
-                deviceModeAddress +=  (d >> 3) << ix;
+                deviceModeAddress +=  (d >> 3);
 
 
             }
@@ -986,8 +1011,8 @@ uint8_t main(void)
             animationRamp();
         else if (woo == 1)
             wooone();
-        else
-            clearDMX();
+//        else if (woo == 0 && mode == 1)
+//            clearDMX();
         if (RGBMode)
         {
             GPIO_PORTF_AFSEL_R |= 0x0F;
