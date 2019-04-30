@@ -58,10 +58,11 @@ uint16_t maxAddress = 512;
 uint16_t deviceModeAddress = 0;
 uint8_t continuous = 0;
 uint8_t prevRX = 0;
-uint8_t mode = 0, rxError = 0; //0-device, 1-controller
+uint8_t mode = 0, rxError = 0; //0-device, 1-controller, 2-servo
 uint16_t DMXMode = 0; //0-break, 1-Mark After Break, 3-start
 uint16_t rxState = 0;
 uint8_t woo = 0;
+int servoDir = 0;
 
 //-----------------------------------------------------------------------------
 // Subroutines
@@ -107,10 +108,11 @@ void initHw()
     GPIO_PORTD_DIR_R |= 0x00000007;
     GPIO_PORTD_DEN_R |= 0x0000000F;
     // Configure LED pins
+    GPIO_PORTF_AFSEL_R = 0;
     GPIO_PORTF_DIR_R = GREEN_LED_MASK | BLUE_LED_MASK | RED_LED_MASK; // bits 1, 2, and 3 are outputs, other pins are inputs
     GPIO_PORTF_DR2R_R = GREEN_LED_MASK | BLUE_LED_MASK | RED_LED_MASK; // set drive strength to 2mA (not needed since default configuration -- for clarity)
-    GPIO_PORTF_DEN_R = PUSH_BUTTON2_MASK | PUSH_BUTTON_MASK | GREEN_LED_MASK | BLUE_LED_MASK
-            | RED_LED_MASK;  // enable LEDs and pushbuttons
+    GPIO_PORTF_DEN_R = PUSH_BUTTON2_MASK | PUSH_BUTTON_MASK | GREEN_LED_MASK
+            | BLUE_LED_MASK | RED_LED_MASK;  // enable LEDs and pushbuttons
     GPIO_PORTF_PUR_R = PUSH_BUTTON2_MASK | PUSH_BUTTON_MASK; // enable internal pull-up for push button
 
     // Configure UART0 pins
@@ -129,7 +131,7 @@ void initHw()
 
     // Configure UART0 to 115200 baud, 8N1 format
     SYSCTL_RCGCUART_R |= SYSCTL_RCGCUART_R1 | SYSCTL_RCGCUART_R0; // turn-on UART0, leave other UARTs in same status
-    SYSCTL_RCGCTIMER_R |= SYSCTL_RCGCTIMER_R1;
+    SYSCTL_RCGCTIMER_R |= SYSCTL_RCGCTIMER_R1 | SYSCTL_RCGCTIMER_R2;
 
     delay4Cycles();
     // wait 4 clock cycles
@@ -163,6 +165,15 @@ void initHw()
     NVIC_EN0_R |= 1 << (INT_TIMER1A - 16);     // turn-on interrupt 37 (TIMER1A)
     TIMER1_CTL_R |= TIMER_CTL_TAEN;                  // turn-on timer
 
+    TIMER2_CTL_R &= ~TIMER_CTL_TAEN;      // turn-off timer before reconfiguring
+    TIMER2_CFG_R = TIMER_CFG_32_BIT_TIMER;    // configure as 32-bit timer (A+B)
+    TIMER2_TAMR_R = TIMER_TAMR_TAMR_PERIOD; // configure for periodic mode (count down)
+    TIMER2_TAILR_R = 1000000; // set load value to 2e5 for 200 Hz interrupt rate
+
+    TIMER2_IMR_R = TIMER_IMR_TATOIM;                 // turn-on interrupts
+    NVIC_EN0_R |= 1 << (INT_TIMER2A - 16);     // turn-on interrupt 39 (TIMER2A)
+    TIMER2_CTL_R |= TIMER_CTL_TAEN;                  // turn-on timer
+
     //Initializing EEPROM
     delay6Cycles();
     while (EEPROM_EEDONE_R & 0x01)
@@ -192,6 +203,7 @@ void initHw()
 
     SYSCTL_RCGC0_R |= SYSCTL_RCGC0_PWM0;             // turn-on PWM1 module
     SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;
+    SYSCTL_RCC_R |= SYSCTL_RCC_USEPWMDIV | SYSCTL_RCC_PWMDIV_16;
     delay6Cycles();
     GPIO_PORTF_DIR_R |= 0x0E;   // make bits 1,2,3
     GPIO_PORTF_DR2R_R |= 0x0E;  // set drive strength to 2mA
@@ -210,10 +222,10 @@ void initHw()
     // output 4 on PWM0, gen 2a, cmpa
     PWM1_3_GENB_R = PWM_1_GENB_ACTCMPBD_ZERO | PWM_1_GENB_ACTLOAD_ONE;
     // output 5 on PWM0, gen 2b, cmpb
-    PWM1_2_LOAD_R = 256; // set period to 40 MHz sys clock / 2 / 256 = 8- kHz
-    PWM1_3_LOAD_R = 256;
+    PWM1_2_LOAD_R = 50000; // set period to 40 MHz sys clock / 2 / 256 = 80 kHz
+    PWM1_3_LOAD_R = 50000;
     PWM1_INVERT_R =
-            PWM_INVERT_PWM5INV | PWM_INVERT_PWM6INV | PWM_INVERT_PWM7INV;
+    PWM_INVERT_PWM5INV | PWM_INVERT_PWM6INV | PWM_INVERT_PWM7INV;
     // invert outputs so duty cycle increases with increasing compare values
     PWM1_2_CMPB_R = 0;               // red off (0=always low, 1023=always high)
     PWM1_3_CMPB_R = 0;                               // green off
@@ -257,7 +269,8 @@ void Uart1Isr()
         uint8_t data = U1_DR & 0xFF;
         //putsUart0(data + '0');
         //putcUart0('\n');
-        if (rxState == 0){
+        if (rxState == 0)
+        {
             TIMER1_CTL_R |= TIMER_CTL_TAEN;
         }
         if (U1_DR & 0x400)
@@ -293,7 +306,8 @@ void Uart1Isr()
                 rxState = 0;
             }
         }
-        else{
+        else
+        {
             rxState = 0;
         }
 
@@ -322,9 +336,122 @@ void changeTimer1Value(uint32_t us)
 }
 
 uint8_t seconds = 0;
+int upR, upG, upB;
+int goR, goG, goB;
+void Timer2ISR(void)
+{
+    if (woo == 2)
+    {
+        if (dmxData[deviceModeAddress - 1] == 0)
+        {
+            upR = 1;
+            goR = 1;
+            goG = 0;
+            goB = 0;
+        }
+        else if (dmxData[deviceModeAddress - 1] == 254)
+        {
+            upR = 0;
+            goR = 0;
+            goG = 1;
+            goB = 0;
+
+        }
+
+        if (dmxData[deviceModeAddress + 1 - 1] == 0)
+        {
+            upG = 1;
+            goR = 0;
+            goG = 1;
+            goB = 0;
+        }
+        else if (dmxData[deviceModeAddress + 1 - 1] == 254)
+        {
+            upG = 0;
+            goR = 0;
+            goG = 0;
+            goB = 1;
+        }
+
+        if (dmxData[deviceModeAddress + 2 - 1] == 0)
+        {
+            upB = 1;
+            goR = 0;
+            goG = 0;
+            goB = 1;
+        }
+        else if (dmxData[deviceModeAddress + 2 - 1] == 254)
+        {
+            upB = 0;
+            goR = 1;
+            goG = 0;
+            goB = 0;
+        }
+//        goR = 1;
+//        goG = 1;
+//        goB = 1;
+
+        if (goR)
+        {
+
+            if (upR)
+                dmxData[deviceModeAddress - 1] = (2
+                        + dmxData[deviceModeAddress - 1]) % 256;
+            else
+                dmxData[deviceModeAddress - 1] = (dmxData[deviceModeAddress - 1]
+                        - 2) % 256;
+        }
+        if (goG)
+        {
+            if (upG)
+                dmxData[deviceModeAddress + 1 - 1] = (2
+                        + dmxData[deviceModeAddress + 1 - 1]) % 256;
+            else
+                dmxData[deviceModeAddress + 1 - 1] = (dmxData[deviceModeAddress
+                        + 1 - 1] - 2) % 256;
+        }
+        if (goB)
+        {
+            if (upB)
+                dmxData[deviceModeAddress + 2 - 1] = (2
+                        + dmxData[deviceModeAddress + 2 - 1]) % 256;
+            else
+                dmxData[deviceModeAddress + 2 - 1] = (dmxData[deviceModeAddress
+                        + 2 - 1] - 2) % 256;
+        }
+
+    }
+
+    if (woo == 4)
+    {
+        if (servoDir == 0)
+        {
+            dmxData[deviceModeAddress + 0 - 1]--;
+        }
+        else
+        {
+            dmxData[deviceModeAddress + 0 - 1]++;
+        }
+
+    }
+
+    TIMER2_ICR_R = TIMER_ICR_TATOCINT;
+}
 
 void Timer1ISR(void)
 {
+    if (mode == 3 && GREEN_LED == 0)
+    {
+        GREEN_LED ^= 1;
+        changeTimer1Value(15000);
+
+    }
+    if (mode == 3 && GREEN_LED == 1)
+    {
+        GREEN_LED ^= 1;
+        changeTimer1Value(200000);
+
+    }
     if (mode == 1)
     {
         //using state machine-like interrupt handling
@@ -374,19 +501,23 @@ void Timer1ISR(void)
 
         // }
     }
-    if (mode == 0){
+    if (mode == 0)
+    {
 
-        if (rxState == 0 && !rxError){
+        if (rxState == 0 && !rxError)
+        {
             changeTimer1Value(2000000);
             TIMER1_CTL_R |= TIMER_CTL_TAEN;
             rxError = 1;
         }
-        else if (rxError){
+        else if (rxError)
+        {
             changeTimer1Value(500000);
             GREEN_LED ^= 1;
 
         }
-        else if (rxState == 1){
+        else if (rxState == 1)
+        {
             rxError = 0;
             rxState = 0;
         }
@@ -476,12 +607,13 @@ void EEWRITE(uint16_t B, uint16_t offSet, uint16_t val) //write to EEPROM at blo
     EEPROM_EERDWR_R = val;
 }
 
-void clearDMX(){
+void clearDMX()
+{
     uint16_t i = 0;
     for (i = 0; i < 512; ++i)
-                {
-                    dmxData[i] = 0;
-                }
+    {
+        dmxData[i] = 0;
+    }
 }
 
 uint8_t parseCommand()
@@ -513,6 +645,14 @@ uint8_t parseCommand()
             else if (woo == 2)
             {
                 putsUart0("\r\nRamp Animation :D\r\n");
+            }
+            else if (woo == 3)
+            {
+                putsUart0("\r\nServo Set :D\r\n");
+            }
+            else if (woo == 4)
+            {
+                putsUart0("\r\nServo Sweep :D\r\n");
             }
             else
             {
@@ -853,28 +993,55 @@ void wooone()
     }
 
 }
+
+void sweepServo()
+{
+    //uint8_t i = 0;
+    //PWM
+    if (woo == 3)
+    {
+        GPIO_PORTF_AFSEL_R |= 0x0F;
+        SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;
+        TIMER1_CTL_R |= TIMER_CTL_TAEN;
+        if (dmxData[deviceModeAddress + 0 - 1] * 100 >= 1400
+                && dmxData[deviceModeAddress + 0 - 1] * 100 <= 5800)
+        {
+            PWM1_2_CMPB_R = dmxData[deviceModeAddress + 0 - 1] * 100;
+        }
+
+    }
+    if (woo == 4)
+    {
+        GPIO_PORTF_AFSEL_R |= 0x0F;
+        SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;
+        TIMER1_CTL_R |= TIMER_CTL_TAEN;
+        if (dmxData[deviceModeAddress + 0 - 1] * 100 >= 1400
+                && dmxData[deviceModeAddress + 0 - 1] * 100 <= 5800)
+        {
+            PWM1_2_CMPB_R = dmxData[deviceModeAddress + 0 - 1] * 100;
+        }
+        else if (dmxData[deviceModeAddress + 0 - 1] * 100 < 1400)
+        {
+            servoDir = 1;
+        }
+        else if (dmxData[deviceModeAddress + 0 - 1] * 100 > 5800)
+        {
+            servoDir = 0;
+        }
+
+    }
+
+    else
+    {
+        TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
+    }
+}
+
 uint8_t up;
 void animationRamp()
 {
     uint16_t x;
-
-    if (dmxData[0] == 0)
-    {
-        up = 1;
-    }
-    if (dmxData[0] == 254)
-    {
-        up = 0;
-    }
-
-    for (x = 0; x < 512; ++x)
-    {
-        if (up)
-            dmxData[x] = (2 + dmxData[x]) % 256;
-        else
-            dmxData[x] = (dmxData[x] - 2) % 256;
-    }
-    waitMicrosecond(10000);
+    TIMER2_CTL_R = TIMER_CTL_TAEN;
 
 }
 
@@ -938,19 +1105,22 @@ uint8_t main(void)
     // For each received character, toggle the green LED
     // For each received "1", set the red LED
     // For each received "0", clear the red LED
-
+    int d = 500;
+    int dir = 0;
     while (1)
     {
-        if (!PUSH_BUTTON2){
+        //mode = 3;
+        if (!PUSH_BUTTON2)
+        {
             uint8_t ix = 0;
             deviceModeAddress = 0;
-            for (ix = 0; ix < 8; ++ix){
+            for (ix = 0; ix < 8; ++ix)
+            {
                 GPIO_PORTD_DATA_R = ix;
                 waitMicrosecond(1000);
                 uint8_t d = GPIO_PORTD_DATA_R & 0x8;
 
-                deviceModeAddress +=  (d >> 3);
-
+                deviceModeAddress += (d >> 3);
 
             }
             putsUart0(intToChar(deviceModeAddress));
@@ -1005,21 +1175,39 @@ uint8_t main(void)
 
         }
 
+        if (woo == 3 || woo == 4)
+        {
 
+            SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;
+            sweepServo();
 
+        }
+        else
+        {
+            SYSCTL_RCGCPWM_R |= ~SYSCTL_RCGCPWM_R1;
+            GPIO_PORTF_AFSEL_R = 0;
+            //dmxData[deviceModeAddress - 1] = 0;
+        }
         if (woo == 2)
             animationRamp();
-        else if (woo == 1)
+        else
+        {
+            TIMER2_CTL_R &= ~TIMER_CTL_TAEN;
+        }
+        if (woo == 1)
             wooone();
+
 //        else if (woo == 0 && mode == 1)
 //            clearDMX();
-        if (RGBMode)
+        if (RGBMode && woo != 3 && woo != 4)
         {
             GPIO_PORTF_AFSEL_R |= 0x0F;
             SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;
-            PWM1_2_CMPB_R = dmxData[deviceModeAddress + 0 - 1]; //red                           // red off (0=always low, 1023=always high)
-            PWM1_3_CMPA_R = dmxData[deviceModeAddress + 1 - 1]; //blue                           // green off
-            PWM1_3_CMPB_R = dmxData[deviceModeAddress + 2 - 1];    //green
+            PWM1_2_CMPB_R = dmxData[deviceModeAddress + 0 - 1] * 196; //red                           // red off (0=always low, 1023=always high)
+            // green off
+            PWM1_3_CMPB_R = dmxData[deviceModeAddress + 1 - 1] * 196;    //green
+
+            PWM1_3_CMPA_R = dmxData[deviceModeAddress + 2 - 1] * 196; //blue
 
         }
         else
@@ -1033,6 +1221,23 @@ uint8_t main(void)
                 BLUE_LED = 0;
             }
         }
+//        if (dir == 0){
+//            d-=1;
+//        }
+//        else{
+//            d+=1;
+//        }
+//        if(d <= 500){
+//            dir = 1;
+//        }
+//        if(d >= 2000){
+//            dir = 0;
+//        }
+//
+//        GREEN_LED = 1;
+//        waitMicrosecond(d);
+//        GREEN_LED = 0;
+//        waitMicrosecond(5000 - d);
 
     }
 }
