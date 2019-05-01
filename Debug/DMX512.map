@@ -1,33 +1,33 @@
 ******************************************************************************
                   TI ARM Linker PC v18.1.4                     
 ******************************************************************************
->> Linked Tue Apr 30 14:58:31 2019
+>> Linked Tue Apr 30 18:45:57 2019
 
 OUTPUT FILE NAME:   <DMX512.out>
-ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 00001fb9
+ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 00002499
 
 
 MEMORY CONFIGURATION
 
          name            origin    length      used     unused   attr    fill
 ----------------------  --------  ---------  --------  --------  ----  --------
-  FLASH                 00000000   00040000  000021a3  0003de5d  R  X
-  SRAM                  20000000   00008000  00000474  00007b8c  RW X
+  FLASH                 00000000   00040000  000026bb  0003d945  R  X
+  SRAM                  20000000   00008000  00000487  00007b79  RW X
 
 
 SEGMENT ALLOCATION MAP
 
 run origin  load origin   length   init length attrs members
 ----------  ----------- ---------- ----------- ----- -------
-00000000    00000000    000021a8   000021a8    r-x
+00000000    00000000    000026c0   000026c0    r-x
   00000000    00000000    0000026c   0000026c    r-- .intvecs
-  0000026c    0000026c    00001df6   00001df6    r-x .text
-  00002062    00002062    00000101   00000101    r-- .const
-  00002168    00002168    00000040   00000040    r-- .cinit
-20000000    20000000    00000474   00000000    rw-
+  0000026c    0000026c    0000230e   0000230e    r-x .text
+  0000257a    0000257a    00000101   00000101    r-- .const
+  00002680    00002680    00000040   00000040    r-- .cinit
+20000000    20000000    00000487   00000000    rw-
   20000000    20000000    00000258   00000000    rw- .bss
   20000258    20000258    00000200   00000000    rw- .stack
-  20000458    20000458    0000001c   00000000    rw- .data
+  20000458    20000458    0000002f   00000000    rw- .data
 
 
 SECTION ALLOCATION MAP
@@ -38,33 +38,35 @@ section   page    origin      length       input sections
 .intvecs   0    00000000    0000026c     
                   00000000    0000026c     tm4c123gh6pm_startup_ccs.obj (.intvecs)
 
-.text      0    0000026c    00001df6     
-                  0000026c    00001bb8     satej_matthew.obj (.text)
-                  00001e24    0000009c     rtsv7M4_T_le_v4SPD16_eabi.lib : memcpy_t2.asm.obj (.text)
-                  00001ec0    00000068                                   : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
-                  00001f28    0000004c                                   : atoi.c.obj (.text:atoi)
-                  00001f74    00000044                                   : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit:__TI_auto_init_nobinit_nopinit)
-                  00001fb8    00000038                                   : boot_cortex_m.c.obj (.text:_c_int00_noargs:_c_int00_noargs)
-                  00001ff0    00000018                                   : strcmp.c.obj (.text:strcmp)
-                  00002008    00000014                                   : strlen.c.obj (.text:strlen)
-                  0000201c    00000012                                   : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset:__TI_zero_init_nomemset)
-                  0000202e    00000002     --HOLE-- [fill = 0]
-                  00002030    00000010                                   : tolower.c.obj (.text:tolower)
-                  00002040    0000000e                                   : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
-                  0000204e    0000000c     tm4c123gh6pm_startup_ccs.obj (.text)
-                  0000205a    00000004     rtsv7M4_T_le_v4SPD16_eabi.lib : pre_init.c.obj (.text:_system_pre_init)
-                  0000205e    00000004                                   : exit.c.obj (.text:abort:abort)
+.text      0    0000026c    0000230e     
+                  0000026c    00001e74     satej_matthew.obj (.text)
+                  000020e0    000001b6     rtsv7M4_T_le_v4SPD16_eabi.lib : fd_add_t2.asm.obj (.text)
+                  00002296    0000009c                                   : memcpy_t2.asm.obj (.text)
+                  00002332    0000006e                                   : fd_tos_t2.asm.obj (.text)
+                  000023a0    00000068                                   : copy_decompress_lzss.c.obj (.text:decompress:lzss:__TI_decompress_lzss)
+                  00002408    0000004c                                   : atoi.c.obj (.text:atoi)
+                  00002454    00000044                                   : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit:__TI_auto_init_nobinit_nopinit)
+                  00002498    00000038                                   : boot_cortex_m.c.obj (.text:_c_int00_noargs:_c_int00_noargs)
+                  000024d0    00000038                                   : fs_tod_t2.asm.obj (.text)
+                  00002508    00000018                                   : strcmp.c.obj (.text:strcmp)
+                  00002520    00000014                                   : strlen.c.obj (.text:strlen)
+                  00002534    00000012                                   : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset:__TI_zero_init_nomemset)
+                  00002546    00000002     --HOLE-- [fill = 0]
+                  00002548    00000010                                   : tolower.c.obj (.text:tolower)
+                  00002558    0000000e                                   : copy_decompress_none.c.obj (.text:decompress:none:__TI_decompress_none)
+                  00002566    0000000c     tm4c123gh6pm_startup_ccs.obj (.text)
+                  00002572    00000004     rtsv7M4_T_le_v4SPD16_eabi.lib : pre_init.c.obj (.text:_system_pre_init)
+                  00002576    00000004                                   : exit.c.obj (.text:abort:abort)
 
-.const     0    00002062    00000101     
-                  00002062    00000101     rtsv7M4_T_le_v4SPD16_eabi.lib : ctype.c.obj (.const:.string:_ctypes_)
+.const     0    0000257a    00000101     
+                  0000257a    00000101     rtsv7M4_T_le_v4SPD16_eabi.lib : ctype.c.obj (.const:.string:_ctypes_)
 
-.cinit     0    00002168    00000040     
-                  00002168    00000015     (.cinit..data.load) [load image, compression = lzss]
-                  0000217d    00000003     --HOLE-- [fill = 0]
-                  00002180    0000000c     (__TI_handler_table)
-                  0000218c    00000004     --HOLE-- [fill = 0]
-                  00002190    00000008     (.cinit..bss.load) [load image, compression = zero_init]
-                  00002198    00000010     (__TI_cinit_table)
+.cinit     0    00002680    00000040     
+                  00002680    0000001b     (.cinit..data.load) [load image, compression = lzss]
+                  0000269b    00000001     --HOLE-- [fill = 0]
+                  0000269c    0000000c     (__TI_handler_table)
+                  000026a8    00000008     (.cinit..bss.load) [load image, compression = zero_init]
+                  000026b0    00000010     (__TI_cinit_table)
 
 .init_array 
 *          0    00000000    00000000     UNINITIALIZED
@@ -82,8 +84,8 @@ section   page    origin      length       input sections
                   20000250    00000004     (.common:upG)
                   20000254    00000004     (.common:upR)
 
-.data      0    20000458    0000001c     UNINITIALIZED
-                  20000458    0000001c     satej_matthew.obj (.data)
+.data      0    20000458    0000002f     UNINITIALIZED
+                  20000458    0000002f     satej_matthew.obj (.data)
 
 .stack     0    20000258    00000200     UNINITIALIZED
                   20000258    00000004     rtsv7M4_T_le_v4SPD16_eabi.lib : boot_cortex_m.c.obj (.stack)
@@ -94,18 +96,21 @@ MODULE SUMMARY
        Module                         code   ro data   rw data
        ------                         ----   -------   -------
     .\
-       satej_matthew.obj              7096   0         628    
+       satej_matthew.obj              7796   0         647    
        tm4c123gh6pm_startup_ccs.obj   12     620       0      
     +--+------------------------------+------+---------+---------+
-       Total:                         7108   620       628    
+       Total:                         7808   620       647    
                                                               
     C:\ti\ccsv8\tools\compiler\ti-cgt-arm_18.1.4.LTS\lib\rtsv7M4_T_le_v4SPD16_eabi.lib
+       fd_add_t2.asm.obj              438    0         0      
        ctype.c.obj                    0      257       0      
        memcpy_t2.asm.obj              156    0         0      
+       fd_tos_t2.asm.obj              110    0         0      
        copy_decompress_lzss.c.obj     104    0         0      
        atoi.c.obj                     76     0         0      
        autoinit.c.obj                 68     0         0      
        boot_cortex_m.c.obj            56     0         0      
+       fs_tod_t2.asm.obj              56     0         0      
        strcmp.c.obj                   24     0         0      
        strlen.c.obj                   20     0         0      
        copy_zero_init.c.obj           18     0         0      
@@ -114,24 +119,24 @@ MODULE SUMMARY
        exit.c.obj                     4      0         0      
        pre_init.c.obj                 4      0         0      
     +--+------------------------------+------+---------+---------+
-       Total:                         560    257       0      
+       Total:                         1164   257       0      
                                                               
        Stack:                         0      0         512    
-       Linker Generated:              0      57        0      
+       Linker Generated:              0      63        0      
     +--+------------------------------+------+---------+---------+
-       Grand Total:                   7668   934       1140   
+       Grand Total:                   8972   940       1159   
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 00002198 records: 2, size/record: 8, table size: 16
-	.data: load addr=00002168, load size=00000015 bytes, run addr=20000458, run size=0000001c bytes, compression=lzss
-	.bss: load addr=00002190, load size=00000008 bytes, run addr=20000000, run size=00000258 bytes, compression=zero_init
+__TI_cinit_table @ 000026b0 records: 2, size/record: 8, table size: 16
+	.data: load addr=00002680, load size=0000001b bytes, run addr=20000458, run size=0000002f bytes, compression=lzss
+	.bss: load addr=000026a8, load size=00000008 bytes, run addr=20000000, run size=00000258 bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 00002180 records: 3, size/record: 4, table size: 12
+__TI_handler_table @ 0000269c records: 3, size/record: 4, table size: 12
 	index: 0, handler: __TI_decompress_lzss
 	index: 1, handler: __TI_decompress_none
 	index: 2, handler: __TI_zero_init
@@ -141,95 +146,103 @@ GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name
 
 address   name                          
 -------   ----                          
-0000205f  C$$EXIT                       
-20000464  DMXMode                       
-00000ce1  EEWRITE                       
-20000473  RGBMode                       
-0000204f  ResetISR                      
-00000aad  Timer1ISR                     
-00000871  Timer2ISR                     
-0000157b  Uart0Isr                      
+00002577  C$$EXIT                       
+2000046c  DMXMode                       
+00000e3b  EEWRITE                       
+20000486  RGBMode                       
+00002567  ResetISR                      
+00000bed  Timer1ISR                     
+0000087d  Timer2ISR                     
+00001821  Uart0Isr                      
 00000619  Uart1Isr                      
 20000458  __STACK_END                   
 00000200  __STACK_SIZE                  
 20000458  __STACK_TOP                   
-00002198  __TI_CINIT_Base               
-000021a8  __TI_CINIT_Limit              
-00002180  __TI_Handler_Table_Base       
-0000218c  __TI_Handler_Table_Limit      
-00001f75  __TI_auto_init_nobinit_nopinit
-00001ec1  __TI_decompress_lzss          
-00002041  __TI_decompress_none          
+000026b0  __TI_CINIT_Base               
+000026c0  __TI_CINIT_Limit              
+0000269c  __TI_Handler_Table_Base       
+000026a8  __TI_Handler_Table_Limit      
+00002455  __TI_auto_init_nobinit_nopinit
+000023a1  __TI_decompress_lzss          
+00002559  __TI_decompress_none          
 ffffffff  __TI_pprof_out_hndl           
 ffffffff  __TI_prof_data_size           
 ffffffff  __TI_prof_data_start          
 00000000  __TI_static_base__            
-0000201d  __TI_zero_init_nomemset       
-00001e25  __aeabi_memcpy                
-00001e25  __aeabi_memcpy4               
-00001e25  __aeabi_memcpy8               
+00002535  __TI_zero_init_nomemset       
+00002333  __aeabi_d2f                   
+000020eb  __aeabi_dadd                  
+000020e1  __aeabi_dsub                  
+000024d1  __aeabi_f2d                   
+00002297  __aeabi_memcpy                
+00002297  __aeabi_memcpy4               
+00002297  __aeabi_memcpy8               
 ffffffff  __binit__                     
 ffffffff  __c_args__                    
 UNDEFED   __mpu_init                    
 20000258  __stack                       
-00001fb9  _c_int00_noargs               
-00002062  _ctypes_                      
+00002499  _c_int00_noargs               
+0000257a  _ctypes_                      
 UNDEFED   _system_post_cinit            
-0000205b  _system_pre_init              
-0000205f  abort                         
-000019c9  animationRamp                 
+00002573  _system_pre_init              
+00002577  abort                         
+00001c75  animationRamp                 
 20000200  arg1                          
 20000214  arg2                          
-00001f29  atoi                          
+00002409  atoi                          
 ffffffff  binit                         
 2000023c  ch                            
 000007b1  changeTimer1Value             
-00000d0d  clearDMX                      
-0000117d  clearStr                      
+00000e7d  clearDMX                      
+00001481  clearStr                      
 20000228  command                       
 20000460  continuous                    
 20000459  dec                           
 2000045e  deviceModeAddress             
+2000047a  dimEnd                        
+20000478  dimStart                      
+2000047c  dimValue                      
 20000000  dmxData                       
 2000045a  enteringField                 
 00000000  g_pfnVectors                  
-00000c97  getModeEE                     
-00000c7f  getcUart0                     
+00000df1  getModeEE                     
+00000dbb  getcUart0                     
 20000240  goB                           
 20000244  goG                           
 20000248  goR                           
 20000458  i                             
-20000472  incr                          
+20000485  incr                          
 0000026d  initHw                        
-00000bd5  intToChar                     
-00001245  isLetter                      
-0000129d  isNumber                      
-00001a05  main                          
+00000d11  intToChar                     
+00001511  isLetter                      
+000015b1  isNumber                      
+00001cb1  main                          
 2000045c  maxAddress                    
-00001e25  memcpy                        
-20000462  mode                          
-00000d91  parseCommand                  
+00002297  memcpy                        
+20000469  mode                          
+00000efd  parseCommand                  
 2000045b  pos                           
-20000461  prevRX                        
-00001375  printCommandList              
-00000c2d  putcUart0                     
+20000468  prevRX                        
+00001615  printCommandList              
+00000d69  putcUart0                     
 00000795  putcUart1                     
-00000c4d  putsUart0                     
-20000463  rxError                       
-20000466  rxState                       
-20000470  seconds                       
-2000046c  servoDir                      
-00001ff1  strcmp                        
-00002009  strlen                        
-000018ad  sweepServo                    
-00002031  tolower                       
+00000d89  putsUart0                     
+2000046a  rxError                       
+2000046e  rxState                       
+20000480  seconds                       
+20000464  secondsTrigger                
+20000474  servoDir                      
+00002509  strcmp                        
+00002521  strlen                        
+00001b55  sweepServo                    
+00002549  tolower                       
 2000024c  upB                           
 20000250  upG                           
 20000254  upR                           
-20000471  vall                          
-000013f1  waitMicrosecond               
-20000468  woo                           
-0000184b  wooone                        
+20000484  vall                          
+00001655  waitMicrosecond               
+20000470  woo                           
+00001af3  wooone                        
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -243,48 +256,52 @@ address   name
 00000619  Uart1Isr                      
 00000795  putcUart1                     
 000007b1  changeTimer1Value             
-00000871  Timer2ISR                     
-00000aad  Timer1ISR                     
-00000bd5  intToChar                     
-00000c2d  putcUart0                     
-00000c4d  putsUart0                     
-00000c7f  getcUart0                     
-00000c97  getModeEE                     
-00000ce1  EEWRITE                       
-00000d0d  clearDMX                      
-00000d91  parseCommand                  
-0000117d  clearStr                      
-00001245  isLetter                      
-0000129d  isNumber                      
-00001375  printCommandList              
-000013f1  waitMicrosecond               
-0000157b  Uart0Isr                      
-0000184b  wooone                        
-000018ad  sweepServo                    
-000019c9  animationRamp                 
-00001a05  main                          
-00001e25  __aeabi_memcpy                
-00001e25  __aeabi_memcpy4               
-00001e25  __aeabi_memcpy8               
-00001e25  memcpy                        
-00001ec1  __TI_decompress_lzss          
-00001f29  atoi                          
-00001f75  __TI_auto_init_nobinit_nopinit
-00001fb9  _c_int00_noargs               
-00001ff1  strcmp                        
-00002009  strlen                        
-0000201d  __TI_zero_init_nomemset       
-00002031  tolower                       
-00002041  __TI_decompress_none          
-0000204f  ResetISR                      
-0000205b  _system_pre_init              
-0000205f  C$$EXIT                       
-0000205f  abort                         
-00002062  _ctypes_                      
-00002180  __TI_Handler_Table_Base       
-0000218c  __TI_Handler_Table_Limit      
-00002198  __TI_CINIT_Base               
-000021a8  __TI_CINIT_Limit              
+0000087d  Timer2ISR                     
+00000bed  Timer1ISR                     
+00000d11  intToChar                     
+00000d69  putcUart0                     
+00000d89  putsUart0                     
+00000dbb  getcUart0                     
+00000df1  getModeEE                     
+00000e3b  EEWRITE                       
+00000e7d  clearDMX                      
+00000efd  parseCommand                  
+00001481  clearStr                      
+00001511  isLetter                      
+000015b1  isNumber                      
+00001615  printCommandList              
+00001655  waitMicrosecond               
+00001821  Uart0Isr                      
+00001af3  wooone                        
+00001b55  sweepServo                    
+00001c75  animationRamp                 
+00001cb1  main                          
+000020e1  __aeabi_dsub                  
+000020eb  __aeabi_dadd                  
+00002297  __aeabi_memcpy                
+00002297  __aeabi_memcpy4               
+00002297  __aeabi_memcpy8               
+00002297  memcpy                        
+00002333  __aeabi_d2f                   
+000023a1  __TI_decompress_lzss          
+00002409  atoi                          
+00002455  __TI_auto_init_nobinit_nopinit
+00002499  _c_int00_noargs               
+000024d1  __aeabi_f2d                   
+00002509  strcmp                        
+00002521  strlen                        
+00002535  __TI_zero_init_nomemset       
+00002549  tolower                       
+00002559  __TI_decompress_none          
+00002567  ResetISR                      
+00002573  _system_pre_init              
+00002577  C$$EXIT                       
+00002577  abort                         
+0000257a  _ctypes_                      
+0000269c  __TI_Handler_Table_Base       
+000026a8  __TI_Handler_Table_Limit      
+000026b0  __TI_CINIT_Base               
+000026c0  __TI_CINIT_Limit              
 20000000  dmxData                       
 20000200  arg1                          
 20000214  arg2                          
@@ -306,17 +323,21 @@ address   name
 2000045c  maxAddress                    
 2000045e  deviceModeAddress             
 20000460  continuous                    
-20000461  prevRX                        
-20000462  mode                          
-20000463  rxError                       
-20000464  DMXMode                       
-20000466  rxState                       
-20000468  woo                           
-2000046c  servoDir                      
-20000470  seconds                       
-20000471  vall                          
-20000472  incr                          
-20000473  RGBMode                       
+20000464  secondsTrigger                
+20000468  prevRX                        
+20000469  mode                          
+2000046a  rxError                       
+2000046c  DMXMode                       
+2000046e  rxState                       
+20000470  woo                           
+20000474  servoDir                      
+20000478  dimStart                      
+2000047a  dimEnd                        
+2000047c  dimValue                      
+20000480  seconds                       
+20000484  vall                          
+20000485  incr                          
+20000486  RGBMode                       
 ffffffff  __TI_pprof_out_hndl           
 ffffffff  __TI_prof_data_size           
 ffffffff  __TI_prof_data_start          
@@ -326,4 +347,4 @@ ffffffff  binit
 UNDEFED   __mpu_init                    
 UNDEFED   _system_post_cinit            
 
-[89 symbols]
+[97 symbols]

@@ -57,12 +57,17 @@ int8_t pos = 0;
 uint16_t maxAddress = 512;
 uint16_t deviceModeAddress = 0;
 uint8_t continuous = 0;
+float secondsTrigger = 0.0;
 uint8_t prevRX = 0;
 uint8_t mode = 0, rxError = 0; //0-device, 1-controller, 2-servo
 uint16_t DMXMode = 0; //0-break, 1-Mark After Break, 3-start
 uint16_t rxState = 0;
 uint8_t woo = 0;
 int servoDir = 0;
+
+uint16_t dimStart = 0;
+uint16_t dimEnd = 0;
+float dimValue = 0;
 
 //-----------------------------------------------------------------------------
 // Subroutines
@@ -168,7 +173,7 @@ void initHw()
     TIMER2_CTL_R &= ~TIMER_CTL_TAEN;      // turn-off timer before reconfiguring
     TIMER2_CFG_R = TIMER_CFG_32_BIT_TIMER;    // configure as 32-bit timer (A+B)
     TIMER2_TAMR_R = TIMER_TAMR_TAMR_PERIOD; // configure for periodic mode (count down)
-    TIMER2_TAILR_R = 1000000; // set load value to 2e5 for 200 Hz interrupt rate
+    TIMER2_TAILR_R = 3000000; //10000000; // set load value to 2e5 for 200 Hz interrupt rate
 
     TIMER2_IMR_R = TIMER_IMR_TATOIM;                 // turn-on interrupts
     NVIC_EN0_R |= 1 << (INT_TIMER2A - 16);     // turn-on interrupt 39 (TIMER2A)
@@ -335,23 +340,26 @@ void changeTimer1Value(uint32_t us)
     TIMER1_CTL_R |= TIMER_CTL_TAEN;
 }
 
-uint8_t seconds = 0;
+float seconds = 0;
 int upR, upG, upB;
 int goR, goG, goB;
 void Timer2ISR(void)
 {
+
     if (woo == 2)
     {
         if (dmxData[deviceModeAddress - 1] == 0)
         {
             upR = 1;
-            goR = 1;
-            goG = 0;
+            dmxData[deviceModeAddress - 1] = 2;
+            goR = 0;
+            goG = 1;
             goB = 0;
         }
-        else if (dmxData[deviceModeAddress - 1] == 254)
+        if (dmxData[deviceModeAddress - 1] == 254)
         {
             upR = 0;
+            dmxData[deviceModeAddress - 1] = 252;
             goR = 0;
             goG = 1;
             goB = 0;
@@ -361,13 +369,15 @@ void Timer2ISR(void)
         if (dmxData[deviceModeAddress + 1 - 1] == 0)
         {
             upG = 1;
+            dmxData[deviceModeAddress + 1 - 1] = 2;
             goR = 0;
-            goG = 1;
-            goB = 0;
+            goG = 0;
+            goB = 1;
         }
-        else if (dmxData[deviceModeAddress + 1 - 1] == 254)
+        if (dmxData[deviceModeAddress + 1 - 1] == 254)
         {
             upG = 0;
+            dmxData[deviceModeAddress + 1 - 1] = 252;
             goR = 0;
             goG = 0;
             goB = 1;
@@ -376,13 +386,15 @@ void Timer2ISR(void)
         if (dmxData[deviceModeAddress + 2 - 1] == 0)
         {
             upB = 1;
-            goR = 0;
+            dmxData[deviceModeAddress + 2 - 1] = 2;
+            goR = 1;
             goG = 0;
-            goB = 1;
+            goB = 0;
         }
-        else if (dmxData[deviceModeAddress + 2 - 1] == 254)
+        if (dmxData[deviceModeAddress + 2 - 1] == 254)
         {
             upB = 0;
+            dmxData[deviceModeAddress + 2 - 1] = 252;
             goR = 1;
             goG = 0;
             goB = 0;
@@ -433,6 +445,30 @@ void Timer2ISR(void)
             dmxData[deviceModeAddress + 0 - 1]++;
         }
 
+    }
+
+    if (woo == 5)
+    {
+        // changeTimer2Value();
+        seconds += 0.1;
+        dimValue -= (dimStart - dimEnd) / secondsTrigger / 10;
+        dmxData[deviceModeAddress - 1] = dimValue;
+        if (dimStart - dimEnd > 0)
+        {
+            if (dimValue < dimEnd){
+            putsUart0("Done Ramp\n\r");
+            dmxData[deviceModeAddress - 1] = dimEnd;
+            woo = 0;
+            }
+        }
+        if (dimStart - dimEnd < 0)
+                {
+                    if (dimValue > dimEnd){
+                    putsUart0("Done Ramp\n\r");
+                    dmxData[deviceModeAddress - 1] = dimEnd;
+                    woo = 0;
+                    }
+                }
     }
 
     TIMER2_ICR_R = TIMER_ICR_TATOCINT;
@@ -635,6 +671,29 @@ uint8_t parseCommand()
             EEWRITE(0, 2, 0);
             return 0;
         }
+        if (strcmp(command, "seconds") == 0)
+        {
+            putsUart0("\n\rSetting:");
+            putsUart0("\n\r Seconds:");
+
+            putsUart0(arg1);
+            secondsTrigger = atoi(arg1);
+            return 0;
+        }
+        if (strcmp(command, "startend") == 0)
+        {
+            putsUart0("\n\rSetting:");
+            putsUart0("\n\r Start:");
+
+            putsUart0(arg1);
+            dimStart = atoi(arg1);
+            putsUart0("\n\rSetting:");
+            putsUart0("\n\r End:");
+
+            putsUart0(arg2);
+            dimEnd = atoi(arg2);
+            return 0;
+        }
         else if (strcmp(command, "woo") == 0)
         {
             woo = atoi(arg1);
@@ -653,6 +712,20 @@ uint8_t parseCommand()
             else if (woo == 4)
             {
                 putsUart0("\r\nServo Sweep :D\r\n");
+            }
+            else if (woo == 5)
+            {
+                TIMER2_CTL_R |= TIMER_CTL_TAEN;
+                putsUart0("\r\nRamping\r\n");
+                putsUart0("\n\r Start:");
+
+                putsUart0(intToChar(dimStart));
+
+                putsUart0("\n\rSetting:");
+                putsUart0("\n\r End:");
+
+                putsUart0(intToChar(dimEnd));
+                dimValue = dimStart;
             }
             else
             {
@@ -704,6 +777,7 @@ uint8_t parseCommand()
 
             return 0;
         }
+
         else if (strcmp(command, "max") == 0)
         {
             putsUart0("\n\rSetting Max to ");
@@ -1002,7 +1076,7 @@ void sweepServo()
     {
         GPIO_PORTF_AFSEL_R |= 0x0F;
         SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;
-        TIMER1_CTL_R |= TIMER_CTL_TAEN;
+        TIMER2_CTL_R |= TIMER_CTL_TAEN;
         if (dmxData[deviceModeAddress + 0 - 1] * 100 >= 1400
                 && dmxData[deviceModeAddress + 0 - 1] * 100 <= 5800)
         {
@@ -1014,7 +1088,7 @@ void sweepServo()
     {
         GPIO_PORTF_AFSEL_R |= 0x0F;
         SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;
-        TIMER1_CTL_R |= TIMER_CTL_TAEN;
+        TIMER2_CTL_R |= TIMER_CTL_TAEN;
         if (dmxData[deviceModeAddress + 0 - 1] * 100 >= 1400
                 && dmxData[deviceModeAddress + 0 - 1] * 100 <= 5800)
         {
@@ -1196,6 +1270,10 @@ uint8_t main(void)
         }
         if (woo == 1)
             wooone();
+        if (woo == 5)
+        {
+            TIMER2_CTL_R |= TIMER_CTL_TAEN;
+        }
 
 //        else if (woo == 0 && mode == 1)
 //            clearDMX();
