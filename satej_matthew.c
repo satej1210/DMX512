@@ -1191,10 +1191,10 @@ uint8_t main(void)
             for (ix = 0; ix < 8; ++ix)
             {
                 GPIO_PORTD_DATA_R = ix;
-                waitMicrosecond(1000);
+                waitMicrosecond(10000);
                 uint8_t d = GPIO_PORTD_DATA_R & 0x8;
 
-                deviceModeAddress += (d >> 3);
+                deviceModeAddress += (d >> 4);
 
             }
             putsUart0(intToChar(deviceModeAddress));
@@ -1202,6 +1202,9 @@ uint8_t main(void)
             putcUart0('\n');
             putcUart0('\r');
             waitMicrosecond(250000);
+            if (deviceModeAddress == 0){
+                deviceModeAddress++;
+            }
         }
 
         if (!PUSH_BUTTON)
