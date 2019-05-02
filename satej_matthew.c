@@ -1,27 +1,40 @@
-// DMX-512 controller and receiver
+/**
+ * @file satej_matthew.c
+ * @author Satej Mhatre, Matthew Hilliard
+ * @date 1 May 2019
+ * @brief File containing everything for the DMX Controller Receiver Project. <br>
+ * For CSE 4342: Embedded II Spring 2019 <br>
+ * Instructor: Dr. Jason Losh<br>
+ * Hardware Target:
+ * -----------------------------------------------------------------------------
+ * Target Platform: EK-TM4C123GXL Evaluation Board <br>
+ * Target uC:       TM4C123GH6PM<br>
+ * System Clock:    40 MHz<br>
+ * Hardware configuration:
+ * -----------------------------------------------------------------------------
+ * Red LED:<br>
+ *   PF1 drives an NPN transistor that powers the red LED<br>
+ * Blue LED:<br>
+ *   PF2 drives an NPN transistor that powers the green LED<br>
+ * Green LED:<br>
+ *   PF3 drives an NPN transistor that powers the green LED<br>
+ * UART Interface:<br>
+ *   U0TX (PA1) and U0RX (PA0) are connected to the 2nd controller<br>
+ *   U1TX (PA1) and U1RX (PA0) are used for DMX Data Transmit and Receive<br>
+ * Other Interface:<br>
+ *   PD0, PD1, PD2, PD3 is connected to a mux that reads the value from a DIP switch<br>
+ *   PF1, PF2, PF3 are also configured as PWM outputs to control servos and LEDs on-board.<br>
+ * To Do:<br>
+ *   PD6, PD7 will be connected to a ESP8266-01 that will serve a webpage for UART communication so that launchpad can be controlled without
+ *   physically using a USB cable.<br>
+ * The USB on the 2nd controller enumerates to an ICDI interface and a virtual COM port<br>
+ * Configured to 115,200 baud, 8N1<br>
+ */
 
-//-----------------------------------------------------------------------------
-// Hardware Target
-//-----------------------------------------------------------------------------
-
-// Target Platform: EK-TM4C123GXL Evaluation Board
-// Target uC:       TM4C123GH6PM
-// System Clock:    40 MHz
-
-// Hardware configuration:
-// Red LED:
-//   PF1 drives an NPN transistor that powers the red LED
-// Green LED:
-//   PF3 drives an NPN transistor that powers the green LED
-// UART Interface:
-//   U0TX (PA1) and U0RX (PA0) are connected to the 2nd controller
-//   The USB on the 2nd controller enumerates to an ICDI interface and a virtual COM port
-//   Configured to 115,200 baud, 8N1
 
 //-----------------------------------------------------------------------------
 // Device includes, defines, and assembler directives
 //-----------------------------------------------------------------------------
-
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -30,51 +43,115 @@
 #include "tm4c123gh6pm.h"
 
 #define RED_LED      (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 1*4)))
+/*!< Bit banding for PORTF1 Red LED */
+
 #define GREEN_LED    (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 3*4)))
+/*!< Bit banding for PORTF3 GREEN LED */
+
 #define BLUE_LED     (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 2*4)))
+/*!< Bit banding for PORTF2 Blue LED */
+
 #define PUSH_BUTTON  (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 4*4)))
+/*!< Bit banding for PORTF4 PushButton 1 */
+
 #define PUSH_BUTTON2  (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 0*4)))
+/*!< Bit banding for PORTF0 PushButton 0 */
+
 
 #define GREEN_LED_MASK 8
+/*!< GPIO PORTF Green LED Mask */
+
 #define RED_LED_MASK 2
+/*!< GPIO PORTF Red LED Mask */
+
 #define BLUE_LED_MASK 4
+/*!< GPIO PORTF Blue LED Mask */
+
 #define PUSH_BUTTON_MASK 16
+/*!< GPIO PORTF Push Button 1 Mask */
+
 #define PUSH_BUTTON2_MASK 1
+/*!< GPIO PORTF Push Button 2 Mask */
+
 
 #define delay4Cycles() __asm(" NOP\n NOP\n NOP\n NOP")
-#define delay1Cycle() __asm(" NOP\n")
-#define delay6Cycles() __asm(" NOP\n NOP\n NOP\n NOP\n NOP\n NOP\n")
+/*!< Delaying for 4 cycles */
 
-uint8_t dmxData[512];
+#define delay1Cycle() __asm(" NOP\n")
+/*!< Delaying for 1 cycle */
+
+#define delay6Cycles() __asm(" NOP\n NOP\n NOP\n NOP\n NOP\n NOP\n")
+/*!< Delaying for 6 cycles */
 
 uint8_t i = 0;
 uint8_t dec = 0;
-char command[20];
-char arg1[20];
-char arg2[20];
-int8_t enteringField = 0; //0-command, 1-arg1, 2-arg2
-int8_t pos = 0;
-uint16_t maxAddress = 512;
-uint16_t deviceModeAddress = 0;
-uint8_t continuous = 0;
-float secondsTrigger = 0.0;
+uint8_t up;
+
+/*
+ * UART0 Global Variables
+ * ========================
+ */
+
+char command[20]; /*!< To Store characters from UART0 command*/
+char arg1[20]; /*!< To Store characters from UART0 command 1st Argument*/
+char arg2[20]; /*!< To Store characters from UART0 command 2nd Argument*/
+int8_t enteringField = 0; /*!< Iterates over the different command fields while entering a command. 0: Command, 1: 1st Argument, 2: 2nd Argument*/
+int8_t pos = 0; /*!< Position of the character in the entering field. */
+
+/*
+ * DMX Transmit Global Variables
+ * ========================
+ */
+
+uint16_t maxAddress = 512; /*!< Maximum Number of DMX Bins to Transmit. */
+uint8_t continuous = 0; /*!< Flag to indicate whether transmit of DMX is enabled or not. */
+uint16_t DMXMode = 0; /*!< Mode to indicate what is being transmitted. 0: Break, 1: Mark After Break, 2: Start Code, > 2: DMX Data bins */
+
+/*
+ * DMX Receive Global Variables
+ * ========================
+ */
+
+uint16_t deviceModeAddress = 0; /*!< Device Address of the Current Receiver */
 uint8_t prevRX = 0;
-uint8_t mode = 0, rxError = 0; //0-device, 1-controller, 2-servo
-uint16_t DMXMode = 0; //0-break, 1-Mark After Break, 3-start
-uint16_t rxState = 0;
-uint8_t woo = 0;
-int servoDir = 0;
+uint8_t rxError = 0; /*!< Flag to indicate whether the receiver is in error state, ie, has not received a break in 2 secs. */
+uint16_t rxState = 0; /*!< Mode to indicate what is being received. 0: Break, 1: Mark After Break, 2: Start Code, > 2: DMX Data bins. */
 
-uint16_t dimStart = 0;
-uint16_t dimEnd = 0;
-float dimValue = 0;
+/*
+ * DMX Special Functions Global Variables
+ * ========================
+ *
+ */
 
-//-----------------------------------------------------------------------------
-// Subroutines
-//-----------------------------------------------------------------------------
+float seconds = 0; /*!< Used by special ramp function to indicate current second count. Timer counts up seconds every 100ms. (not very accurate) */
+int upR, upG, upB; /*!< Used by special ramp function for ramping logic */
+int goR, goG, goB; /*!< Used by special ramp function for ramping logic */
+float secondsTrigger = 0.0; /*!< Used for special ramp function to indicate the number of seconds to complete ramp. */
+uint16_t dimStart = 0; /*!< Used for special ramp function to indicate the start value. */
+uint16_t dimEnd = 0; /*!< Used for special ramp function to indicate the stop value of ramp function. */
+float dimValue = 0; /*!< Used for special ramp function to indicate the current ramp value at time t. */
+uint8_t woo = 0; /*!< Variable to indicate what special function is running. 0: Nothing, 1: Sets all addresses to 255
+ , 2: Ramp Animation using Timer2, 3: Set servo angle ([14,58] -> [0,180] degrees), 4: Sweep Servo from 0-180-0, 5: Special Timer
+ based ramp control. */
+int servoDir = 0; /*!< Used by servoSweep to indicate direction of sweep. */
+char ch[3]; /*!< For storing integer to character */
+uint8_t vall = 8; /*!< For EEPROM Data */
+uint8_t incr = 1; /*!< For EEPROM Data */
+uint16_t program, Address, opMode, setval; /*!< For EEPROM Data */
 
-// Initialize Hardware
+/*
+ * Launchpad Control Global Variables
+ * ========================
+ */
+uint8_t mode = 0; /*!< Indicates the current mode of the launchpad. 0: Device, 1: Controller. */
+uint8_t dmxData[512]; /*!< Array to store bins of DMX data. */
+uint8_t RGBMode = 0; /*!< Flag to indicate whether in 1: full device mode or 0: normal device mode. (Full device mode: Onboard R,G,B LED has address 1,2,3 wrt device Address)
+ normal device mode: device will function according to specifications.*/
 
+/*
+ * Function Definitions
+ * ========================
+ */
 void animationRamp();
 void clearStr();
 char getcUart0();
@@ -91,28 +168,57 @@ void wooone();
 void putsUart0(char*);
 void changeTimer1Value(uint32_t);
 
+/*
+ * Subroutines
+ * ========================
+ */
+
+/**
+ * @brief
+ *
+ * Function to initialize all required hardware functions
+ */
 void initHw()
 {
-    // Configure HW to work with 16 MHz XTAL, PLL enabled, system clock of 40 MHz
+
+    /**
+     *    Configure HW to work with 16 MHz XTAL, PLL enabled, system clock of 40 MHz
+     */
     SYSCTL_RCC_R = SYSCTL_RCC_XTAL_16MHZ | SYSCTL_RCC_OSCSRC_MAIN
             | SYSCTL_RCC_USESYSDIV | (4 << SYSCTL_RCC_SYSDIV_S);
 
-    // Set GPIO ports to use APB (not needed since default configuration -- for clarity)
-    // Note UART on port A must use APB
+    /**
+     *    Set GPIO ports to use APB (not needed since default configuration -- for clarity)
+     * Note UART on port A must use APB
+     */
     SYSCTL_GPIOHBCTL_R = 0;
 
-    // Enable GPIO port A for UART0, port C for UART1 and port F peripherals
+    /**
+     *   Enable GPIO port A for UART0, port C for UART1 and port F peripherals, and PORTD for DIP Switch
+     */
     SYSCTL_RCGC2_R = SYSCTL_RCGC2_GPIOA | SYSCTL_RCGC2_GPIOC
             | SYSCTL_RCGC2_GPIOF | SYSCTL_RCGC2_GPIOD;
 
+    /**
+     *  Give clock to EEPROM
+     */
     SYSCTL_RCGCEEPROM_R |= SYSCTL_RCGCEEPROM_R0;
 
+    /**
+     *  Unlock PORTF pin that is configured by default for NMI
+     */
     GPIO_PORTF_LOCK_R = GPIO_LOCK_KEY;
     GPIO_PORTF_CR_R |= 0x00000001;
 
+    /**
+     *  Configure pins for DIP Switch Reading
+     */
     GPIO_PORTD_DIR_R |= 0x00000007;
     GPIO_PORTD_DEN_R |= 0x0000000F;
-    // Configure LED pins
+
+    /**
+     *  Configure LED Pins on PORTF
+     */
     GPIO_PORTF_AFSEL_R = 0;
     GPIO_PORTF_DIR_R = GREEN_LED_MASK | BLUE_LED_MASK | RED_LED_MASK; // bits 1, 2, and 3 are outputs, other pins are inputs
     GPIO_PORTF_DR2R_R = GREEN_LED_MASK | BLUE_LED_MASK | RED_LED_MASK; // set drive strength to 2mA (not needed since default configuration -- for clarity)
@@ -120,34 +226,45 @@ void initHw()
             | BLUE_LED_MASK | RED_LED_MASK;  // enable LEDs and pushbuttons
     GPIO_PORTF_PUR_R = PUSH_BUTTON2_MASK | PUSH_BUTTON_MASK; // enable internal pull-up for push button
 
-    // Configure UART0 pins
+    /**
+     *  Configure UART0
+     */
     GPIO_PORTA_DIR_R |= 2; // enable output on UART0 TX pin: default, added for clarity
     GPIO_PORTA_DEN_R |= 3; // enable digital on UART0 pins: default, added for clarity
     GPIO_PORTA_AFSEL_R |= 3; // use peripheral to drive PA0, PA1: default, added for clarity
     GPIO_PORTA_PCTL_R &= 0xFFFFFF00;       // set fields for PA0 and PA1 to zero
-    GPIO_PORTA_PCTL_R |= GPIO_PCTL_PA1_U0TX | GPIO_PCTL_PA0_U0RX;
-    // select UART0 to drive pins PA0 and PA1: default, added for clarity
+    GPIO_PORTA_PCTL_R |= GPIO_PCTL_PA1_U0TX | GPIO_PCTL_PA0_U0RX; // select UART0 to drive pins PA0 and PA1: default, added for clarity
 
+    /**
+     *  Configure PORTC for UART1 Transmit
+     */
     GPIO_PORTC_DIR_R |= 0x60;
     GPIO_PORTC_DEN_R |= 0x70;
     GPIO_PORTC_AFSEL_R |= 0x30;
-    //GPIO_PORTC_PCTL_R &= 0xFFFFFF00;
     GPIO_PORTC_PCTL_R |= GPIO_PCTL_PC5_U1TX | GPIO_PCTL_PC4_U1RX;
 
-    // Configure UART0 to 115200 baud, 8N1 format
-    SYSCTL_RCGCUART_R |= SYSCTL_RCGCUART_R1 | SYSCTL_RCGCUART_R0; // turn-on UART0, leave other UARTs in same status
+    /**
+     *  Give clock to UART0, UART1, TIMER1, TIMER2
+     */
+    SYSCTL_RCGCUART_R |= SYSCTL_RCGCUART_R1 | SYSCTL_RCGCUART_R0; // turn-on UART0,1 , leave other UARTs in same status
     SYSCTL_RCGCTIMER_R |= SYSCTL_RCGCTIMER_R1 | SYSCTL_RCGCTIMER_R2;
 
     delay4Cycles();
     // wait 4 clock cycles
+
+    /**
+     * Configuring UART0
+     */
     UART0_CTL_R = 0;                 // turn-off UART0 to allow safe programming
     UART0_CC_R = UART_CC_CS_SYSCLK;                 // use system clock (40 MHz)
     UART0_IBRD_R = 21; // r = 40 MHz / (Nx115.2kHz), set floor(r)=21, where N=16
     UART0_FBRD_R = 45;                               // round(fract(r)*64)=45
     UART0_LCRH_R = UART_LCRH_WLEN_8; // configure for 8N1 w/ 16-level FIFO
-    UART0_CTL_R = UART_CTL_TXE | UART_CTL_RXE | UART_CTL_UARTEN;
-    // enable TX, RX, and module
+    UART0_CTL_R = UART_CTL_TXE | UART_CTL_RXE | UART_CTL_UARTEN; // enable TX, RX, and module
 
+    /**
+     * Configuring UART1
+     */
     UART1_CTL_R = 0;
     UART1_CC_R = UART_CC_CS_SYSCLK;                 // use system clock (40 MHz)
     UART1_IBRD_R = 10; // r = 40 MHz / (Nx115.2kHz), set floor(r)=21, where N=16
@@ -160,8 +277,10 @@ void initHw()
 
     UART1_IM_R = UART_IM_RXIM | UART_IM_TXIM;
     NVIC_EN0_R |= 1 << (INT_UART1 - 16);
-//
-//    // Configure Timer 1 for keyboard service
+
+    /**
+     * Configuring Timer 1 for DMX Transmit and Receive
+     */
     TIMER1_CTL_R &= ~TIMER_CTL_TAEN;      // turn-off timer before reconfiguring
     TIMER1_CFG_R = TIMER_CFG_32_BIT_TIMER;    // configure as 32-bit timer (A+B)
     TIMER1_TAMR_R = TIMER_TAMR_TAMR_PERIOD; // configure for periodic mode (count down)
@@ -170,6 +289,9 @@ void initHw()
     NVIC_EN0_R |= 1 << (INT_TIMER1A - 16);     // turn-on interrupt 37 (TIMER1A)
     TIMER1_CTL_R |= TIMER_CTL_TAEN;                  // turn-on timer
 
+    /**
+     * Configuring Timer 2 for DMX Transmit and Receive
+     */
     TIMER2_CTL_R &= ~TIMER_CTL_TAEN;      // turn-off timer before reconfiguring
     TIMER2_CFG_R = TIMER_CFG_32_BIT_TIMER;    // configure as 32-bit timer (A+B)
     TIMER2_TAMR_R = TIMER_TAMR_TAMR_PERIOD; // configure for periodic mode (count down)
@@ -179,10 +301,11 @@ void initHw()
     NVIC_EN0_R |= 1 << (INT_TIMER2A - 16);     // turn-on interrupt 39 (TIMER2A)
     TIMER2_CTL_R |= TIMER_CTL_TAEN;                  // turn-on timer
 
-    //Initializing EEPROM
+    /**
+     * EEPROM initialize and configuration from datasheet
+     */
     delay6Cycles();
-    while (EEPROM_EEDONE_R & 0x01)
-        ;
+    while (EEPROM_EEDONE_R & 0x01);
 
     if (EEPROM_EESUPP_R & EEPROM_EESUPP_PRETRY
             || EEPROM_EESUPP_R & EEPROM_EESUPP_ERETRY)
@@ -206,32 +329,32 @@ void initHw()
         exit(0);
     }
 
-    SYSCTL_RCGC0_R |= SYSCTL_RCGC0_PWM0;             // turn-on PWM1 module
-    SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;
-    SYSCTL_RCC_R |= SYSCTL_RCC_USEPWMDIV | SYSCTL_RCC_PWMDIV_16;
-    delay6Cycles();
+    /**
+     * Configuring PWM and PORTF for LEDs and Servo Control
+     */
+    SYSCTL_RCGC0_R |= SYSCTL_RCGC0_PWM0;            // turn-on PWM1 module
+    SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;          // enable clock for PWM
+    SYSCTL_RCC_R |= SYSCTL_RCC_USEPWMDIV | SYSCTL_RCC_PWMDIV_16; // use SysClk / 16 for PWM clock
+
     GPIO_PORTF_DIR_R |= 0x0E;   // make bits 1,2,3
     GPIO_PORTF_DR2R_R |= 0x0E;  // set drive strength to 2mA
     GPIO_PORTF_DEN_R |= 0x0E;   // enable bits 1,2,3 digital
-    //GPIO_PORTF_AFSEL_R |= 0x0E; // select auxilary function for bits 1, 2 and 3
     GPIO_PORTF_PCTL_R |= GPIO_PCTL_PF1_M1PWM5 | GPIO_PCTL_PF2_M1PWM6
-            | GPIO_PCTL_PF3_M1PWM7;
-    // SYSCTL_SRPWM_R = SYSCTL_SRPWM_R0;                // reset PWM0 module
-    SYSCTL_SRPWM_R = 0;                              // leave reset state
-    PWM1_1_CTL_R = 0;
-    PWM1_2_CTL_R = 0;                               // turn-off PWM0 generator 1
-    PWM1_3_CTL_R = 0;                               // turn-off PWM0 generator 2
-    PWM1_2_GENB_R = PWM_1_GENB_ACTCMPBD_ZERO | PWM_1_GENB_ACTLOAD_ONE;
-    // output 3 on PWM0, gen 1b, cmpb
-    PWM1_3_GENA_R = PWM_1_GENA_ACTCMPAD_ZERO | PWM_1_GENA_ACTLOAD_ONE;
-    // output 4 on PWM0, gen 2a, cmpa
-    PWM1_3_GENB_R = PWM_1_GENB_ACTCMPBD_ZERO | PWM_1_GENB_ACTLOAD_ONE;
-    // output 5 on PWM0, gen 2b, cmpb
-    PWM1_2_LOAD_R = 50000; // set period to 40 MHz sys clock / 2 / 256 = 80 kHz
-    PWM1_3_LOAD_R = 50000;
+            | GPIO_PCTL_PF3_M1PWM7;  //Use PORTF 1,2,3 as PWM Outputs.
+
+    SYSCTL_SRPWM_R = 0;                             // leave reset state
+    PWM1_1_CTL_R = 0;                               // turn-off PWM1 generator 2
+    PWM1_2_CTL_R = 0;                               // turn-off PWM1 generator 2
+    PWM1_3_CTL_R = 0;                               // turn-off PWM1 generator 3
+
+    PWM1_2_GENB_R = PWM_1_GENB_ACTCMPBD_ZERO | PWM_1_GENB_ACTLOAD_ONE; // output 3 on PWM0, gen 1b, cmpb
+    PWM1_3_GENA_R = PWM_1_GENA_ACTCMPAD_ZERO | PWM_1_GENA_ACTLOAD_ONE; // output 4 on PWM0, gen 2a, cmpa
+    PWM1_3_GENB_R = PWM_1_GENB_ACTCMPBD_ZERO | PWM_1_GENB_ACTLOAD_ONE; // output 5 on PWM0, gen 2b, cmpb
+
+    PWM1_2_LOAD_R = 50000; // set period to 40 MHz sys clock / 16 / 50000 = 50Hz for servo control
+    PWM1_3_LOAD_R = 50000; // set period to 40 MHz sys clock / 16 / 50000 = 50Hz for servo control
     PWM1_INVERT_R =
-    PWM_INVERT_PWM5INV | PWM_INVERT_PWM6INV | PWM_INVERT_PWM7INV;
-    // invert outputs so duty cycle increases with increasing compare values
+    PWM_INVERT_PWM5INV | PWM_INVERT_PWM6INV | PWM_INVERT_PWM7INV; // invert outputs so duty cycle increases with increasing compare values
     PWM1_2_CMPB_R = 0;               // red off (0=always low, 1023=always high)
     PWM1_3_CMPB_R = 0;                               // green off
     PWM1_3_CMPA_R = 0;                               // blue off
@@ -242,11 +365,17 @@ void initHw()
 
 }
 
+/**
+ * @brief
+ *
+ * Function to Handle Interrupts from UART1
+ */
 void Uart1Isr()
 {
+
+    //For controller mode
     if (mode == 1)
     {
-        //UART1_CTL_R = UART_CTL_TXE | UART_CTL_UARTEN | UART_CTL_EOT;
         if (DMXMode - 3 < maxAddress)
         {
             UART1_DR_R = dmxData[DMXMode - 3];
@@ -266,37 +395,40 @@ void Uart1Isr()
         }
     }
 
+    //For device mode
     if (UART1_MIS_R & UART_MIS_RXMIS)
     {
-        //if(!(UART1_FR_R & UART_FR_RXFE)){
 
         uint16_t U1_DR = UART1_DR_R;
         uint8_t data = U1_DR & 0xFF;
-        //putsUart0(data + '0');
-        //putcUart0('\n');
+
+        //enable error Timer if rxState is 0; blinks green LED after 2 seconds if no activity.
         if (rxState == 0)
         {
             TIMER1_CTL_R |= TIMER_CTL_TAEN;
         }
+
+        //if you get break bit
         if (U1_DR & 0x400)
-        {        //get break bit){
+        {
             changeTimer1Value(2000000);
             TIMER1_CTL_R |= TIMER_CTL_TAEN;
-            //TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
             rxState = 1;
             rxError = 0;
             prevRX = 0;
-            //UART1_ECR_R = 0;
-            //BLUE_LED = 1;
             GREEN_LED = 1;
         }
+
+        //ignore mark after break
+        //get start bit
         else if (rxState == 1 && data == 0)
         {
             prevRX = 1;
             rxState = 2;
-            GREEN_LED = 0;
 
         }
+
+        //get dmx data
         else if (rxState >= 2 && rxState <= 514)
         {
             dmxData[(rxState) - 2] = data;
@@ -306,33 +438,41 @@ void Uart1Isr()
             if (rxState == 514)
             {
                 GREEN_LED ^= 1;
-                //BLUE_LED = 0;
-
                 rxState = 0;
             }
         }
+
+        //turn on error state if no data
         else
         {
             rxState = 0;
         }
-
-        //
-        //}
 
     }
     UART1_ICR_R = 0;
 
 }
 
+/**
+ * @brief
+ *
+ * Function to send characters to UART0
+ */
 void putcUart1(uint8_t i)
 {
-    while (UART1_FR_R & UART_FR_TXFF)
-        ;               // wait if uart0 tx fifo full
+
+    while (UART1_FR_R & UART_FR_TXFF);               // wait if uart0 tx fifo full
     UART1_DR_R = i;                                  // write character to fifo
 }
 
+/**
+ * @brief
+ *
+ * Function to change load value of Timer1
+ */
 void changeTimer1Value(uint32_t us)
 {
+
     TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
     TIMER1_TAILR_R = us * 40;             // turn-off timer before reconfiguring
     // reset interrupt
@@ -340,9 +480,11 @@ void changeTimer1Value(uint32_t us)
     TIMER1_CTL_R |= TIMER_CTL_TAEN;
 }
 
-float seconds = 0;
-int upR, upG, upB;
-int goR, goG, goB;
+/**
+ * @brief
+ *
+ * Function to Handle Interrupts from Timer2
+ */
 void Timer2ISR(void)
 {
 
@@ -399,9 +541,6 @@ void Timer2ISR(void)
             goG = 0;
             goB = 0;
         }
-//        goR = 1;
-//        goG = 1;
-//        goB = 1;
 
         if (goR)
         {
@@ -449,33 +588,40 @@ void Timer2ISR(void)
 
     if (woo == 5)
     {
-        // changeTimer2Value();
         seconds += 0.1;
         dimValue -= (dimStart - dimEnd) / secondsTrigger / 10;
         dmxData[deviceModeAddress - 1] = dimValue;
         if (dimStart - dimEnd > 0)
         {
-            if (dimValue < dimEnd){
-            putsUart0("Done Ramp\n\r");
-            dmxData[deviceModeAddress - 1] = dimEnd;
-            woo = 0;
+            if (dimValue < dimEnd)
+            {
+                putsUart0("Done Ramp\n\r");
+                dmxData[deviceModeAddress - 1] = dimEnd;
+                woo = 0;
             }
         }
         if (dimStart - dimEnd < 0)
-                {
-                    if (dimValue > dimEnd){
-                    putsUart0("Done Ramp\n\r");
-                    dmxData[deviceModeAddress - 1] = dimEnd;
-                    woo = 0;
-                    }
-                }
+        {
+            if (dimValue > dimEnd)
+            {
+                putsUart0("Done Ramp\n\r");
+                dmxData[deviceModeAddress - 1] = dimEnd;
+                woo = 0;
+            }
+        }
     }
 
     TIMER2_ICR_R = TIMER_ICR_TATOCINT;
 }
 
+/**
+ * @brief
+ *
+ * Function to handle TIMER1 interrupts
+ */
 void Timer1ISR(void)
 {
+
     if (mode == 3 && GREEN_LED == 0)
     {
         GREEN_LED ^= 1;
@@ -488,7 +634,7 @@ void Timer1ISR(void)
         changeTimer1Value(200000);
 
     }
-    if (mode == 1)
+    if (mode == 1 && continuous)
     {
         //using state machine-like interrupt handling
         //Diagram Used for reference: http://www.etcconnect.com/Support/Articles/DMX-Speed.aspx
@@ -498,14 +644,12 @@ void Timer1ISR(void)
             //send nothing
             GPIO_PORTC_AFSEL_R &= 0x00;
             GPIO_PORTC_DATA_R &= 0xDF;
-            //putcUart1(0);
             changeTimer1Value(176); //For Break
             DMXMode++;
         }
         else if (DMXMode == 1)
         {
             //Mark After Break
-
             GPIO_PORTC_DATA_R |= 0x20;
             changeTimer1Value(12); //For MAB
             DMXMode++;
@@ -520,23 +664,8 @@ void Timer1ISR(void)
             putcUart1(0);
 
         }
-//        else
-//        {
-//            DMXMode = 0;
-//            TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
-//            TIMER1_IMR_R = 0;
-//
-//            GPIO_PORTC_AFSEL_R |= 0x30;
-//            putcUart1(0);
-//            uint16_t i = 0;
-//
-//            for (i = 0; i < 512; ++i)
-//            {
-//                putcUart1(dmxData[i]);
-//            }
-
-        // }
     }
+
     if (mode == 0)
     {
 
@@ -561,8 +690,11 @@ void Timer1ISR(void)
     TIMER1_ICR_R = TIMER_ICR_TATOCINT;
 }
 
-char ch[3];
-
+/**
+ * @brief
+ *
+ * Function to convert integer to character for UART0
+ */
 char* intToChar(uint16_t x)
 {
 
@@ -577,38 +709,54 @@ char* intToChar(uint16_t x)
     return ch;
 }
 
-// Blocking function that writes a serial character when the UART buffer is not full
+/**
+ * @brief
+ *
+ * Blocking function that writes a serial character when the UART buffer is not full
+ */
 void putcUart0(char c)
 {
+
     while (UART0_FR_R & UART_FR_TXFF)
         ;               // wait if uart0 tx fifo full
     UART0_DR_R = c;                                  // write character to fifo
 }
 
-// Blocking function that writes a string when the UART buffer is not full
+/**
+ * @brief
+ *
+ * Blocking function that writes a string when the UART buffer is not full
+ */
 void putsUart0(char* str)
 {
+
     uint8_t i;
     for (i = 0; i < strlen(str); i++)
         putcUart0(str[i]);
 }
 
-// Blocking function that returns with serial data once the buffer is not empty
+/**
+ * @brief
+ *
+ * Blocking function that returns with serial data once the buffer is not empty
+ */
 char getcUart0()
 {
+
     if (!(UART0_FR_R & UART_FR_RXFE))             // wait if uart0 rx fifo empty
         return UART0_DR_R & 0xFF;                     // get character from fifo
     else
         return '\0';
 }
 
-uint8_t vall = 8;
-uint8_t incr = 1;
-
-uint16_t program, Address, opMode, setval;
-
+/**
+ * @brief
+ *
+ * Function to get the launchpad mode from EEPROM
+ */
 void getModeEE()
 {
+
     while (EEPROM_EEDONE_R & 0x01)
         ;
     delay6Cycles();
@@ -619,32 +767,29 @@ void getModeEE()
     EEPROM_EEBLOCK_R = 1;
     EEPROM_EEOFFSET_R = 2;
     deviceModeAddress = (uint16_t) EEPROM_EERDWR_R;
-//    if(EEPROM_EERDWR_R == 0xFFFFFFFF)
-//    {
-//     EEPROM_EERDWR_R = 0x01;
-//     program = EEPROM_EERDWRINC_R;
-//     EEPROM_EEOFFSET_R = 1;
-//     EEPROM_EERDWR_R = 0; //Starts in device mode
-//     opMode = (uint16_t)EEPROM_EERDWRINC_R;
-//    }
-//    else{
-//        program = EEPROM_EERDWRINC_R;
-//        opMode = (uint16_t)EEPROM_EERDWRINC_R;
-//        EEPROM_EERDWR_R = 0x04;
-//        setval = EEPROM_EERDWRINC_R; //get last value of info to controller
-//        Address = EEPROM_EERDWR_R;   //get device address
-//    }
 }
 
-void EEWRITE(uint16_t B, uint16_t offSet, uint16_t val) //write to EEPROM at block + offset
+/**
+ * @brief
+ *
+ * Function to write to EEPROM to set address
+ */
+void EEWRITE(uint16_t B, uint16_t offSet, uint16_t val)
 {
+
     EEPROM_EEBLOCK_R = B;
     EEPROM_EEOFFSET_R = offSet;
     EEPROM_EERDWR_R = val;
 }
 
+/**
+ * @brief
+ *
+ * Function to clear DMX data bins.
+ */
 void clearDMX()
 {
+
     uint16_t i = 0;
     for (i = 0; i < 512; ++i)
     {
@@ -652,8 +797,14 @@ void clearDMX()
     }
 }
 
+/**
+ * @brief
+ *
+ * Function to parse commands from UART0 and execute functions or set flags.
+ */
 uint8_t parseCommand()
 {
+
     if (mode == 1)
     { //controller mode
         if (strcmp(command, "device") == 0)
@@ -735,7 +886,6 @@ uint8_t parseCommand()
         }
         else if (strcmp(command, "clear") == 0)
         {
-            uint16_t i = 0;
 
             clearDMX();
 
@@ -812,6 +962,8 @@ uint8_t parseCommand()
             return 0;
         }
     }
+
+    //device Mode
     else if (mode == 0)
     {
         if (strcmp(command, "address") == 0)
@@ -857,8 +1009,14 @@ uint8_t parseCommand()
     }
 }
 
+/**
+ * @brief
+ *
+ * Function to clear command, arg1, and arg2 arrays.
+ */
 void clearStr()
 {
+
     uint8_t i = 0;
     for (; i < 20; ++i)
     {
@@ -870,18 +1028,36 @@ void clearStr()
     enteringField = 0;
 }
 
+/**
+ * @brief
+ *
+ * Function to check if character is letter
+ */
 bool isLetter(char c)
 {
+
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
+/**
+ * @brief
+ *
+ * Function to check if character is number
+ */
 bool isNumber(char c)
 {
+
     return (c >= '0' && c <= '9');
 }
 
+/**
+ * @brief
+ *
+ * Function to print available commands to user
+ */
 void printCommandList()
 {
+
     putsUart0("\n\rAvailable Commands:\r\n");
     putsUart0("For Device Mode:\r\n");
     putsUart0("\tcontroller\n\r");
@@ -893,12 +1069,20 @@ void printCommandList()
     putsUart0("\tget <address>,<value>\r\n");
     putsUart0(
             "\twoo < 0 for no woo :( \r\n\t    | 1 for all addresses 255 \r\n\t    | 2 for ramp animation >\r\n");
+    putsUart0(
+            "\twoo < 3 for servo angle set \r\n\t    | 4 for servo sweep \r\n\t    | 5 for special ramping function >\r\n");
     putsUart0("\tmax <number of addresses>\r\n");
 
 }
 
+/**
+ * @brief
+ *
+ * Function to wait for specified microseconds
+ */
 void waitMicrosecond(uint32_t us)
 {
+
     __asm("WMS_LOOP0:   MOV  R1, #6");
     // 1
     __asm("WMS_LOOP1:   SUB  R1, #1");
@@ -924,8 +1108,14 @@ void waitMicrosecond(uint32_t us)
     // 40 clocks/us + error
 }
 
+/**
+ * @brief
+ *
+ * Function to handle UART0 interrupts
+ */
 void Uart0Isr(void)
 {
+
     char c = getcUart0();
 
     if (c == '\0')
@@ -1058,8 +1248,15 @@ void Uart0Isr(void)
     }
 
 }
+
+/**
+ * @brief
+ *
+ * Function to set all DMX values to 255
+ */
 void wooone()
 {
+
     int x = 0;
     for (x = 0; x < 512; x += 1)
     {
@@ -1068,10 +1265,14 @@ void wooone()
 
 }
 
+/**
+ * @brief
+ *
+ * Function to sweep servo
+ */
 void sweepServo()
 {
-    //uint8_t i = 0;
-    //PWM
+
     if (woo == 3)
     {
         GPIO_PORTF_AFSEL_R |= 0x0F;
@@ -1111,42 +1312,29 @@ void sweepServo()
     }
 }
 
-uint8_t up;
+/**
+ * @brief
+ *
+ * Function to enable ramping animation
+ */
 void animationRamp()
 {
-    uint16_t x;
-    TIMER2_CTL_R = TIMER_CTL_TAEN;
 
+    TIMER2_CTL_R = TIMER_CTL_TAEN;
 }
 
-uint8_t RGBMode = 0;
-//-----------------------------------------------------------------------------
-// Main
-//-----------------------------------------------------------------------------
+/**
+ * @brief
+ *
+ * Runs everything
+ */
 uint8_t main(void)
 {
+
     // Initialize hardware
     initHw();
 
-    GREEN_LED = 1;
-    waitMicrosecond(250000);
-    GREEN_LED = 0;
-    waitMicrosecond(250000);
-    BLUE_LED = 0;
-
-    uint16_t x = 0;
-
-    for (x = 0; x < 512; ++x)
-    {
-        dmxData[x] = x % 256;
-    }
-
-    dmxData[0] = 00;
-    dmxData[1] = 0;
-    dmxData[2] = 0;
-
     getModeEE();
-    // Display greeting
     putsUart0("\r\n\r\nCurrent Mode: ");
     if (mode == 0)
     {
@@ -1159,8 +1347,6 @@ uint8_t main(void)
         GPIO_PORTC_DATA_R &= 0x9F;
         UART1_LCRH_R = UART_LCRH_WLEN_8 | UART_LCRH_STP2;
         UART1_CTL_R = UART_CTL_RXE | UART_CTL_UARTEN;
-        //deviceModeAddress = 0;
-
     }
     else
     {
@@ -1168,7 +1354,7 @@ uint8_t main(void)
         putsUart0("Controller");
         UART1_IM_R = UART_IM_TXIM;
         GPIO_PORTC_DATA_R &= 0xDF;
-        //deviceModeAddress = 1;
+
     }
 
     putsUart0("\r\nCurrent Device Mode Address: ");
@@ -1176,14 +1362,25 @@ uint8_t main(void)
     printCommandList();
     putsUart0("\r\n>");
 
-    // For each received character, toggle the green LED
-    // For each received "1", set the red LED
-    // For each received "0", clear the red LED
-    int d = 500;
-    int dir = 0;
+    GREEN_LED = 1;
+    waitMicrosecond(250000);
+    GREEN_LED = 0;
+    waitMicrosecond(250000);
+    BLUE_LED = 0;
+
+    //Setting initial values for dmx for testing
+    uint16_t x = 0;
+
+    for (x = 0; x < 512; ++x)
+    {
+        dmxData[x] = x % 256;
+    }
+
     while (1)
     {
-        //mode = 3;
+
+        //to read values from mux from DIP switch
+        //NOT TESTED with DIP SWITCH
         if (!PUSH_BUTTON2)
         {
             uint8_t ix = 0;
@@ -1202,7 +1399,8 @@ uint8_t main(void)
             putcUart0('\n');
             putcUart0('\r');
             waitMicrosecond(250000);
-            if (deviceModeAddress == 0){
+            if (deviceModeAddress == 0)
+            {
                 deviceModeAddress++;
             }
         }
@@ -1259,12 +1457,7 @@ uint8_t main(void)
             sweepServo();
 
         }
-        else
-        {
-            SYSCTL_RCGCPWM_R |= ~SYSCTL_RCGCPWM_R1;
-            GPIO_PORTF_AFSEL_R = 0;
-            //dmxData[deviceModeAddress - 1] = 0;
-        }
+
         if (woo == 2)
             animationRamp();
         else
@@ -1278,47 +1471,33 @@ uint8_t main(void)
             TIMER2_CTL_R |= TIMER_CTL_TAEN;
         }
 
-//        else if (woo == 0 && mode == 1)
-//            clearDMX();
-        if (RGBMode && woo != 3 && woo != 4)
+        if (RGBMode && woo != 3 && woo != 4 && mode == 0)
         {
+
             GPIO_PORTF_AFSEL_R |= 0x0F;
             SYSCTL_RCGCPWM_R |= SYSCTL_RCGCPWM_R1;
-            PWM1_2_CMPB_R = dmxData[deviceModeAddress + 0 - 1] * 196; //red                           // red off (0=always low, 1023=always high)
-            // green off
-            PWM1_3_CMPB_R = dmxData[deviceModeAddress + 1 - 1] * 196;    //green
+            PWM1_2_CMPB_R = dmxData[deviceModeAddress + 0 - 1] * 100; //red
 
-            PWM1_3_CMPA_R = dmxData[deviceModeAddress + 2 - 1] * 196; //blue
+            PWM1_3_CMPB_R = dmxData[deviceModeAddress + 1 - 1] * 100;    //green
+
+            PWM1_3_CMPA_R = dmxData[deviceModeAddress + 2 - 1] * 100; //blue
 
         }
         else
         {
-            if (dmxData[deviceModeAddress - 1] != 0)
+            SYSCTL_RCGCPWM_R |= ~SYSCTL_RCGCPWM_R1;
+            GPIO_PORTF_AFSEL_R = 0;
+            if (mode == 0)
             {
-                BLUE_LED = 1;
-            }
-            else
-            {
-                BLUE_LED = 0;
+                if (dmxData[deviceModeAddress - 1] != 0)
+                {
+                    BLUE_LED = 1;
+                }
+                else
+                {
+                    BLUE_LED = 0;
+                }
             }
         }
-//        if (dir == 0){
-//            d-=1;
-//        }
-//        else{
-//            d+=1;
-//        }
-//        if(d <= 500){
-//            dir = 1;
-//        }
-//        if(d >= 2000){
-//            dir = 0;
-//        }
-//
-//        GREEN_LED = 1;
-//        waitMicrosecond(d);
-//        GREEN_LED = 0;
-//        waitMicrosecond(5000 - d);
-
     }
 }

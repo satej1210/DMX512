@@ -1,0 +1,12 @@
+digraph "changeTimer1Value"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="RL";
+  Node3 [label="changeTimer1Value",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Function to change load value of Timer1."];
+  Node3 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="Uart1Isr",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tm4c123gh6pm__startup__ccs_8c.html#af19c26d9a6dc91ca0e5358bef906f61f",tooltip="Function to Handle Interrupts from UART1."];
+  Node3 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="Timer1ISR",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$tm4c123gh6pm__startup__ccs_8c.html#afdad67070c699e644b8ddae35b29347b",tooltip="Function to handle TIMER1 interrupts."];
+}

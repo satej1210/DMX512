@@ -1,0 +1,12 @@
+digraph "initHw"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node24 [label="initHw",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="initHw()"];
+  Node24 -> Node25 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node25 [label="putsUart0",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$satej__matthew_8c.html#af4adb618930ee1a928705aec083cf726",tooltip="putsUart0(char* str)"];
+  Node25 -> Node26 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node26 [label="putcUart0",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$satej__matthew_8c.html#a27ebab6950bfb65d641dd04feb03906f",tooltip="putcUart0(char c)"];
+}

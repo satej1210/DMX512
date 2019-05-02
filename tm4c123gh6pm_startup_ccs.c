@@ -1,3 +1,13 @@
+/**
+ * @file tm4c123gh6pm_startup_ccs.c
+ * @author Satej Mhatre, Matthew Hilliard
+ * @date 1 May 2019
+ * @brief Startup File for Project
+ *
+ * For CSE 4342: Embedded II Spring 2019
+ * Instructor: Dr. Jason Losh
+ */
+
 //*****************************************************************************
 //
 // Startup code for use with TI's Code Composer Studio.
