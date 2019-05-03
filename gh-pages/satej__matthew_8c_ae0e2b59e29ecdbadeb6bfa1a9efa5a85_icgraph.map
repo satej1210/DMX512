@@ -1,5 +1,0 @@
-<map id="changeTimer1Value" name="changeTimer1Value">
-<area shape="rect" id="node1" title="Function to change load value of Timer1." alt="" coords="136,31,272,57"/>
-<area shape="rect" id="node2" href="$tm4c123gh6pm__startup__ccs_8c.html#af19c26d9a6dc91ca0e5358bef906f61f" title="Function to Handle Interrupts from UART1." alt="" coords="13,5,80,32"/>
-<area shape="rect" id="node3" href="$tm4c123gh6pm__startup__ccs_8c.html#afdad67070c699e644b8ddae35b29347b" title="Function to handle TIMER1 interrupts." alt="" coords="5,56,88,83"/>
-</map>

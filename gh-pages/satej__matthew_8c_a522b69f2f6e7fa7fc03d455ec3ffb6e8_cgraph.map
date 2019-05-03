@@ -1,4 +1,0 @@
-<map id="Uart1Isr" name="Uart1Isr">
-<area shape="rect" id="node1" title="Function to Handle Interrupts from UART1." alt="" coords="5,5,72,32"/>
-<area shape="rect" id="node2" href="$satej__matthew_8c.html#ae0e2b59e29ecdbadeb6bfa1a9efa5a85" title="Function to change load value of Timer1." alt="" coords="120,5,256,32"/>
-</map>

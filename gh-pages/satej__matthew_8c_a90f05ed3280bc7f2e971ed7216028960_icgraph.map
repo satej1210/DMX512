@@ -1,5 +1,0 @@
-<map id="clearDMX" name="clearDMX">
-<area shape="rect" id="node1" title="Function to clear DMX data bins." alt="" coords="281,5,359,32"/>
-<area shape="rect" id="node2" href="$satej__matthew_8c.html#a784ef656236362513864c6ba3507e22d" title="Function to parse commands from UART0 and execute functions or set flags." alt="" coords="120,5,233,32"/>
-<area shape="rect" id="node3" href="$tm4c123gh6pm__startup__ccs_8c.html#affa7c2cc09d04fc57b05c5644b1c8a68" title="Function to handle UART0 interrupts." alt="" coords="5,5,72,32"/>
-</map>

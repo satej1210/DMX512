@@ -1,4 +1,0 @@
-<map id="clearStr" name="clearStr">
-<area shape="rect" id="node1" title="Function to clear command, arg1, and arg2 arrays." alt="" coords="120,5,187,32"/>
-<area shape="rect" id="node2" href="$tm4c123gh6pm__startup__ccs_8c.html#affa7c2cc09d04fc57b05c5644b1c8a68" title="Function to handle UART0 interrupts." alt="" coords="5,5,72,32"/>
-</map>

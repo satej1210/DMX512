@@ -8,5 +8,7 @@ var searchData=
   ['dimstart',['dimStart',['../satej__matthew_8c.html#ad2e81110ac5d5101e2b8b67c4458bae3',1,'satej_matthew.c']]],
   ['dimvalue',['dimValue',['../satej__matthew_8c.html#a2dfb3db6e969929dc4c426fc2a65cc69',1,'satej_matthew.c']]],
   ['dmxdata',['dmxData',['../satej__matthew_8c.html#a94df0a1f870976c09bb86a0885b47388',1,'satej_matthew.c']]],
-  ['dmxmode',['DMXMode',['../satej__matthew_8c.html#a57f25f3dc6e734d597fcd5abacb04166',1,'satej_matthew.c']]]
+  ['dmxmode',['DMXMode',['../satej__matthew_8c.html#a57f25f3dc6e734d597fcd5abacb04166',1,'satej_matthew.c']]],
+  ['dmx_2d512_20controller_20receiver',['DMX-512 Controller Receiver',['../index.html',1,'']]],
+  ['dmx512',['DMX512',['../md__r_e_a_d_m_e.html',1,'']]]
 ];

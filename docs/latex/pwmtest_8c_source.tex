@@ -1,0 +1,47 @@
+\section{pwmtest.\+c}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001 \textcolor{preprocessor}{\#include <stdint.h>}}
+\DoxyCodeLine{00002 \textcolor{preprocessor}{\#include <stdbool.h>}}
+\DoxyCodeLine{00003 \textcolor{preprocessor}{\#include "inc/hw\_memmap.h"}}
+\DoxyCodeLine{00004 \textcolor{preprocessor}{\#include "inc/hw\_types.h"}}
+\DoxyCodeLine{00005 \textcolor{preprocessor}{\#include "driverlib/sysctl.h"}}
+\DoxyCodeLine{00006 \textcolor{preprocessor}{\#include "driverlib/gpio.h"}}
+\DoxyCodeLine{00007 \textcolor{preprocessor}{\#include "driverlib/debug.h"}}
+\DoxyCodeLine{00008 \textcolor{preprocessor}{\#include "driverlib/pwm.h"}}
+\DoxyCodeLine{00009 \textcolor{preprocessor}{\#include "driverlib/pin\_map.h"}}
+\DoxyCodeLine{00010 \textcolor{preprocessor}{\#include "inc/hw\_gpio.h"}}
+\DoxyCodeLine{00011 }
+\DoxyCodeLine{00012 \textcolor{preprocessor}{\#define PWM\_FREQUENCY 55}}
+\DoxyCodeLine{00013 }
+\DoxyCodeLine{00014 \textcolor{keywordtype}{int} maein(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{00015 \{}
+\DoxyCodeLine{00016     \textcolor{keyword}{volatile} uint32\_t ui32Load;}
+\DoxyCodeLine{00017     \textcolor{keyword}{volatile} uint32\_t ui32PWMClock;}
+\DoxyCodeLine{00018     \textcolor{keyword}{volatile} uint8\_t ui8Adjust;}
+\DoxyCodeLine{00019     ui8Adjust = 83;}
+\DoxyCodeLine{00020 }
+\DoxyCodeLine{00021     SysCtlClockSet(SYSCTL\_SYSDIV\_5|SYSCTL\_USE\_PLL|SYSCTL\_OSC\_MAIN|SYSCTL\_XTAL\_16MHZ);}
+\DoxyCodeLine{00022     SysCtlPWMClockSet(SYSCTL\_PWMDIV\_64);}
+\DoxyCodeLine{00023 }
+\DoxyCodeLine{00024     SysCtlPeripheralEnable(SYSCTL\_PERIPH\_PWM1);}
+\DoxyCodeLine{00025     SysCtlPeripheralEnable(SYSCTL\_PERIPH\_GPIOD);}
+\DoxyCodeLine{00026 }
+\DoxyCodeLine{00027     GPIOPinTypePWM(GPIO\_PORTD\_BASE, GPIO\_PIN\_0);}
+\DoxyCodeLine{00028     GPIOPinConfigure(GPIO\_PD0\_M1PWM0);}
+\DoxyCodeLine{00029 }
+\DoxyCodeLine{00030     ui32PWMClock = SysCtlClockGet() / 64;}
+\DoxyCodeLine{00031     ui32Load = (ui32PWMClock / PWM\_FREQUENCY) - 1;}
+\DoxyCodeLine{00032     PWMGenConfigure(PWM1\_BASE, PWM\_GEN\_0, PWM\_GEN\_MODE\_DOWN);}
+\DoxyCodeLine{00033     PWMGenPeriodSet(PWM1\_BASE, PWM\_GEN\_0, ui32Load);}
+\DoxyCodeLine{00034 }
+\DoxyCodeLine{00035     PWMPulseWidthSet(PWM1\_BASE, PWM\_OUT\_0, ui8Adjust * ui32Load / 1000);}
+\DoxyCodeLine{00036     PWMOutputState(PWM1\_BASE, PWM\_OUT\_0\_BIT, \textcolor{keyword}{true});}
+\DoxyCodeLine{00037     PWMGenEnable(PWM1\_BASE, PWM\_GEN\_0);}
+\DoxyCodeLine{00038 }
+\DoxyCodeLine{00039     \textcolor{keywordflow}{while}(1)}
+\DoxyCodeLine{00040     \{}
+\DoxyCodeLine{00041     \}}
+\DoxyCodeLine{00042 \}}
+
+\end{DoxyCode}

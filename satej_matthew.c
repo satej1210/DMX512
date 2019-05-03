@@ -1,3 +1,11 @@
+/*! \mainpage DMX-512 Controller Receiver
+ *
+ *  For CSE 4342: Embedded II Spring 2019 <br>
+ *  Instructor: Dr. Jason Losh<br>
+ *  Made by: Satej Mhatre, Matthew Hilliard
+ * 
+ */
+
 /**
  * @file satej_matthew.c
  * @author Satej Mhatre, Matthew Hilliard

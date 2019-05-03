@@ -24,6 +24,8 @@ for the JavaScript code in this file
 var NAVTREE =
 [
   [ "DMX512 Controller Receiver", "index.html", [
+    [ "DMX-512 Controller Receiver", "index.html", null ],
+    [ "DMX512", "md__r_e_a_d_m_e.html", null ],
     [ "Files", "files.html", [
       [ "File List", "files.html", "files_dup" ],
       [ "Globals", "globals.html", [
@@ -38,7 +40,7 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"files.html"
+"dir_faa8bedbcbaa373d57b77d9219afda20.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

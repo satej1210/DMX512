@@ -2,1216 +2,1208 @@
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001 }
-\DoxyCodeLine{00035 \textcolor{comment}{//-----------------------------------------------------------------------------}}
-\DoxyCodeLine{00036 \textcolor{comment}{// Device includes, defines, and assembler directives}}
-\DoxyCodeLine{00037 \textcolor{comment}{//-----------------------------------------------------------------------------}}
-\DoxyCodeLine{00038 \textcolor{preprocessor}{\#include <stdint.h>}}
-\DoxyCodeLine{00039 \textcolor{preprocessor}{\#include <stdlib.h>}}
-\DoxyCodeLine{00040 \textcolor{preprocessor}{\#include <stdbool.h>}}
-\DoxyCodeLine{00041 \textcolor{preprocessor}{\#include <string.h>}}
-\DoxyCodeLine{00042 \textcolor{preprocessor}{\#include <ctype.h>}}
-\DoxyCodeLine{00043 \textcolor{preprocessor}{\#include "tm4c123gh6pm.h"}}
-\DoxyCodeLine{00044 }
-\DoxyCodeLine{00045 \textcolor{preprocessor}{\#define RED\_LED      (*((volatile uint32\_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 1*4)))}}
-\DoxyCodeLine{00046 }
-\DoxyCodeLine{00048 \textcolor{preprocessor}{\#define GREEN\_LED    (*((volatile uint32\_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 3*4)))}}
-\DoxyCodeLine{00049 }
-\DoxyCodeLine{00051 \textcolor{preprocessor}{\#define BLUE\_LED     (*((volatile uint32\_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 2*4)))}}
+\DoxyCodeLine{00043 \textcolor{comment}{//-----------------------------------------------------------------------------}}
+\DoxyCodeLine{00044 \textcolor{comment}{// Device includes, defines, and assembler directives}}
+\DoxyCodeLine{00045 \textcolor{comment}{//-----------------------------------------------------------------------------}}
+\DoxyCodeLine{00046 \textcolor{preprocessor}{\#include <stdint.h>}}
+\DoxyCodeLine{00047 \textcolor{preprocessor}{\#include <stdlib.h>}}
+\DoxyCodeLine{00048 \textcolor{preprocessor}{\#include <stdbool.h>}}
+\DoxyCodeLine{00049 \textcolor{preprocessor}{\#include <string.h>}}
+\DoxyCodeLine{00050 \textcolor{preprocessor}{\#include <ctype.h>}}
+\DoxyCodeLine{00051 \textcolor{preprocessor}{\#include "tm4c123gh6pm.h"}}
 \DoxyCodeLine{00052 }
-\DoxyCodeLine{00054 \textcolor{preprocessor}{\#define PUSH\_BUTTON  (*((volatile uint32\_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 4*4)))}}
-\DoxyCodeLine{00055 }
-\DoxyCodeLine{00057 \textcolor{preprocessor}{\#define PUSH\_BUTTON2  (*((volatile uint32\_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 0*4)))}}
-\DoxyCodeLine{00058 }
-\DoxyCodeLine{00060 \textcolor{preprocessor}{\#define GREEN\_LED\_MASK 8}}
-\DoxyCodeLine{00061 }
-\DoxyCodeLine{00063 \textcolor{preprocessor}{\#define RED\_LED\_MASK 2}}
-\DoxyCodeLine{00064 }
-\DoxyCodeLine{00066 \textcolor{preprocessor}{\#define BLUE\_LED\_MASK 4}}
-\DoxyCodeLine{00067 }
-\DoxyCodeLine{00069 \textcolor{preprocessor}{\#define PUSH\_BUTTON\_MASK 16}}
-\DoxyCodeLine{00070 }
-\DoxyCodeLine{00072 \textcolor{preprocessor}{\#define PUSH\_BUTTON2\_MASK 1}}
-\DoxyCodeLine{00073 }
-\DoxyCodeLine{00075 \textcolor{preprocessor}{\#define delay4Cycles() \_\_asm(" NOP\(\backslash\)n NOP\(\backslash\)n NOP\(\backslash\)n NOP") }}
-\DoxyCodeLine{00077 \textcolor{preprocessor}{\#define delay1Cycle() \_\_asm(" NOP\(\backslash\)n") }}
-\DoxyCodeLine{00079 \textcolor{preprocessor}{\#define delay6Cycles() \_\_asm(" NOP\(\backslash\)n NOP\(\backslash\)n NOP\(\backslash\)n NOP\(\backslash\)n NOP\(\backslash\)n NOP\(\backslash\)n") }}
-\DoxyCodeLine{00082 \textcolor{preprocessor}{}\textcolor{comment}{/*}}
-\DoxyCodeLine{00083 \textcolor{comment}{ * UART0 Global Variables}}
-\DoxyCodeLine{00084 \textcolor{comment}{ * ========================}}
-\DoxyCodeLine{00085 \textcolor{comment}{ */}\textcolor{preprocessor}{}}
-\DoxyCodeLine{00086 }
-\DoxyCodeLine{00087 \textcolor{keywordtype}{char} command[20]; }
-\DoxyCodeLine{00088 \textcolor{keywordtype}{char} arg1[20]; }
-\DoxyCodeLine{00089 \textcolor{keywordtype}{char} arg2[20]; }
-\DoxyCodeLine{00090 int8\_t enteringField = 0; }
-\DoxyCodeLine{00091 int8\_t pos = 0; }
-\DoxyCodeLine{00093 \textcolor{comment}{/*}}
-\DoxyCodeLine{00094 \textcolor{comment}{ * DMX Transmit Global Variables}}
-\DoxyCodeLine{00095 \textcolor{comment}{ * ========================}}
-\DoxyCodeLine{00096 \textcolor{comment}{ */}}
-\DoxyCodeLine{00097 }
-\DoxyCodeLine{00098 uint16\_t maxAddress = 512; }
-\DoxyCodeLine{00099 uint8\_t continuous = 0; }
-\DoxyCodeLine{00100 uint16\_t DMXMode = 0; }
-\DoxyCodeLine{00102 \textcolor{comment}{/*}}
-\DoxyCodeLine{00103 \textcolor{comment}{ * DMX Receive Global Variables}}
-\DoxyCodeLine{00104 \textcolor{comment}{ * ========================}}
-\DoxyCodeLine{00105 \textcolor{comment}{ */}}
-\DoxyCodeLine{00106 }
-\DoxyCodeLine{00107 uint16\_t deviceModeAddress = 0; }
-\DoxyCodeLine{00108 uint8\_t prevRX = 0;}
-\DoxyCodeLine{00109 uint8\_t rxError = 0; }
-\DoxyCodeLine{00110 uint16\_t rxState = 0; }
-\DoxyCodeLine{00112 \textcolor{comment}{/*}}
-\DoxyCodeLine{00113 \textcolor{comment}{ * DMX Special Functions Global Variables}}
-\DoxyCodeLine{00114 \textcolor{comment}{ * ========================}}
-\DoxyCodeLine{00115 \textcolor{comment}{ *}}
-\DoxyCodeLine{00116 \textcolor{comment}{ */}}
-\DoxyCodeLine{00117 }
-\DoxyCodeLine{00118 \textcolor{keywordtype}{float} seconds = 0; }
-\DoxyCodeLine{00119 \textcolor{keywordtype}{int} upR, upG, upB; }
-\DoxyCodeLine{00120 \textcolor{keywordtype}{int} goR, goG, goB; }
-\DoxyCodeLine{00121 \textcolor{keywordtype}{float} secondsTrigger = 0.0; }
-\DoxyCodeLine{00122 uint16\_t dimStart = 0; }
-\DoxyCodeLine{00123 uint16\_t dimEnd = 0; }
-\DoxyCodeLine{00124 \textcolor{keywordtype}{float} dimValue = 0; }
-\DoxyCodeLine{00125 uint8\_t woo = 0; }
-\DoxyCodeLine{00128 \textcolor{keywordtype}{int} servoDir = 0; }
-\DoxyCodeLine{00129 \textcolor{keywordtype}{char} ch[3]; }
-\DoxyCodeLine{00130 uint8\_t vall = 8; }
-\DoxyCodeLine{00131 uint8\_t incr = 1; }
-\DoxyCodeLine{00132 uint16\_t program; }
-\DoxyCodeLine{00133 uint16\_t Address; }
-\DoxyCodeLine{00134 uint16\_t opMode; }
-\DoxyCodeLine{00135 uint16\_t setval; }
-\DoxyCodeLine{00137 \textcolor{comment}{/*}}
-\DoxyCodeLine{00138 \textcolor{comment}{ * Launchpad Control Global Variables}}
-\DoxyCodeLine{00139 \textcolor{comment}{ * ========================}}
-\DoxyCodeLine{00140 \textcolor{comment}{ */}}
-\DoxyCodeLine{00141 uint8\_t mode = 0; }
-\DoxyCodeLine{00142 uint8\_t dmxData[512]; }
-\DoxyCodeLine{00143 uint8\_t RGBMode = 0; }
-\DoxyCodeLine{00146 \textcolor{comment}{/*}}
-\DoxyCodeLine{00147 \textcolor{comment}{ * Function Definitions}}
-\DoxyCodeLine{00148 \textcolor{comment}{ * ========================}}
-\DoxyCodeLine{00149 \textcolor{comment}{ */}}
-\DoxyCodeLine{00150 \textcolor{keywordtype}{void} animationRamp();}
-\DoxyCodeLine{00151 \textcolor{keywordtype}{void} clearStr();}
-\DoxyCodeLine{00152 \textcolor{keywordtype}{char} getcUart0();}
-\DoxyCodeLine{00153 \textcolor{keywordtype}{void} getModeEE();}
-\DoxyCodeLine{00154 \textcolor{keywordtype}{char}* intToChar(uint16\_t x);}
-\DoxyCodeLine{00155 \textcolor{keywordtype}{bool} isLetter(\textcolor{keywordtype}{char} c);}
-\DoxyCodeLine{00156 \textcolor{keywordtype}{bool} isNumber(\textcolor{keywordtype}{char} c);}
-\DoxyCodeLine{00157 uint8\_t main(\textcolor{keywordtype}{void});}
-\DoxyCodeLine{00158 \textcolor{keywordtype}{void} printCommandList();}
-\DoxyCodeLine{00159 \textcolor{keywordtype}{void} putcUart1(uint8\_t i);}
-\DoxyCodeLine{00160 \textcolor{keywordtype}{void} Uart0Isr(\textcolor{keywordtype}{void});}
-\DoxyCodeLine{00161 \textcolor{keywordtype}{void} waitMicrosecond(uint32\_t us);}
-\DoxyCodeLine{00162 \textcolor{keywordtype}{void} wooone();}
-\DoxyCodeLine{00163 \textcolor{keywordtype}{void} putsUart0(\textcolor{keywordtype}{char}*);}
-\DoxyCodeLine{00164 \textcolor{keywordtype}{void} changeTimer1Value(uint32\_t);}
-\DoxyCodeLine{00165 }
-\DoxyCodeLine{00166 \textcolor{comment}{/*}}
-\DoxyCodeLine{00167 \textcolor{comment}{ * Subroutines}}
-\DoxyCodeLine{00168 \textcolor{comment}{ * ========================}}
-\DoxyCodeLine{00169 \textcolor{comment}{ */}}
-\DoxyCodeLine{00170 }
-\DoxyCodeLine{00176 \textcolor{keywordtype}{void} initHw()}
-\DoxyCodeLine{00177 \{}
+\DoxyCodeLine{00053 \textcolor{preprocessor}{\#define RED\_LED      (*((volatile uint32\_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 1*4)))}}
+\DoxyCodeLine{00054 }
+\DoxyCodeLine{00056 \textcolor{preprocessor}{\#define GREEN\_LED    (*((volatile uint32\_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 3*4)))}}
+\DoxyCodeLine{00057 }
+\DoxyCodeLine{00059 \textcolor{preprocessor}{\#define BLUE\_LED     (*((volatile uint32\_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 2*4)))}}
+\DoxyCodeLine{00060 }
+\DoxyCodeLine{00062 \textcolor{preprocessor}{\#define PUSH\_BUTTON  (*((volatile uint32\_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 4*4)))}}
+\DoxyCodeLine{00063 }
+\DoxyCodeLine{00065 \textcolor{preprocessor}{\#define PUSH\_BUTTON2  (*((volatile uint32\_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 0*4)))}}
+\DoxyCodeLine{00066 }
+\DoxyCodeLine{00068 \textcolor{preprocessor}{\#define GREEN\_LED\_MASK 8}}
+\DoxyCodeLine{00069 }
+\DoxyCodeLine{00071 \textcolor{preprocessor}{\#define RED\_LED\_MASK 2}}
+\DoxyCodeLine{00072 }
+\DoxyCodeLine{00074 \textcolor{preprocessor}{\#define BLUE\_LED\_MASK 4}}
+\DoxyCodeLine{00075 }
+\DoxyCodeLine{00077 \textcolor{preprocessor}{\#define PUSH\_BUTTON\_MASK 16}}
+\DoxyCodeLine{00078 }
+\DoxyCodeLine{00080 \textcolor{preprocessor}{\#define PUSH\_BUTTON2\_MASK 1}}
+\DoxyCodeLine{00081 }
+\DoxyCodeLine{00083 \textcolor{preprocessor}{\#define delay4Cycles() \_\_asm(" NOP\(\backslash\)n NOP\(\backslash\)n NOP\(\backslash\)n NOP") }}
+\DoxyCodeLine{00085 \textcolor{preprocessor}{\#define delay1Cycle() \_\_asm(" NOP\(\backslash\)n") }}
+\DoxyCodeLine{00087 \textcolor{preprocessor}{\#define delay6Cycles() \_\_asm(" NOP\(\backslash\)n NOP\(\backslash\)n NOP\(\backslash\)n NOP\(\backslash\)n NOP\(\backslash\)n NOP\(\backslash\)n") }}
+\DoxyCodeLine{00090 \textcolor{preprocessor}{}\textcolor{comment}{/*}}
+\DoxyCodeLine{00091 \textcolor{comment}{ * UART0 Global Variables}}
+\DoxyCodeLine{00092 \textcolor{comment}{ * ========================}}
+\DoxyCodeLine{00093 \textcolor{comment}{ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00094 }
+\DoxyCodeLine{00095 \textcolor{keywordtype}{char} command[20]; }
+\DoxyCodeLine{00096 \textcolor{keywordtype}{char} arg1[20]; }
+\DoxyCodeLine{00097 \textcolor{keywordtype}{char} arg2[20]; }
+\DoxyCodeLine{00098 int8\_t enteringField = 0; }
+\DoxyCodeLine{00099 int8\_t pos = 0; }
+\DoxyCodeLine{00101 \textcolor{comment}{/*}}
+\DoxyCodeLine{00102 \textcolor{comment}{ * DMX Transmit Global Variables}}
+\DoxyCodeLine{00103 \textcolor{comment}{ * ========================}}
+\DoxyCodeLine{00104 \textcolor{comment}{ */}}
+\DoxyCodeLine{00105 }
+\DoxyCodeLine{00106 uint16\_t maxAddress = 512; }
+\DoxyCodeLine{00107 uint8\_t continuous = 0; }
+\DoxyCodeLine{00108 uint16\_t DMXMode = 0; }
+\DoxyCodeLine{00110 \textcolor{comment}{/*}}
+\DoxyCodeLine{00111 \textcolor{comment}{ * DMX Receive Global Variables}}
+\DoxyCodeLine{00112 \textcolor{comment}{ * ========================}}
+\DoxyCodeLine{00113 \textcolor{comment}{ */}}
+\DoxyCodeLine{00114 }
+\DoxyCodeLine{00115 uint16\_t deviceModeAddress = 0; }
+\DoxyCodeLine{00116 uint8\_t prevRX = 0;}
+\DoxyCodeLine{00117 uint8\_t rxError = 0; }
+\DoxyCodeLine{00118 uint16\_t rxState = 0; }
+\DoxyCodeLine{00120 \textcolor{comment}{/*}}
+\DoxyCodeLine{00121 \textcolor{comment}{ * DMX Special Functions Global Variables}}
+\DoxyCodeLine{00122 \textcolor{comment}{ * ========================}}
+\DoxyCodeLine{00123 \textcolor{comment}{ *}}
+\DoxyCodeLine{00124 \textcolor{comment}{ */}}
+\DoxyCodeLine{00125 }
+\DoxyCodeLine{00126 \textcolor{keywordtype}{float} seconds = 0; }
+\DoxyCodeLine{00127 \textcolor{keywordtype}{int} upR, upG, upB; }
+\DoxyCodeLine{00128 \textcolor{keywordtype}{int} goR, goG, goB; }
+\DoxyCodeLine{00129 \textcolor{keywordtype}{float} secondsTrigger = 0.0; }
+\DoxyCodeLine{00130 uint16\_t dimStart = 0; }
+\DoxyCodeLine{00131 uint16\_t dimEnd = 0; }
+\DoxyCodeLine{00132 \textcolor{keywordtype}{float} dimValue = 0; }
+\DoxyCodeLine{00133 uint8\_t woo = 0; }
+\DoxyCodeLine{00136 \textcolor{keywordtype}{int} servoDir = 0; }
+\DoxyCodeLine{00137 \textcolor{keywordtype}{char} ch[3]; }
+\DoxyCodeLine{00138 uint8\_t vall = 8; }
+\DoxyCodeLine{00139 uint8\_t incr = 1; }
+\DoxyCodeLine{00140 uint16\_t program; }
+\DoxyCodeLine{00141 uint16\_t Address; }
+\DoxyCodeLine{00142 uint16\_t opMode; }
+\DoxyCodeLine{00143 uint16\_t setval; }
+\DoxyCodeLine{00145 \textcolor{comment}{/*}}
+\DoxyCodeLine{00146 \textcolor{comment}{ * Launchpad Control Global Variables}}
+\DoxyCodeLine{00147 \textcolor{comment}{ * ========================}}
+\DoxyCodeLine{00148 \textcolor{comment}{ */}}
+\DoxyCodeLine{00149 uint8\_t mode = 0; }
+\DoxyCodeLine{00150 uint8\_t dmxData[512]; }
+\DoxyCodeLine{00151 uint8\_t RGBMode = 0; }
+\DoxyCodeLine{00154 \textcolor{comment}{/*}}
+\DoxyCodeLine{00155 \textcolor{comment}{ * Function Definitions}}
+\DoxyCodeLine{00156 \textcolor{comment}{ * ========================}}
+\DoxyCodeLine{00157 \textcolor{comment}{ */}}
+\DoxyCodeLine{00158 \textcolor{keywordtype}{void} animationRamp();}
+\DoxyCodeLine{00159 \textcolor{keywordtype}{void} clearStr();}
+\DoxyCodeLine{00160 \textcolor{keywordtype}{char} getcUart0();}
+\DoxyCodeLine{00161 \textcolor{keywordtype}{void} getModeEE();}
+\DoxyCodeLine{00162 \textcolor{keywordtype}{char}* intToChar(uint16\_t x);}
+\DoxyCodeLine{00163 \textcolor{keywordtype}{bool} isLetter(\textcolor{keywordtype}{char} c);}
+\DoxyCodeLine{00164 \textcolor{keywordtype}{bool} isNumber(\textcolor{keywordtype}{char} c);}
+\DoxyCodeLine{00165 uint8\_t main(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00166 \textcolor{keywordtype}{void} printCommandList();}
+\DoxyCodeLine{00167 \textcolor{keywordtype}{void} putcUart1(uint8\_t i);}
+\DoxyCodeLine{00168 \textcolor{keywordtype}{void} Uart0Isr(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00169 \textcolor{keywordtype}{void} waitMicrosecond(uint32\_t us);}
+\DoxyCodeLine{00170 \textcolor{keywordtype}{void} wooone();}
+\DoxyCodeLine{00171 \textcolor{keywordtype}{void} putsUart0(\textcolor{keywordtype}{char}*);}
+\DoxyCodeLine{00172 \textcolor{keywordtype}{void} changeTimer1Value(uint32\_t);}
+\DoxyCodeLine{00173 }
+\DoxyCodeLine{00174 \textcolor{comment}{/*}}
+\DoxyCodeLine{00175 \textcolor{comment}{ * Subroutines}}
+\DoxyCodeLine{00176 \textcolor{comment}{ * ========================}}
+\DoxyCodeLine{00177 \textcolor{comment}{ */}}
 \DoxyCodeLine{00178 }
-\DoxyCodeLine{00182     SYSCTL\_RCC\_R = SYSCTL\_RCC\_XTAL\_16MHZ | SYSCTL\_RCC\_OSCSRC\_MAIN}
-\DoxyCodeLine{00183             | SYSCTL\_RCC\_USESYSDIV | (4 << SYSCTL\_RCC\_SYSDIV\_S);}
-\DoxyCodeLine{00184 }
-\DoxyCodeLine{00189     SYSCTL\_GPIOHBCTL\_R = 0;}
-\DoxyCodeLine{00190 }
-\DoxyCodeLine{00194     SYSCTL\_RCGC2\_R = SYSCTL\_RCGC2\_GPIOA | SYSCTL\_RCGC2\_GPIOC}
-\DoxyCodeLine{00195             | SYSCTL\_RCGC2\_GPIOF | SYSCTL\_RCGC2\_GPIOD;}
-\DoxyCodeLine{00196 }
-\DoxyCodeLine{00200     SYSCTL\_RCGCEEPROM\_R |= SYSCTL\_RCGCEEPROM\_R0;}
-\DoxyCodeLine{00201 }
-\DoxyCodeLine{00205     GPIO\_PORTF\_LOCK\_R = GPIO\_LOCK\_KEY;}
-\DoxyCodeLine{00206     GPIO\_PORTF\_CR\_R |= 0x00000001;}
-\DoxyCodeLine{00207 }
-\DoxyCodeLine{00211     GPIO\_PORTD\_DIR\_R |= 0x00000007;}
-\DoxyCodeLine{00212     GPIO\_PORTD\_DEN\_R |= 0x0000000F;}
-\DoxyCodeLine{00213 }
-\DoxyCodeLine{00217     GPIO\_PORTF\_AFSEL\_R = 0;}
-\DoxyCodeLine{00218     GPIO\_PORTF\_DIR\_R = GREEN\_LED\_MASK | BLUE\_LED\_MASK | RED\_LED\_MASK; \textcolor{comment}{// bits 1, 2, and 3 are outputs, other pins are inputs}}
-\DoxyCodeLine{00219     GPIO\_PORTF\_DR2R\_R = GREEN\_LED\_MASK | BLUE\_LED\_MASK | RED\_LED\_MASK; \textcolor{comment}{// set drive strength to 2mA (not needed since default configuration -- for clarity)}}
-\DoxyCodeLine{00220     GPIO\_PORTF\_DEN\_R = PUSH\_BUTTON2\_MASK | PUSH\_BUTTON\_MASK | GREEN\_LED\_MASK}
-\DoxyCodeLine{00221             | BLUE\_LED\_MASK | RED\_LED\_MASK;  \textcolor{comment}{// enable LEDs and pushbuttons}}
-\DoxyCodeLine{00222     GPIO\_PORTF\_PUR\_R = PUSH\_BUTTON2\_MASK | PUSH\_BUTTON\_MASK; \textcolor{comment}{// enable internal pull-up for push button}}
-\DoxyCodeLine{00223 }
-\DoxyCodeLine{00227     GPIO\_PORTA\_DIR\_R |= 2; \textcolor{comment}{// enable output on UART0 TX pin: default, added for clarity}}
-\DoxyCodeLine{00228     GPIO\_PORTA\_DEN\_R |= 3; \textcolor{comment}{// enable digital on UART0 pins: default, added for clarity}}
-\DoxyCodeLine{00229     GPIO\_PORTA\_AFSEL\_R |= 3; \textcolor{comment}{// use peripheral to drive PA0, PA1: default, added for clarity}}
-\DoxyCodeLine{00230     GPIO\_PORTA\_PCTL\_R \&= 0xFFFFFF00;       \textcolor{comment}{// set fields for PA0 and PA1 to zero}}
-\DoxyCodeLine{00231     GPIO\_PORTA\_PCTL\_R |= GPIO\_PCTL\_PA1\_U0TX | GPIO\_PCTL\_PA0\_U0RX; \textcolor{comment}{// select UART0 to drive pins PA0 and PA1: default, added for clarity}}
-\DoxyCodeLine{00232 }
-\DoxyCodeLine{00236     GPIO\_PORTC\_DIR\_R |= 0x60;}
-\DoxyCodeLine{00237     GPIO\_PORTC\_DEN\_R |= 0x70;}
-\DoxyCodeLine{00238     GPIO\_PORTC\_AFSEL\_R |= 0x30;}
-\DoxyCodeLine{00239     GPIO\_PORTC\_PCTL\_R |= GPIO\_PCTL\_PC5\_U1TX | GPIO\_PCTL\_PC4\_U1RX;}
+\DoxyCodeLine{00184 \textcolor{keywordtype}{void} initHw()}
+\DoxyCodeLine{00185 \{}
+\DoxyCodeLine{00186 }
+\DoxyCodeLine{00190     SYSCTL\_RCC\_R = SYSCTL\_RCC\_XTAL\_16MHZ | SYSCTL\_RCC\_OSCSRC\_MAIN}
+\DoxyCodeLine{00191             | SYSCTL\_RCC\_USESYSDIV | (4 << SYSCTL\_RCC\_SYSDIV\_S);}
+\DoxyCodeLine{00192 }
+\DoxyCodeLine{00197     SYSCTL\_GPIOHBCTL\_R = 0;}
+\DoxyCodeLine{00198 }
+\DoxyCodeLine{00202     SYSCTL\_RCGC2\_R = SYSCTL\_RCGC2\_GPIOA | SYSCTL\_RCGC2\_GPIOC}
+\DoxyCodeLine{00203             | SYSCTL\_RCGC2\_GPIOF | SYSCTL\_RCGC2\_GPIOD;}
+\DoxyCodeLine{00204 }
+\DoxyCodeLine{00208     SYSCTL\_RCGCEEPROM\_R |= SYSCTL\_RCGCEEPROM\_R0;}
+\DoxyCodeLine{00209 }
+\DoxyCodeLine{00213     GPIO\_PORTF\_LOCK\_R = GPIO\_LOCK\_KEY;}
+\DoxyCodeLine{00214     GPIO\_PORTF\_CR\_R |= 0x00000001;}
+\DoxyCodeLine{00215 }
+\DoxyCodeLine{00219     GPIO\_PORTD\_DIR\_R |= 0x00000007;}
+\DoxyCodeLine{00220     GPIO\_PORTD\_DEN\_R |= 0x0000000F;}
+\DoxyCodeLine{00221 }
+\DoxyCodeLine{00225     GPIO\_PORTF\_AFSEL\_R = 0;}
+\DoxyCodeLine{00226     GPIO\_PORTF\_DIR\_R = GREEN\_LED\_MASK | BLUE\_LED\_MASK | RED\_LED\_MASK; \textcolor{comment}{// bits 1, 2, and 3 are outputs, other pins are inputs}}
+\DoxyCodeLine{00227     GPIO\_PORTF\_DR2R\_R = GREEN\_LED\_MASK | BLUE\_LED\_MASK | RED\_LED\_MASK; \textcolor{comment}{// set drive strength to 2mA (not needed since default configuration -- for clarity)}}
+\DoxyCodeLine{00228     GPIO\_PORTF\_DEN\_R = PUSH\_BUTTON2\_MASK | PUSH\_BUTTON\_MASK | GREEN\_LED\_MASK}
+\DoxyCodeLine{00229             | BLUE\_LED\_MASK | RED\_LED\_MASK;  \textcolor{comment}{// enable LEDs and pushbuttons}}
+\DoxyCodeLine{00230     GPIO\_PORTF\_PUR\_R = PUSH\_BUTTON2\_MASK | PUSH\_BUTTON\_MASK; \textcolor{comment}{// enable internal pull-up for push button}}
+\DoxyCodeLine{00231 }
+\DoxyCodeLine{00235     GPIO\_PORTA\_DIR\_R |= 2; \textcolor{comment}{// enable output on UART0 TX pin: default, added for clarity}}
+\DoxyCodeLine{00236     GPIO\_PORTA\_DEN\_R |= 3; \textcolor{comment}{// enable digital on UART0 pins: default, added for clarity}}
+\DoxyCodeLine{00237     GPIO\_PORTA\_AFSEL\_R |= 3; \textcolor{comment}{// use peripheral to drive PA0, PA1: default, added for clarity}}
+\DoxyCodeLine{00238     GPIO\_PORTA\_PCTL\_R \&= 0xFFFFFF00;       \textcolor{comment}{// set fields for PA0 and PA1 to zero}}
+\DoxyCodeLine{00239     GPIO\_PORTA\_PCTL\_R |= GPIO\_PCTL\_PA1\_U0TX | GPIO\_PCTL\_PA0\_U0RX; \textcolor{comment}{// select UART0 to drive pins PA0 and PA1: default, added for clarity}}
 \DoxyCodeLine{00240 }
-\DoxyCodeLine{00244     SYSCTL\_RCGCUART\_R |= SYSCTL\_RCGCUART\_R1 | SYSCTL\_RCGCUART\_R0; \textcolor{comment}{// turn-on UART0,1 , leave other UARTs in same status}}
-\DoxyCodeLine{00245     SYSCTL\_RCGCTIMER\_R |= SYSCTL\_RCGCTIMER\_R1 | SYSCTL\_RCGCTIMER\_R2;}
-\DoxyCodeLine{00246 }
-\DoxyCodeLine{00247     delay4Cycles();}
-\DoxyCodeLine{00248     \textcolor{comment}{// wait 4 clock cycles}}
-\DoxyCodeLine{00249 }
-\DoxyCodeLine{00253     UART0\_CTL\_R = 0;                 \textcolor{comment}{// turn-off UART0 to allow safe programming}}
-\DoxyCodeLine{00254     UART0\_CC\_R = UART\_CC\_CS\_SYSCLK;                 \textcolor{comment}{// use system clock (40 MHz)}}
-\DoxyCodeLine{00255     UART0\_IBRD\_R = 21; \textcolor{comment}{// r = 40 MHz / (Nx115.2kHz), set floor(r)=21, where N=16}}
-\DoxyCodeLine{00256     UART0\_FBRD\_R = 45;                               \textcolor{comment}{// round(fract(r)*64)=45}}
-\DoxyCodeLine{00257     UART0\_LCRH\_R = UART\_LCRH\_WLEN\_8; \textcolor{comment}{// configure for 8N1 w/ 16-level FIFO}}
-\DoxyCodeLine{00258     UART0\_CTL\_R = UART\_CTL\_TXE | UART\_CTL\_RXE | UART\_CTL\_UARTEN; \textcolor{comment}{// enable TX, RX, and module}}
-\DoxyCodeLine{00259 }
-\DoxyCodeLine{00263     UART1\_CTL\_R = 0;}
-\DoxyCodeLine{00264     UART1\_CC\_R = UART\_CC\_CS\_SYSCLK;                 \textcolor{comment}{// use system clock (40 MHz)}}
-\DoxyCodeLine{00265     UART1\_IBRD\_R = 10; \textcolor{comment}{// r = 40 MHz / (Nx115.2kHz), set floor(r)=21, where N=16}}
-\DoxyCodeLine{00266     UART1\_FBRD\_R = 0;}
-\DoxyCodeLine{00267     UART1\_LCRH\_R = UART\_LCRH\_WLEN\_8 | UART\_LCRH\_STP2;}
-\DoxyCodeLine{00268     UART1\_CTL\_R = UART\_CTL\_TXE | UART\_CTL\_UARTEN | UART\_CTL\_EOT;}
-\DoxyCodeLine{00269 }
-\DoxyCodeLine{00270     UART0\_IM\_R = UART\_IM\_RXIM;                       \textcolor{comment}{// turn-on RX interrupt}}
-\DoxyCodeLine{00271     NVIC\_EN0\_R |= 1 << (INT\_UART0 - 16);         \textcolor{comment}{// turn-on interrupt 21 (UART0)}}
-\DoxyCodeLine{00272 }
-\DoxyCodeLine{00273     UART1\_IM\_R = UART\_IM\_RXIM | UART\_IM\_TXIM;}
-\DoxyCodeLine{00274     NVIC\_EN0\_R |= 1 << (INT\_UART1 - 16);}
-\DoxyCodeLine{00275 }
-\DoxyCodeLine{00279     TIMER1\_CTL\_R \&= ~TIMER\_CTL\_TAEN;      \textcolor{comment}{// turn-off timer before reconfiguring}}
-\DoxyCodeLine{00280     TIMER1\_CFG\_R = TIMER\_CFG\_32\_BIT\_TIMER;    \textcolor{comment}{// configure as 32-bit timer (A+B)}}
-\DoxyCodeLine{00281     TIMER1\_TAMR\_R = TIMER\_TAMR\_TAMR\_PERIOD; \textcolor{comment}{// configure for periodic mode (count down)}}
-\DoxyCodeLine{00282     TIMER1\_TAILR\_R = 0x30D40; \textcolor{comment}{// set load value to 2e5 for 200 Hz interrupt rate}}
-\DoxyCodeLine{00283     TIMER1\_IMR\_R = TIMER\_IMR\_TATOIM;                 \textcolor{comment}{// turn-on interrupts}}
-\DoxyCodeLine{00284     NVIC\_EN0\_R |= 1 << (INT\_TIMER1A - 16);     \textcolor{comment}{// turn-on interrupt 37 (TIMER1A)}}
-\DoxyCodeLine{00285     TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;                  \textcolor{comment}{// turn-on timer}}
-\DoxyCodeLine{00286 }
-\DoxyCodeLine{00290     TIMER2\_CTL\_R \&= ~TIMER\_CTL\_TAEN;      \textcolor{comment}{// turn-off timer before reconfiguring}}
-\DoxyCodeLine{00291     TIMER2\_CFG\_R = TIMER\_CFG\_32\_BIT\_TIMER;    \textcolor{comment}{// configure as 32-bit timer (A+B)}}
-\DoxyCodeLine{00292     TIMER2\_TAMR\_R = TIMER\_TAMR\_TAMR\_PERIOD; \textcolor{comment}{// configure for periodic mode (count down)}}
-\DoxyCodeLine{00293     TIMER2\_TAILR\_R = 3000000; \textcolor{comment}{//10000000; // set load value to 2e5 for 200 Hz interrupt rate}}
+\DoxyCodeLine{00244     GPIO\_PORTC\_DIR\_R |= 0x60;}
+\DoxyCodeLine{00245     GPIO\_PORTC\_DEN\_R |= 0x70;}
+\DoxyCodeLine{00246     GPIO\_PORTC\_AFSEL\_R |= 0x30;}
+\DoxyCodeLine{00247     GPIO\_PORTC\_PCTL\_R |= GPIO\_PCTL\_PC5\_U1TX | GPIO\_PCTL\_PC4\_U1RX;}
+\DoxyCodeLine{00248 }
+\DoxyCodeLine{00252     SYSCTL\_RCGCUART\_R |= SYSCTL\_RCGCUART\_R1 | SYSCTL\_RCGCUART\_R0; \textcolor{comment}{// turn-on UART0,1 , leave other UARTs in same status}}
+\DoxyCodeLine{00253     SYSCTL\_RCGCTIMER\_R |= SYSCTL\_RCGCTIMER\_R1 | SYSCTL\_RCGCTIMER\_R2;}
+\DoxyCodeLine{00254 }
+\DoxyCodeLine{00255     delay4Cycles();}
+\DoxyCodeLine{00256     \textcolor{comment}{// wait 4 clock cycles}}
+\DoxyCodeLine{00257 }
+\DoxyCodeLine{00261     UART0\_CTL\_R = 0;                 \textcolor{comment}{// turn-off UART0 to allow safe programming}}
+\DoxyCodeLine{00262     UART0\_CC\_R = UART\_CC\_CS\_SYSCLK;                 \textcolor{comment}{// use system clock (40 MHz)}}
+\DoxyCodeLine{00263     UART0\_IBRD\_R = 21; \textcolor{comment}{// r = 40 MHz / (Nx115.2kHz), set floor(r)=21, where N=16}}
+\DoxyCodeLine{00264     UART0\_FBRD\_R = 45;                               \textcolor{comment}{// round(fract(r)*64)=45}}
+\DoxyCodeLine{00265     UART0\_LCRH\_R = UART\_LCRH\_WLEN\_8; \textcolor{comment}{// configure for 8N1 w/ 16-level FIFO}}
+\DoxyCodeLine{00266     UART0\_CTL\_R = UART\_CTL\_TXE | UART\_CTL\_RXE | UART\_CTL\_UARTEN; \textcolor{comment}{// enable TX, RX, and module}}
+\DoxyCodeLine{00267 }
+\DoxyCodeLine{00271     UART1\_CTL\_R = 0;}
+\DoxyCodeLine{00272     UART1\_CC\_R = UART\_CC\_CS\_SYSCLK;                 \textcolor{comment}{// use system clock (40 MHz)}}
+\DoxyCodeLine{00273     UART1\_IBRD\_R = 10; \textcolor{comment}{// r = 40 MHz / (Nx115.2kHz), set floor(r)=21, where N=16}}
+\DoxyCodeLine{00274     UART1\_FBRD\_R = 0;}
+\DoxyCodeLine{00275     UART1\_LCRH\_R = UART\_LCRH\_WLEN\_8 | UART\_LCRH\_STP2;}
+\DoxyCodeLine{00276     UART1\_CTL\_R = UART\_CTL\_TXE | UART\_CTL\_UARTEN | UART\_CTL\_EOT;}
+\DoxyCodeLine{00277 }
+\DoxyCodeLine{00278     UART0\_IM\_R = UART\_IM\_RXIM;                       \textcolor{comment}{// turn-on RX interrupt}}
+\DoxyCodeLine{00279     NVIC\_EN0\_R |= 1 << (INT\_UART0 - 16);         \textcolor{comment}{// turn-on interrupt 21 (UART0)}}
+\DoxyCodeLine{00280 }
+\DoxyCodeLine{00281     UART1\_IM\_R = UART\_IM\_RXIM | UART\_IM\_TXIM;}
+\DoxyCodeLine{00282     NVIC\_EN0\_R |= 1 << (INT\_UART1 - 16);}
+\DoxyCodeLine{00283 }
+\DoxyCodeLine{00287     TIMER1\_CTL\_R \&= ~TIMER\_CTL\_TAEN;      \textcolor{comment}{// turn-off timer before reconfiguring}}
+\DoxyCodeLine{00288     TIMER1\_CFG\_R = TIMER\_CFG\_32\_BIT\_TIMER;    \textcolor{comment}{// configure as 32-bit timer (A+B)}}
+\DoxyCodeLine{00289     TIMER1\_TAMR\_R = TIMER\_TAMR\_TAMR\_PERIOD; \textcolor{comment}{// configure for periodic mode (count down)}}
+\DoxyCodeLine{00290     TIMER1\_TAILR\_R = 0x30D40; \textcolor{comment}{// set load value to 2e5 for 200 Hz interrupt rate}}
+\DoxyCodeLine{00291     TIMER1\_IMR\_R = TIMER\_IMR\_TATOIM;                 \textcolor{comment}{// turn-on interrupts}}
+\DoxyCodeLine{00292     NVIC\_EN0\_R |= 1 << (INT\_TIMER1A - 16);     \textcolor{comment}{// turn-on interrupt 37 (TIMER1A)}}
+\DoxyCodeLine{00293     TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;                  \textcolor{comment}{// turn-on timer}}
 \DoxyCodeLine{00294 }
-\DoxyCodeLine{00295     TIMER2\_IMR\_R = TIMER\_IMR\_TATOIM;                 \textcolor{comment}{// turn-on interrupts}}
-\DoxyCodeLine{00296     NVIC\_EN0\_R |= 1 << (INT\_TIMER2A - 16);     \textcolor{comment}{// turn-on interrupt 39 (TIMER2A)}}
-\DoxyCodeLine{00297     TIMER2\_CTL\_R |= TIMER\_CTL\_TAEN;                  \textcolor{comment}{// turn-on timer}}
-\DoxyCodeLine{00298 }
-\DoxyCodeLine{00302     delay6Cycles();}
-\DoxyCodeLine{00303     \textcolor{keywordflow}{while} (EEPROM\_EEDONE\_R \& 0x01);}
-\DoxyCodeLine{00304 }
-\DoxyCodeLine{00305     \textcolor{keywordflow}{if} (EEPROM\_EESUPP\_R \& EEPROM\_EESUPP\_PRETRY}
-\DoxyCodeLine{00306             || EEPROM\_EESUPP\_R \& EEPROM\_EESUPP\_ERETRY)}
-\DoxyCodeLine{00307     \{}
-\DoxyCodeLine{00308         putsUart0(\textcolor{stringliteral}{"EEPROM Init Error before reset!"});}
-\DoxyCodeLine{00309         exit(0);}
-\DoxyCodeLine{00310     \}}
-\DoxyCodeLine{00311     \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00312     \{}
-\DoxyCodeLine{00313         SYSCTL\_SREEPROM\_R |= SYSCTL\_SREEPROM\_R0;}
-\DoxyCodeLine{00314         SYSCTL\_SREEPROM\_R \&= ~SYSCTL\_SREEPROM\_R0;}
-\DoxyCodeLine{00315     \}}
-\DoxyCodeLine{00316 }
-\DoxyCodeLine{00317     delay6Cycles();}
-\DoxyCodeLine{00318     \textcolor{keywordflow}{while} (EEPROM\_EEDONE\_R \& 0x01)}
-\DoxyCodeLine{00319         ;}
-\DoxyCodeLine{00320     \textcolor{keywordflow}{if} (EEPROM\_EESUPP\_R \& EEPROM\_EESUPP\_PRETRY}
-\DoxyCodeLine{00321             || EEPROM\_EESUPP\_R \& EEPROM\_EESUPP\_ERETRY)}
-\DoxyCodeLine{00322     \{}
-\DoxyCodeLine{00323         putsUart0(\textcolor{stringliteral}{"EEPROM Init Error after reset!"});}
-\DoxyCodeLine{00324         exit(0);}
-\DoxyCodeLine{00325     \}}
-\DoxyCodeLine{00326 }
-\DoxyCodeLine{00330     SYSCTL\_RCGC0\_R |= SYSCTL\_RCGC0\_PWM0;            \textcolor{comment}{// turn-on PWM1 module}}
-\DoxyCodeLine{00331     SYSCTL\_RCGCPWM\_R |= SYSCTL\_RCGCPWM\_R1;          \textcolor{comment}{// enable clock for PWM}}
-\DoxyCodeLine{00332     SYSCTL\_RCC\_R |= SYSCTL\_RCC\_USEPWMDIV | SYSCTL\_RCC\_PWMDIV\_16; \textcolor{comment}{// use SysClk / 16 for PWM clock}}
-\DoxyCodeLine{00333 }
-\DoxyCodeLine{00334     GPIO\_PORTF\_DIR\_R |= 0x0E;   \textcolor{comment}{// make bits 1,2,3}}
-\DoxyCodeLine{00335     GPIO\_PORTF\_DR2R\_R |= 0x0E;  \textcolor{comment}{// set drive strength to 2mA}}
-\DoxyCodeLine{00336     GPIO\_PORTF\_DEN\_R |= 0x0E;   \textcolor{comment}{// enable bits 1,2,3 digital}}
-\DoxyCodeLine{00337     GPIO\_PORTF\_PCTL\_R |= GPIO\_PCTL\_PF1\_M1PWM5 | GPIO\_PCTL\_PF2\_M1PWM6}
-\DoxyCodeLine{00338             | GPIO\_PCTL\_PF3\_M1PWM7;  \textcolor{comment}{//Use PORTF 1,2,3 as PWM Outputs.}}
-\DoxyCodeLine{00339 }
-\DoxyCodeLine{00340     SYSCTL\_SRPWM\_R = 0;                             \textcolor{comment}{// leave reset state}}
-\DoxyCodeLine{00341     PWM1\_1\_CTL\_R = 0;                               \textcolor{comment}{// turn-off PWM1 generator 2}}
-\DoxyCodeLine{00342     PWM1\_2\_CTL\_R = 0;                               \textcolor{comment}{// turn-off PWM1 generator 2}}
-\DoxyCodeLine{00343     PWM1\_3\_CTL\_R = 0;                               \textcolor{comment}{// turn-off PWM1 generator 3}}
-\DoxyCodeLine{00344 }
-\DoxyCodeLine{00345     PWM1\_2\_GENB\_R = PWM\_1\_GENB\_ACTCMPBD\_ZERO | PWM\_1\_GENB\_ACTLOAD\_ONE; \textcolor{comment}{// output 3 on PWM0, gen 1b, cmpb}}
-\DoxyCodeLine{00346     PWM1\_3\_GENA\_R = PWM\_1\_GENA\_ACTCMPAD\_ZERO | PWM\_1\_GENA\_ACTLOAD\_ONE; \textcolor{comment}{// output 4 on PWM0, gen 2a, cmpa}}
-\DoxyCodeLine{00347     PWM1\_3\_GENB\_R = PWM\_1\_GENB\_ACTCMPBD\_ZERO | PWM\_1\_GENB\_ACTLOAD\_ONE; \textcolor{comment}{// output 5 on PWM0, gen 2b, cmpb}}
-\DoxyCodeLine{00348 }
-\DoxyCodeLine{00349     PWM1\_2\_LOAD\_R = 50000; \textcolor{comment}{// set period to 40 MHz sys clock / 16 / 50000 = 50Hz for servo control}}
-\DoxyCodeLine{00350     PWM1\_3\_LOAD\_R = 50000; \textcolor{comment}{// set period to 40 MHz sys clock / 16 / 50000 = 50Hz for servo control}}
-\DoxyCodeLine{00351     PWM1\_INVERT\_R =}
-\DoxyCodeLine{00352     PWM\_INVERT\_PWM5INV | PWM\_INVERT\_PWM6INV | PWM\_INVERT\_PWM7INV; \textcolor{comment}{// invert outputs so duty cycle increases with increasing compare values}}
-\DoxyCodeLine{00353     PWM1\_2\_CMPB\_R = 0;               \textcolor{comment}{// red off (0=always low, 1023=always high)}}
-\DoxyCodeLine{00354     PWM1\_3\_CMPB\_R = 0;                               \textcolor{comment}{// green off}}
-\DoxyCodeLine{00355     PWM1\_3\_CMPA\_R = 0;                               \textcolor{comment}{// blue off}}
+\DoxyCodeLine{00298     TIMER2\_CTL\_R \&= ~TIMER\_CTL\_TAEN;      \textcolor{comment}{// turn-off timer before reconfiguring}}
+\DoxyCodeLine{00299     TIMER2\_CFG\_R = TIMER\_CFG\_32\_BIT\_TIMER;    \textcolor{comment}{// configure as 32-bit timer (A+B)}}
+\DoxyCodeLine{00300     TIMER2\_TAMR\_R = TIMER\_TAMR\_TAMR\_PERIOD; \textcolor{comment}{// configure for periodic mode (count down)}}
+\DoxyCodeLine{00301     TIMER2\_TAILR\_R = 3000000; \textcolor{comment}{//10000000; // set load value to 2e5 for 200 Hz interrupt rate}}
+\DoxyCodeLine{00302 }
+\DoxyCodeLine{00303     TIMER2\_IMR\_R = TIMER\_IMR\_TATOIM;                 \textcolor{comment}{// turn-on interrupts}}
+\DoxyCodeLine{00304     NVIC\_EN0\_R |= 1 << (INT\_TIMER2A - 16);     \textcolor{comment}{// turn-on interrupt 39 (TIMER2A)}}
+\DoxyCodeLine{00305     TIMER2\_CTL\_R |= TIMER\_CTL\_TAEN;                  \textcolor{comment}{// turn-on timer}}
+\DoxyCodeLine{00306 }
+\DoxyCodeLine{00310     delay6Cycles();}
+\DoxyCodeLine{00311     \textcolor{keywordflow}{while} (EEPROM\_EEDONE\_R \& 0x01);}
+\DoxyCodeLine{00312 }
+\DoxyCodeLine{00313     \textcolor{keywordflow}{if} (EEPROM\_EESUPP\_R \& EEPROM\_EESUPP\_PRETRY}
+\DoxyCodeLine{00314             || EEPROM\_EESUPP\_R \& EEPROM\_EESUPP\_ERETRY)}
+\DoxyCodeLine{00315     \{}
+\DoxyCodeLine{00316         putsUart0(\textcolor{stringliteral}{"EEPROM Init Error before reset!"});}
+\DoxyCodeLine{00317         exit(0);}
+\DoxyCodeLine{00318     \}}
+\DoxyCodeLine{00319     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00320     \{}
+\DoxyCodeLine{00321         SYSCTL\_SREEPROM\_R |= SYSCTL\_SREEPROM\_R0;}
+\DoxyCodeLine{00322         SYSCTL\_SREEPROM\_R \&= ~SYSCTL\_SREEPROM\_R0;}
+\DoxyCodeLine{00323     \}}
+\DoxyCodeLine{00324 }
+\DoxyCodeLine{00325     delay6Cycles();}
+\DoxyCodeLine{00326     \textcolor{keywordflow}{while} (EEPROM\_EEDONE\_R \& 0x01)}
+\DoxyCodeLine{00327         ;}
+\DoxyCodeLine{00328     \textcolor{keywordflow}{if} (EEPROM\_EESUPP\_R \& EEPROM\_EESUPP\_PRETRY}
+\DoxyCodeLine{00329             || EEPROM\_EESUPP\_R \& EEPROM\_EESUPP\_ERETRY)}
+\DoxyCodeLine{00330     \{}
+\DoxyCodeLine{00331         putsUart0(\textcolor{stringliteral}{"EEPROM Init Error after reset!"});}
+\DoxyCodeLine{00332         exit(0);}
+\DoxyCodeLine{00333     \}}
+\DoxyCodeLine{00334 }
+\DoxyCodeLine{00338     SYSCTL\_RCGC0\_R |= SYSCTL\_RCGC0\_PWM0;            \textcolor{comment}{// turn-on PWM1 module}}
+\DoxyCodeLine{00339     SYSCTL\_RCGCPWM\_R |= SYSCTL\_RCGCPWM\_R1;          \textcolor{comment}{// enable clock for PWM}}
+\DoxyCodeLine{00340     SYSCTL\_RCC\_R |= SYSCTL\_RCC\_USEPWMDIV | SYSCTL\_RCC\_PWMDIV\_16; \textcolor{comment}{// use SysClk / 16 for PWM clock}}
+\DoxyCodeLine{00341 }
+\DoxyCodeLine{00342     GPIO\_PORTF\_DIR\_R |= 0x0E;   \textcolor{comment}{// make bits 1,2,3}}
+\DoxyCodeLine{00343     GPIO\_PORTF\_DR2R\_R |= 0x0E;  \textcolor{comment}{// set drive strength to 2mA}}
+\DoxyCodeLine{00344     GPIO\_PORTF\_DEN\_R |= 0x0E;   \textcolor{comment}{// enable bits 1,2,3 digital}}
+\DoxyCodeLine{00345     GPIO\_PORTF\_PCTL\_R |= GPIO\_PCTL\_PF1\_M1PWM5 | GPIO\_PCTL\_PF2\_M1PWM6}
+\DoxyCodeLine{00346             | GPIO\_PCTL\_PF3\_M1PWM7;  \textcolor{comment}{//Use PORTF 1,2,3 as PWM Outputs.}}
+\DoxyCodeLine{00347 }
+\DoxyCodeLine{00348     SYSCTL\_SRPWM\_R = 0;                             \textcolor{comment}{// leave reset state}}
+\DoxyCodeLine{00349     PWM1\_1\_CTL\_R = 0;                               \textcolor{comment}{// turn-off PWM1 generator 2}}
+\DoxyCodeLine{00350     PWM1\_2\_CTL\_R = 0;                               \textcolor{comment}{// turn-off PWM1 generator 2}}
+\DoxyCodeLine{00351     PWM1\_3\_CTL\_R = 0;                               \textcolor{comment}{// turn-off PWM1 generator 3}}
+\DoxyCodeLine{00352 }
+\DoxyCodeLine{00353     PWM1\_2\_GENB\_R = PWM\_1\_GENB\_ACTCMPBD\_ZERO | PWM\_1\_GENB\_ACTLOAD\_ONE; \textcolor{comment}{// output 3 on PWM0, gen 1b, cmpb}}
+\DoxyCodeLine{00354     PWM1\_3\_GENA\_R = PWM\_1\_GENA\_ACTCMPAD\_ZERO | PWM\_1\_GENA\_ACTLOAD\_ONE; \textcolor{comment}{// output 4 on PWM0, gen 2a, cmpa}}
+\DoxyCodeLine{00355     PWM1\_3\_GENB\_R = PWM\_1\_GENB\_ACTCMPBD\_ZERO | PWM\_1\_GENB\_ACTLOAD\_ONE; \textcolor{comment}{// output 5 on PWM0, gen 2b, cmpb}}
 \DoxyCodeLine{00356 }
-\DoxyCodeLine{00357     PWM1\_2\_CTL\_R = PWM\_2\_CTL\_ENABLE;                 \textcolor{comment}{// turn-on PWM0 generator 1}}
-\DoxyCodeLine{00358     PWM1\_3\_CTL\_R = PWM\_3\_CTL\_ENABLE;                 \textcolor{comment}{// turn-on PWM0 generator 2}}
-\DoxyCodeLine{00359     PWM1\_ENABLE\_R = PWM\_ENABLE\_PWM5EN | PWM\_ENABLE\_PWM6EN | PWM\_ENABLE\_PWM7EN;}
-\DoxyCodeLine{00360 }
-\DoxyCodeLine{00361 \}}
-\DoxyCodeLine{00362 }
-\DoxyCodeLine{00368 \textcolor{keywordtype}{void} Uart1Isr()}
-\DoxyCodeLine{00369 \{}
+\DoxyCodeLine{00357     PWM1\_2\_LOAD\_R = 50000; \textcolor{comment}{// set period to 40 MHz sys clock / 16 / 50000 = 50Hz for servo control}}
+\DoxyCodeLine{00358     PWM1\_3\_LOAD\_R = 50000; \textcolor{comment}{// set period to 40 MHz sys clock / 16 / 50000 = 50Hz for servo control}}
+\DoxyCodeLine{00359     PWM1\_INVERT\_R =}
+\DoxyCodeLine{00360     PWM\_INVERT\_PWM5INV | PWM\_INVERT\_PWM6INV | PWM\_INVERT\_PWM7INV; \textcolor{comment}{// invert outputs so duty cycle increases with increasing compare values}}
+\DoxyCodeLine{00361     PWM1\_2\_CMPB\_R = 0;               \textcolor{comment}{// red off (0=always low, 1023=always high)}}
+\DoxyCodeLine{00362     PWM1\_3\_CMPB\_R = 0;                               \textcolor{comment}{// green off}}
+\DoxyCodeLine{00363     PWM1\_3\_CMPA\_R = 0;                               \textcolor{comment}{// blue off}}
+\DoxyCodeLine{00364 }
+\DoxyCodeLine{00365     PWM1\_2\_CTL\_R = PWM\_2\_CTL\_ENABLE;                 \textcolor{comment}{// turn-on PWM0 generator 1}}
+\DoxyCodeLine{00366     PWM1\_3\_CTL\_R = PWM\_3\_CTL\_ENABLE;                 \textcolor{comment}{// turn-on PWM0 generator 2}}
+\DoxyCodeLine{00367     PWM1\_ENABLE\_R = PWM\_ENABLE\_PWM5EN | PWM\_ENABLE\_PWM6EN | PWM\_ENABLE\_PWM7EN;}
+\DoxyCodeLine{00368 }
+\DoxyCodeLine{00369 \}}
 \DoxyCodeLine{00370 }
-\DoxyCodeLine{00371     \textcolor{comment}{//For controller mode}}
-\DoxyCodeLine{00372     \textcolor{keywordflow}{if} (mode == 1)}
-\DoxyCodeLine{00373     \{}
-\DoxyCodeLine{00374         \textcolor{keywordflow}{if} (DMXMode - 3 < maxAddress)}
-\DoxyCodeLine{00375         \{}
-\DoxyCodeLine{00376             UART1\_DR\_R = dmxData[DMXMode - 3];}
-\DoxyCodeLine{00377             DMXMode++;}
-\DoxyCodeLine{00378             UART1\_ICR\_R = UART\_ICR\_TXIC;}
-\DoxyCodeLine{00379         \}}
-\DoxyCodeLine{00380         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00381         \{}
-\DoxyCodeLine{00382             UART1\_ICR\_R = UART\_ICR\_TXIC;}
-\DoxyCodeLine{00383             GPIO\_PORTC\_AFSEL\_R \&= 0x00;}
-\DoxyCodeLine{00384             GPIO\_PORTC\_DATA\_R \&= 0xDF;}
-\DoxyCodeLine{00385             DMXMode = 0;}
-\DoxyCodeLine{00386             UART1\_CTL\_R = 0;}
-\DoxyCodeLine{00387             changeTimer1Value(176);}
-\DoxyCodeLine{00388             TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{00389 }
-\DoxyCodeLine{00390         \}}
-\DoxyCodeLine{00391     \}}
-\DoxyCodeLine{00392 }
-\DoxyCodeLine{00393     \textcolor{comment}{//For device mode}}
-\DoxyCodeLine{00394     \textcolor{keywordflow}{if} (UART1\_MIS\_R \& UART\_MIS\_RXMIS)}
-\DoxyCodeLine{00395     \{}
-\DoxyCodeLine{00396 }
-\DoxyCodeLine{00397         uint16\_t U1\_DR = UART1\_DR\_R;}
-\DoxyCodeLine{00398         uint8\_t data = U1\_DR \& 0xFF;}
-\DoxyCodeLine{00399 }
-\DoxyCodeLine{00400         \textcolor{comment}{//enable error Timer if rxState is 0; blinks green LED after 2 seconds if no activity.}}
-\DoxyCodeLine{00401         \textcolor{keywordflow}{if} (rxState == 0)}
-\DoxyCodeLine{00402         \{}
-\DoxyCodeLine{00403             TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{00404         \}}
-\DoxyCodeLine{00405 }
-\DoxyCodeLine{00406         \textcolor{comment}{//if you get break bit}}
-\DoxyCodeLine{00407         \textcolor{keywordflow}{if} (U1\_DR \& 0x400)}
-\DoxyCodeLine{00408         \{}
-\DoxyCodeLine{00409             changeTimer1Value(2000000);}
-\DoxyCodeLine{00410             TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{00411             rxState = 1;}
-\DoxyCodeLine{00412             rxError = 0;}
-\DoxyCodeLine{00413             prevRX = 0;}
-\DoxyCodeLine{00414             GREEN\_LED = 1;}
-\DoxyCodeLine{00415         \}}
-\DoxyCodeLine{00416 }
-\DoxyCodeLine{00417         \textcolor{comment}{//ignore mark after break}}
-\DoxyCodeLine{00418         \textcolor{comment}{//get start bit}}
-\DoxyCodeLine{00419         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (rxState == 1 \&\& data == 0)}
-\DoxyCodeLine{00420         \{}
-\DoxyCodeLine{00421             prevRX = 1;}
-\DoxyCodeLine{00422             rxState = 2;}
-\DoxyCodeLine{00423 }
-\DoxyCodeLine{00424         \}}
-\DoxyCodeLine{00425 }
-\DoxyCodeLine{00426         \textcolor{comment}{//get dmx data}}
-\DoxyCodeLine{00427         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (rxState >= 2 \&\& rxState <= 514)}
+\DoxyCodeLine{00376 \textcolor{keywordtype}{void} Uart1Isr()}
+\DoxyCodeLine{00377 \{}
+\DoxyCodeLine{00378 }
+\DoxyCodeLine{00379     \textcolor{comment}{//For controller mode}}
+\DoxyCodeLine{00380     \textcolor{keywordflow}{if} (mode == 1)}
+\DoxyCodeLine{00381     \{}
+\DoxyCodeLine{00382         \textcolor{keywordflow}{if} (DMXMode - 3 < maxAddress)}
+\DoxyCodeLine{00383         \{}
+\DoxyCodeLine{00384             UART1\_DR\_R = dmxData[DMXMode - 3];}
+\DoxyCodeLine{00385             DMXMode++;}
+\DoxyCodeLine{00386             UART1\_ICR\_R = UART\_ICR\_TXIC;}
+\DoxyCodeLine{00387         \}}
+\DoxyCodeLine{00388         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00389         \{}
+\DoxyCodeLine{00390             UART1\_ICR\_R = UART\_ICR\_TXIC;}
+\DoxyCodeLine{00391             GPIO\_PORTC\_AFSEL\_R \&= 0x00;}
+\DoxyCodeLine{00392             GPIO\_PORTC\_DATA\_R \&= 0xDF;}
+\DoxyCodeLine{00393             DMXMode = 0;}
+\DoxyCodeLine{00394             UART1\_CTL\_R = 0;}
+\DoxyCodeLine{00395             changeTimer1Value(176);}
+\DoxyCodeLine{00396             TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{00397 }
+\DoxyCodeLine{00398         \}}
+\DoxyCodeLine{00399     \}}
+\DoxyCodeLine{00400 }
+\DoxyCodeLine{00401     \textcolor{comment}{//For device mode}}
+\DoxyCodeLine{00402     \textcolor{keywordflow}{if} (UART1\_MIS\_R \& UART\_MIS\_RXMIS)}
+\DoxyCodeLine{00403     \{}
+\DoxyCodeLine{00404 }
+\DoxyCodeLine{00405         uint16\_t U1\_DR = UART1\_DR\_R;}
+\DoxyCodeLine{00406         uint8\_t data = U1\_DR \& 0xFF;}
+\DoxyCodeLine{00407 }
+\DoxyCodeLine{00408         \textcolor{comment}{//enable error Timer if rxState is 0; blinks green LED after 2 seconds if no activity.}}
+\DoxyCodeLine{00409         \textcolor{keywordflow}{if} (rxState == 0)}
+\DoxyCodeLine{00410         \{}
+\DoxyCodeLine{00411             TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{00412         \}}
+\DoxyCodeLine{00413 }
+\DoxyCodeLine{00414         \textcolor{comment}{//if you get break bit}}
+\DoxyCodeLine{00415         \textcolor{keywordflow}{if} (U1\_DR \& 0x400)}
+\DoxyCodeLine{00416         \{}
+\DoxyCodeLine{00417             changeTimer1Value(2000000);}
+\DoxyCodeLine{00418             TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{00419             rxState = 1;}
+\DoxyCodeLine{00420             rxError = 0;}
+\DoxyCodeLine{00421             prevRX = 0;}
+\DoxyCodeLine{00422             GREEN\_LED = 1;}
+\DoxyCodeLine{00423         \}}
+\DoxyCodeLine{00424 }
+\DoxyCodeLine{00425         \textcolor{comment}{//ignore mark after break}}
+\DoxyCodeLine{00426         \textcolor{comment}{//get start bit}}
+\DoxyCodeLine{00427         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (rxState == 1 \&\& data == 0)}
 \DoxyCodeLine{00428         \{}
-\DoxyCodeLine{00429             dmxData[(rxState) - 2] = data;}
-\DoxyCodeLine{00430             prevRX = rxState;}
-\DoxyCodeLine{00431             rxState++;}
-\DoxyCodeLine{00432 }
-\DoxyCodeLine{00433             \textcolor{keywordflow}{if} (rxState == 514)}
-\DoxyCodeLine{00434             \{}
-\DoxyCodeLine{00435                 GREEN\_LED \string^= 1;}
-\DoxyCodeLine{00436                 rxState = 0;}
-\DoxyCodeLine{00437             \}}
-\DoxyCodeLine{00438         \}}
-\DoxyCodeLine{00439 }
-\DoxyCodeLine{00440         \textcolor{comment}{//turn on error state if no data}}
-\DoxyCodeLine{00441         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00442         \{}
-\DoxyCodeLine{00443             rxState = 0;}
-\DoxyCodeLine{00444         \}}
-\DoxyCodeLine{00445 }
-\DoxyCodeLine{00446     \}}
-\DoxyCodeLine{00447     UART1\_ICR\_R = 0;}
-\DoxyCodeLine{00448 }
-\DoxyCodeLine{00449 \}}
-\DoxyCodeLine{00450 }
-\DoxyCodeLine{00456 \textcolor{keywordtype}{void} putcUart1(uint8\_t i )}
-\DoxyCodeLine{00457 \{}
+\DoxyCodeLine{00429             prevRX = 1;}
+\DoxyCodeLine{00430             rxState = 2;}
+\DoxyCodeLine{00431 }
+\DoxyCodeLine{00432         \}}
+\DoxyCodeLine{00433 }
+\DoxyCodeLine{00434         \textcolor{comment}{//get dmx data}}
+\DoxyCodeLine{00435         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (rxState >= 2 \&\& rxState <= 514)}
+\DoxyCodeLine{00436         \{}
+\DoxyCodeLine{00437             dmxData[(rxState) - 2] = data;}
+\DoxyCodeLine{00438             prevRX = rxState;}
+\DoxyCodeLine{00439             rxState++;}
+\DoxyCodeLine{00440 }
+\DoxyCodeLine{00441             \textcolor{keywordflow}{if} (rxState == 514)}
+\DoxyCodeLine{00442             \{}
+\DoxyCodeLine{00443                 GREEN\_LED \string^= 1;}
+\DoxyCodeLine{00444                 rxState = 0;}
+\DoxyCodeLine{00445             \}}
+\DoxyCodeLine{00446         \}}
+\DoxyCodeLine{00447 }
+\DoxyCodeLine{00448         \textcolor{comment}{//turn on error state if no data}}
+\DoxyCodeLine{00449         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00450         \{}
+\DoxyCodeLine{00451             rxState = 0;}
+\DoxyCodeLine{00452         \}}
+\DoxyCodeLine{00453 }
+\DoxyCodeLine{00454     \}}
+\DoxyCodeLine{00455     UART1\_ICR\_R = 0;}
+\DoxyCodeLine{00456 }
+\DoxyCodeLine{00457 \}}
 \DoxyCodeLine{00458 }
-\DoxyCodeLine{00459     \textcolor{keywordflow}{while} (UART1\_FR\_R \& UART\_FR\_TXFF);               \textcolor{comment}{// wait if uart0 tx fifo full}}
-\DoxyCodeLine{00460     UART1\_DR\_R = i;                                  \textcolor{comment}{// write character to fifo}}
-\DoxyCodeLine{00461 \}}
-\DoxyCodeLine{00462 }
-\DoxyCodeLine{00468 \textcolor{keywordtype}{void} changeTimer1Value(uint32\_t us )}
-\DoxyCodeLine{00469 \{}
+\DoxyCodeLine{00464 \textcolor{keywordtype}{void} putcUart1(uint8\_t i )}
+\DoxyCodeLine{00465 \{}
+\DoxyCodeLine{00466 }
+\DoxyCodeLine{00467     \textcolor{keywordflow}{while} (UART1\_FR\_R \& UART\_FR\_TXFF);               \textcolor{comment}{// wait if uart0 tx fifo full}}
+\DoxyCodeLine{00468     UART1\_DR\_R = i;                                  \textcolor{comment}{// write character to fifo}}
+\DoxyCodeLine{00469 \}}
 \DoxyCodeLine{00470 }
-\DoxyCodeLine{00471     TIMER1\_CTL\_R \&= ~TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{00472     TIMER1\_TAILR\_R = us * 40;             \textcolor{comment}{// turn-off timer before reconfiguring}}
-\DoxyCodeLine{00473     \textcolor{comment}{// reset interrupt}}
-\DoxyCodeLine{00474     \textcolor{comment}{// set load value to 2e5 for 200 Hz interrupt rate}}
-\DoxyCodeLine{00475     TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{00476 \}}
-\DoxyCodeLine{00477 }
-\DoxyCodeLine{00483 \textcolor{keywordtype}{void} Timer2ISR()}
-\DoxyCodeLine{00484 \{}
+\DoxyCodeLine{00476 \textcolor{keywordtype}{void} changeTimer1Value(uint32\_t us )}
+\DoxyCodeLine{00477 \{}
+\DoxyCodeLine{00478 }
+\DoxyCodeLine{00479     TIMER1\_CTL\_R \&= ~TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{00480     TIMER1\_TAILR\_R = us * 40;             \textcolor{comment}{// turn-off timer before reconfiguring}}
+\DoxyCodeLine{00481     \textcolor{comment}{// reset interrupt}}
+\DoxyCodeLine{00482     \textcolor{comment}{// set load value to 2e5 for 200 Hz interrupt rate}}
+\DoxyCodeLine{00483     TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{00484 \}}
 \DoxyCodeLine{00485 }
-\DoxyCodeLine{00486     \textcolor{keywordflow}{if} (woo == 2)}
-\DoxyCodeLine{00487     \{}
-\DoxyCodeLine{00488         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress - 1] == 0)}
-\DoxyCodeLine{00489         \{}
-\DoxyCodeLine{00490             upR = 1;}
-\DoxyCodeLine{00491             dmxData[deviceModeAddress - 1] = 2;}
-\DoxyCodeLine{00492             goR = 0;}
-\DoxyCodeLine{00493             goG = 1;}
-\DoxyCodeLine{00494             goB = 0;}
-\DoxyCodeLine{00495         \}}
-\DoxyCodeLine{00496         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress - 1] == 254)}
+\DoxyCodeLine{00491 \textcolor{keywordtype}{void} Timer2ISR()}
+\DoxyCodeLine{00492 \{}
+\DoxyCodeLine{00493 }
+\DoxyCodeLine{00494     \textcolor{keywordflow}{if} (woo == 2)}
+\DoxyCodeLine{00495     \{}
+\DoxyCodeLine{00496         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress - 1] == 0)}
 \DoxyCodeLine{00497         \{}
-\DoxyCodeLine{00498             upR = 0;}
-\DoxyCodeLine{00499             dmxData[deviceModeAddress - 1] = 252;}
+\DoxyCodeLine{00498             upR = 1;}
+\DoxyCodeLine{00499             dmxData[deviceModeAddress - 1] = 2;}
 \DoxyCodeLine{00500             goR = 0;}
 \DoxyCodeLine{00501             goG = 1;}
 \DoxyCodeLine{00502             goB = 0;}
-\DoxyCodeLine{00503 }
-\DoxyCodeLine{00504         \}}
-\DoxyCodeLine{00505 }
-\DoxyCodeLine{00506         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 1 - 1] == 0)}
-\DoxyCodeLine{00507         \{}
-\DoxyCodeLine{00508             upG = 1;}
-\DoxyCodeLine{00509             dmxData[deviceModeAddress + 1 - 1] = 2;}
-\DoxyCodeLine{00510             goR = 0;}
-\DoxyCodeLine{00511             goG = 0;}
-\DoxyCodeLine{00512             goB = 1;}
-\DoxyCodeLine{00513         \}}
-\DoxyCodeLine{00514         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 1 - 1] == 254)}
+\DoxyCodeLine{00503         \}}
+\DoxyCodeLine{00504         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress - 1] == 254)}
+\DoxyCodeLine{00505         \{}
+\DoxyCodeLine{00506             upR = 0;}
+\DoxyCodeLine{00507             dmxData[deviceModeAddress - 1] = 252;}
+\DoxyCodeLine{00508             goR = 0;}
+\DoxyCodeLine{00509             goG = 1;}
+\DoxyCodeLine{00510             goB = 0;}
+\DoxyCodeLine{00511 }
+\DoxyCodeLine{00512         \}}
+\DoxyCodeLine{00513 }
+\DoxyCodeLine{00514         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 1 - 1] == 0)}
 \DoxyCodeLine{00515         \{}
-\DoxyCodeLine{00516             upG = 0;}
-\DoxyCodeLine{00517             dmxData[deviceModeAddress + 1 - 1] = 252;}
+\DoxyCodeLine{00516             upG = 1;}
+\DoxyCodeLine{00517             dmxData[deviceModeAddress + 1 - 1] = 2;}
 \DoxyCodeLine{00518             goR = 0;}
 \DoxyCodeLine{00519             goG = 0;}
 \DoxyCodeLine{00520             goB = 1;}
 \DoxyCodeLine{00521         \}}
-\DoxyCodeLine{00522 }
-\DoxyCodeLine{00523         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 2 - 1] == 0)}
-\DoxyCodeLine{00524         \{}
-\DoxyCodeLine{00525             upB = 1;}
-\DoxyCodeLine{00526             dmxData[deviceModeAddress + 2 - 1] = 2;}
-\DoxyCodeLine{00527             goR = 1;}
-\DoxyCodeLine{00528             goG = 0;}
-\DoxyCodeLine{00529             goB = 0;}
-\DoxyCodeLine{00530         \}}
-\DoxyCodeLine{00531         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 2 - 1] == 254)}
+\DoxyCodeLine{00522         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 1 - 1] == 254)}
+\DoxyCodeLine{00523         \{}
+\DoxyCodeLine{00524             upG = 0;}
+\DoxyCodeLine{00525             dmxData[deviceModeAddress + 1 - 1] = 252;}
+\DoxyCodeLine{00526             goR = 0;}
+\DoxyCodeLine{00527             goG = 0;}
+\DoxyCodeLine{00528             goB = 1;}
+\DoxyCodeLine{00529         \}}
+\DoxyCodeLine{00530 }
+\DoxyCodeLine{00531         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 2 - 1] == 0)}
 \DoxyCodeLine{00532         \{}
-\DoxyCodeLine{00533             upB = 0;}
-\DoxyCodeLine{00534             dmxData[deviceModeAddress + 2 - 1] = 252;}
+\DoxyCodeLine{00533             upB = 1;}
+\DoxyCodeLine{00534             dmxData[deviceModeAddress + 2 - 1] = 2;}
 \DoxyCodeLine{00535             goR = 1;}
 \DoxyCodeLine{00536             goG = 0;}
 \DoxyCodeLine{00537             goB = 0;}
 \DoxyCodeLine{00538         \}}
-\DoxyCodeLine{00539 }
-\DoxyCodeLine{00540         \textcolor{keywordflow}{if} (goR)}
-\DoxyCodeLine{00541         \{}
-\DoxyCodeLine{00542 }
-\DoxyCodeLine{00543             \textcolor{keywordflow}{if} (upR)}
-\DoxyCodeLine{00544                 dmxData[deviceModeAddress - 1] = (2}
-\DoxyCodeLine{00545                         + dmxData[deviceModeAddress - 1]) \% 256;}
-\DoxyCodeLine{00546             \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00547                 dmxData[deviceModeAddress - 1] = (dmxData[deviceModeAddress - 1]}
-\DoxyCodeLine{00548                         - 2) \% 256;}
-\DoxyCodeLine{00549         \}}
-\DoxyCodeLine{00550         \textcolor{keywordflow}{if} (goG)}
-\DoxyCodeLine{00551         \{}
-\DoxyCodeLine{00552             \textcolor{keywordflow}{if} (upG)}
-\DoxyCodeLine{00553                 dmxData[deviceModeAddress + 1 - 1] = (2}
-\DoxyCodeLine{00554                         + dmxData[deviceModeAddress + 1 - 1]) \% 256;}
-\DoxyCodeLine{00555             \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00556                 dmxData[deviceModeAddress + 1 - 1] = (dmxData[deviceModeAddress}
-\DoxyCodeLine{00557                         + 1 - 1] - 2) \% 256;}
-\DoxyCodeLine{00558         \}}
-\DoxyCodeLine{00559         \textcolor{keywordflow}{if} (goB)}
-\DoxyCodeLine{00560         \{}
-\DoxyCodeLine{00561             \textcolor{keywordflow}{if} (upB)}
-\DoxyCodeLine{00562                 dmxData[deviceModeAddress + 2 - 1] = (2}
-\DoxyCodeLine{00563                         + dmxData[deviceModeAddress + 2 - 1]) \% 256;}
-\DoxyCodeLine{00564             \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00565                 dmxData[deviceModeAddress + 2 - 1] = (dmxData[deviceModeAddress}
-\DoxyCodeLine{00566                         + 2 - 1] - 2) \% 256;}
-\DoxyCodeLine{00567         \}}
-\DoxyCodeLine{00568 }
-\DoxyCodeLine{00569     \}}
-\DoxyCodeLine{00570 }
-\DoxyCodeLine{00571     \textcolor{keywordflow}{if} (woo == 4)}
-\DoxyCodeLine{00572     \{}
-\DoxyCodeLine{00573         \textcolor{keywordflow}{if} (servoDir == 0)}
-\DoxyCodeLine{00574         \{}
-\DoxyCodeLine{00575             dmxData[deviceModeAddress + 0 - 1]--;}
-\DoxyCodeLine{00576         \}}
-\DoxyCodeLine{00577         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00578         \{}
-\DoxyCodeLine{00579             dmxData[deviceModeAddress + 0 - 1]++;}
-\DoxyCodeLine{00580         \}}
-\DoxyCodeLine{00581 }
-\DoxyCodeLine{00582     \}}
-\DoxyCodeLine{00583 }
-\DoxyCodeLine{00584     \textcolor{keywordflow}{if} (woo == 5)}
-\DoxyCodeLine{00585     \{}
-\DoxyCodeLine{00586         seconds += 0.1;}
-\DoxyCodeLine{00587         dimValue -= (dimStart - dimEnd) / secondsTrigger / 10;}
-\DoxyCodeLine{00588         dmxData[deviceModeAddress - 1] = dimValue;}
-\DoxyCodeLine{00589         \textcolor{keywordflow}{if} (dimStart - dimEnd > 0)}
-\DoxyCodeLine{00590         \{}
-\DoxyCodeLine{00591             \textcolor{keywordflow}{if} (dimValue < dimEnd)}
-\DoxyCodeLine{00592             \{}
-\DoxyCodeLine{00593                 putsUart0(\textcolor{stringliteral}{"Done Ramp\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{00594                 dmxData[deviceModeAddress - 1] = dimEnd;}
-\DoxyCodeLine{00595                 woo = 0;}
-\DoxyCodeLine{00596             \}}
-\DoxyCodeLine{00597         \}}
-\DoxyCodeLine{00598         \textcolor{keywordflow}{if} (dimStart - dimEnd < 0)}
-\DoxyCodeLine{00599         \{}
-\DoxyCodeLine{00600             \textcolor{keywordflow}{if} (dimValue > dimEnd)}
-\DoxyCodeLine{00601             \{}
-\DoxyCodeLine{00602                 putsUart0(\textcolor{stringliteral}{"Done Ramp\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{00603                 dmxData[deviceModeAddress - 1] = dimEnd;}
-\DoxyCodeLine{00604                 woo = 0;}
-\DoxyCodeLine{00605             \}}
-\DoxyCodeLine{00606         \}}
-\DoxyCodeLine{00607     \}}
-\DoxyCodeLine{00608 }
-\DoxyCodeLine{00609     TIMER2\_ICR\_R = TIMER\_ICR\_TATOCINT;}
-\DoxyCodeLine{00610 \}}
-\DoxyCodeLine{00611 }
-\DoxyCodeLine{00617 \textcolor{keywordtype}{void} Timer1ISR()}
-\DoxyCodeLine{00618 \{}
+\DoxyCodeLine{00539         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 2 - 1] == 254)}
+\DoxyCodeLine{00540         \{}
+\DoxyCodeLine{00541             upB = 0;}
+\DoxyCodeLine{00542             dmxData[deviceModeAddress + 2 - 1] = 252;}
+\DoxyCodeLine{00543             goR = 1;}
+\DoxyCodeLine{00544             goG = 0;}
+\DoxyCodeLine{00545             goB = 0;}
+\DoxyCodeLine{00546         \}}
+\DoxyCodeLine{00547 }
+\DoxyCodeLine{00548         \textcolor{keywordflow}{if} (goR)}
+\DoxyCodeLine{00549         \{}
+\DoxyCodeLine{00550 }
+\DoxyCodeLine{00551             \textcolor{keywordflow}{if} (upR)}
+\DoxyCodeLine{00552                 dmxData[deviceModeAddress - 1] = (2}
+\DoxyCodeLine{00553                         + dmxData[deviceModeAddress - 1]) \% 256;}
+\DoxyCodeLine{00554             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00555                 dmxData[deviceModeAddress - 1] = (dmxData[deviceModeAddress - 1]}
+\DoxyCodeLine{00556                         - 2) \% 256;}
+\DoxyCodeLine{00557         \}}
+\DoxyCodeLine{00558         \textcolor{keywordflow}{if} (goG)}
+\DoxyCodeLine{00559         \{}
+\DoxyCodeLine{00560             \textcolor{keywordflow}{if} (upG)}
+\DoxyCodeLine{00561                 dmxData[deviceModeAddress + 1 - 1] = (2}
+\DoxyCodeLine{00562                         + dmxData[deviceModeAddress + 1 - 1]) \% 256;}
+\DoxyCodeLine{00563             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00564                 dmxData[deviceModeAddress + 1 - 1] = (dmxData[deviceModeAddress}
+\DoxyCodeLine{00565                         + 1 - 1] - 2) \% 256;}
+\DoxyCodeLine{00566         \}}
+\DoxyCodeLine{00567         \textcolor{keywordflow}{if} (goB)}
+\DoxyCodeLine{00568         \{}
+\DoxyCodeLine{00569             \textcolor{keywordflow}{if} (upB)}
+\DoxyCodeLine{00570                 dmxData[deviceModeAddress + 2 - 1] = (2}
+\DoxyCodeLine{00571                         + dmxData[deviceModeAddress + 2 - 1]) \% 256;}
+\DoxyCodeLine{00572             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00573                 dmxData[deviceModeAddress + 2 - 1] = (dmxData[deviceModeAddress}
+\DoxyCodeLine{00574                         + 2 - 1] - 2) \% 256;}
+\DoxyCodeLine{00575         \}}
+\DoxyCodeLine{00576 }
+\DoxyCodeLine{00577     \}}
+\DoxyCodeLine{00578 }
+\DoxyCodeLine{00579     \textcolor{keywordflow}{if} (woo == 4)}
+\DoxyCodeLine{00580     \{}
+\DoxyCodeLine{00581         \textcolor{keywordflow}{if} (servoDir == 0)}
+\DoxyCodeLine{00582         \{}
+\DoxyCodeLine{00583             dmxData[deviceModeAddress + 0 - 1]--;}
+\DoxyCodeLine{00584         \}}
+\DoxyCodeLine{00585         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00586         \{}
+\DoxyCodeLine{00587             dmxData[deviceModeAddress + 0 - 1]++;}
+\DoxyCodeLine{00588         \}}
+\DoxyCodeLine{00589 }
+\DoxyCodeLine{00590     \}}
+\DoxyCodeLine{00591 }
+\DoxyCodeLine{00592     \textcolor{keywordflow}{if} (woo == 5)}
+\DoxyCodeLine{00593     \{}
+\DoxyCodeLine{00594         seconds += 0.1;}
+\DoxyCodeLine{00595         dimValue -= (dimStart - dimEnd) / secondsTrigger / 10;}
+\DoxyCodeLine{00596         dmxData[deviceModeAddress - 1] = dimValue;}
+\DoxyCodeLine{00597         \textcolor{keywordflow}{if} (dimStart - dimEnd > 0)}
+\DoxyCodeLine{00598         \{}
+\DoxyCodeLine{00599             \textcolor{keywordflow}{if} (dimValue < dimEnd)}
+\DoxyCodeLine{00600             \{}
+\DoxyCodeLine{00601                 putsUart0(\textcolor{stringliteral}{"Done Ramp\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{00602                 dmxData[deviceModeAddress - 1] = dimEnd;}
+\DoxyCodeLine{00603                 woo = 0;}
+\DoxyCodeLine{00604             \}}
+\DoxyCodeLine{00605         \}}
+\DoxyCodeLine{00606         \textcolor{keywordflow}{if} (dimStart - dimEnd < 0)}
+\DoxyCodeLine{00607         \{}
+\DoxyCodeLine{00608             \textcolor{keywordflow}{if} (dimValue > dimEnd)}
+\DoxyCodeLine{00609             \{}
+\DoxyCodeLine{00610                 putsUart0(\textcolor{stringliteral}{"Done Ramp\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{00611                 dmxData[deviceModeAddress - 1] = dimEnd;}
+\DoxyCodeLine{00612                 woo = 0;}
+\DoxyCodeLine{00613             \}}
+\DoxyCodeLine{00614         \}}
+\DoxyCodeLine{00615     \}}
+\DoxyCodeLine{00616 }
+\DoxyCodeLine{00617     TIMER2\_ICR\_R = TIMER\_ICR\_TATOCINT;}
+\DoxyCodeLine{00618 \}}
 \DoxyCodeLine{00619 }
-\DoxyCodeLine{00620     \textcolor{keywordflow}{if} (mode == 3 \&\& GREEN\_LED == 0)}
-\DoxyCodeLine{00621     \{}
-\DoxyCodeLine{00622         GREEN\_LED \string^= 1;}
-\DoxyCodeLine{00623         changeTimer1Value(15000);}
-\DoxyCodeLine{00624 }
-\DoxyCodeLine{00625     \}}
-\DoxyCodeLine{00626     \textcolor{keywordflow}{if} (mode == 3 \&\& GREEN\_LED == 1)}
-\DoxyCodeLine{00627     \{}
-\DoxyCodeLine{00628         GREEN\_LED \string^= 1;}
-\DoxyCodeLine{00629         changeTimer1Value(200000);}
-\DoxyCodeLine{00630 }
-\DoxyCodeLine{00631     \}}
-\DoxyCodeLine{00632     \textcolor{keywordflow}{if} (mode == 1 \&\& continuous)}
-\DoxyCodeLine{00633     \{}
-\DoxyCodeLine{00634         \textcolor{comment}{//using state machine-like interrupt handling}}
-\DoxyCodeLine{00635         \textcolor{comment}{//Diagram Used for reference: http://www.etcconnect.com/Support/Articles/DMX-Speed.aspx}}
-\DoxyCodeLine{00636         \textcolor{keywordflow}{if} (DMXMode == 0)}
-\DoxyCodeLine{00637         \{}
-\DoxyCodeLine{00638             \textcolor{comment}{//Break}}
-\DoxyCodeLine{00639             \textcolor{comment}{//send nothing}}
-\DoxyCodeLine{00640             GPIO\_PORTC\_AFSEL\_R \&= 0x00;}
-\DoxyCodeLine{00641             GPIO\_PORTC\_DATA\_R \&= 0xDF;}
-\DoxyCodeLine{00642             changeTimer1Value(176); \textcolor{comment}{//For Break}}
-\DoxyCodeLine{00643             DMXMode++;}
-\DoxyCodeLine{00644         \}}
-\DoxyCodeLine{00645         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (DMXMode == 1)}
-\DoxyCodeLine{00646         \{}
-\DoxyCodeLine{00647             \textcolor{comment}{//Mark After Break}}
-\DoxyCodeLine{00648             GPIO\_PORTC\_DATA\_R |= 0x20;}
-\DoxyCodeLine{00649             changeTimer1Value(12); \textcolor{comment}{//For MAB}}
-\DoxyCodeLine{00650             DMXMode++;}
-\DoxyCodeLine{00651         \}}
-\DoxyCodeLine{00652         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (DMXMode == 2)}
-\DoxyCodeLine{00653         \{}
-\DoxyCodeLine{00654             \textcolor{comment}{//Start Code with post start(2 stop bits)}}
-\DoxyCodeLine{00655             TIMER1\_CTL\_R \&= ~TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{00656             UART1\_CTL\_R = UART\_CTL\_TXE | UART\_CTL\_UARTEN | UART\_CTL\_EOT;}
-\DoxyCodeLine{00657             GPIO\_PORTC\_AFSEL\_R |= 0x30;}
+\DoxyCodeLine{00625 \textcolor{keywordtype}{void} Timer1ISR()}
+\DoxyCodeLine{00626 \{}
+\DoxyCodeLine{00627 }
+\DoxyCodeLine{00628     \textcolor{keywordflow}{if} (mode == 3 \&\& GREEN\_LED == 0)}
+\DoxyCodeLine{00629     \{}
+\DoxyCodeLine{00630         GREEN\_LED \string^= 1;}
+\DoxyCodeLine{00631         changeTimer1Value(15000);}
+\DoxyCodeLine{00632 }
+\DoxyCodeLine{00633     \}}
+\DoxyCodeLine{00634     \textcolor{keywordflow}{if} (mode == 3 \&\& GREEN\_LED == 1)}
+\DoxyCodeLine{00635     \{}
+\DoxyCodeLine{00636         GREEN\_LED \string^= 1;}
+\DoxyCodeLine{00637         changeTimer1Value(200000);}
+\DoxyCodeLine{00638 }
+\DoxyCodeLine{00639     \}}
+\DoxyCodeLine{00640     \textcolor{keywordflow}{if} (mode == 1 \&\& continuous)}
+\DoxyCodeLine{00641     \{}
+\DoxyCodeLine{00642         \textcolor{comment}{//using state machine-like interrupt handling}}
+\DoxyCodeLine{00643         \textcolor{comment}{//Diagram Used for reference: http://www.etcconnect.com/Support/Articles/DMX-Speed.aspx}}
+\DoxyCodeLine{00644         \textcolor{keywordflow}{if} (DMXMode == 0)}
+\DoxyCodeLine{00645         \{}
+\DoxyCodeLine{00646             \textcolor{comment}{//Break}}
+\DoxyCodeLine{00647             \textcolor{comment}{//send nothing}}
+\DoxyCodeLine{00648             GPIO\_PORTC\_AFSEL\_R \&= 0x00;}
+\DoxyCodeLine{00649             GPIO\_PORTC\_DATA\_R \&= 0xDF;}
+\DoxyCodeLine{00650             changeTimer1Value(176); \textcolor{comment}{//For Break}}
+\DoxyCodeLine{00651             DMXMode++;}
+\DoxyCodeLine{00652         \}}
+\DoxyCodeLine{00653         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (DMXMode == 1)}
+\DoxyCodeLine{00654         \{}
+\DoxyCodeLine{00655             \textcolor{comment}{//Mark After Break}}
+\DoxyCodeLine{00656             GPIO\_PORTC\_DATA\_R |= 0x20;}
+\DoxyCodeLine{00657             changeTimer1Value(12); \textcolor{comment}{//For MAB}}
 \DoxyCodeLine{00658             DMXMode++;}
-\DoxyCodeLine{00659             putcUart1(0);}
-\DoxyCodeLine{00660 }
-\DoxyCodeLine{00661         \}}
-\DoxyCodeLine{00662     \}}
-\DoxyCodeLine{00663 }
-\DoxyCodeLine{00664     \textcolor{keywordflow}{if} (mode == 0)}
-\DoxyCodeLine{00665     \{}
-\DoxyCodeLine{00666 }
-\DoxyCodeLine{00667         \textcolor{keywordflow}{if} (rxState == 0 \&\& !rxError)}
-\DoxyCodeLine{00668         \{}
-\DoxyCodeLine{00669             changeTimer1Value(2000000);}
-\DoxyCodeLine{00670             TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{00671             rxError = 1;}
-\DoxyCodeLine{00672         \}}
-\DoxyCodeLine{00673         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (rxError)}
-\DoxyCodeLine{00674         \{}
-\DoxyCodeLine{00675             changeTimer1Value(500000);}
-\DoxyCodeLine{00676             GREEN\_LED \string^= 1;}
-\DoxyCodeLine{00677 }
-\DoxyCodeLine{00678         \}}
-\DoxyCodeLine{00679         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (rxState == 1)}
-\DoxyCodeLine{00680         \{}
-\DoxyCodeLine{00681             rxError = 0;}
-\DoxyCodeLine{00682             rxState = 0;}
-\DoxyCodeLine{00683         \}}
-\DoxyCodeLine{00684     \}}
-\DoxyCodeLine{00685     TIMER1\_ICR\_R = TIMER\_ICR\_TATOCINT;}
-\DoxyCodeLine{00686 \}}
-\DoxyCodeLine{00687 }
-\DoxyCodeLine{00693 \textcolor{keywordtype}{char}* intToChar(uint16\_t x )}
-\DoxyCodeLine{00694 \{}
+\DoxyCodeLine{00659         \}}
+\DoxyCodeLine{00660         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (DMXMode == 2)}
+\DoxyCodeLine{00661         \{}
+\DoxyCodeLine{00662             \textcolor{comment}{//Start Code with post start(2 stop bits)}}
+\DoxyCodeLine{00663             TIMER1\_CTL\_R \&= ~TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{00664             UART1\_CTL\_R = UART\_CTL\_TXE | UART\_CTL\_UARTEN | UART\_CTL\_EOT;}
+\DoxyCodeLine{00665             GPIO\_PORTC\_AFSEL\_R |= 0x30;}
+\DoxyCodeLine{00666             DMXMode++;}
+\DoxyCodeLine{00667             putcUart1(0);}
+\DoxyCodeLine{00668 }
+\DoxyCodeLine{00669         \}}
+\DoxyCodeLine{00670     \}}
+\DoxyCodeLine{00671 }
+\DoxyCodeLine{00672     \textcolor{keywordflow}{if} (mode == 0)}
+\DoxyCodeLine{00673     \{}
+\DoxyCodeLine{00674 }
+\DoxyCodeLine{00675         \textcolor{keywordflow}{if} (rxState == 0 \&\& !rxError)}
+\DoxyCodeLine{00676         \{}
+\DoxyCodeLine{00677             changeTimer1Value(2000000);}
+\DoxyCodeLine{00678             TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{00679             rxError = 1;}
+\DoxyCodeLine{00680         \}}
+\DoxyCodeLine{00681         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (rxError)}
+\DoxyCodeLine{00682         \{}
+\DoxyCodeLine{00683             changeTimer1Value(500000);}
+\DoxyCodeLine{00684             GREEN\_LED \string^= 1;}
+\DoxyCodeLine{00685 }
+\DoxyCodeLine{00686         \}}
+\DoxyCodeLine{00687         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (rxState == 1)}
+\DoxyCodeLine{00688         \{}
+\DoxyCodeLine{00689             rxError = 0;}
+\DoxyCodeLine{00690             rxState = 0;}
+\DoxyCodeLine{00691         \}}
+\DoxyCodeLine{00692     \}}
+\DoxyCodeLine{00693     TIMER1\_ICR\_R = TIMER\_ICR\_TATOCINT;}
+\DoxyCodeLine{00694 \}}
 \DoxyCodeLine{00695 }
-\DoxyCodeLine{00696     int8\_t i = 2;}
-\DoxyCodeLine{00697 }
-\DoxyCodeLine{00698     uint16\_t temp = x;}
-\DoxyCodeLine{00699     \textcolor{keywordflow}{for} (; i >= 0; --i)}
-\DoxyCodeLine{00700     \{}
-\DoxyCodeLine{00701         ch[i] = \textcolor{charliteral}{'0'} + temp \% 10;}
-\DoxyCodeLine{00702         temp /= 10;}
-\DoxyCodeLine{00703     \}}
-\DoxyCodeLine{00704     \textcolor{keywordflow}{return} ch;}
-\DoxyCodeLine{00705 \}}
-\DoxyCodeLine{00706 }
-\DoxyCodeLine{00712 \textcolor{keywordtype}{void} putcUart0(\textcolor{keywordtype}{char} c )}
-\DoxyCodeLine{00713 \{}
+\DoxyCodeLine{00701 \textcolor{keywordtype}{char}* intToChar(uint16\_t x )}
+\DoxyCodeLine{00702 \{}
+\DoxyCodeLine{00703 }
+\DoxyCodeLine{00704     int8\_t i = 2;}
+\DoxyCodeLine{00705 }
+\DoxyCodeLine{00706     uint16\_t temp = x;}
+\DoxyCodeLine{00707     \textcolor{keywordflow}{for} (; i >= 0; --i)}
+\DoxyCodeLine{00708     \{}
+\DoxyCodeLine{00709         ch[i] = \textcolor{charliteral}{'0'} + temp \% 10;}
+\DoxyCodeLine{00710         temp /= 10;}
+\DoxyCodeLine{00711     \}}
+\DoxyCodeLine{00712     \textcolor{keywordflow}{return} ch;}
+\DoxyCodeLine{00713 \}}
 \DoxyCodeLine{00714 }
-\DoxyCodeLine{00715     \textcolor{keywordflow}{while} (UART0\_FR\_R \& UART\_FR\_TXFF)}
-\DoxyCodeLine{00716         ;               \textcolor{comment}{// wait if uart0 tx fifo full}}
-\DoxyCodeLine{00717     UART0\_DR\_R = c;                                  \textcolor{comment}{// write character to fifo}}
-\DoxyCodeLine{00718 \}}
-\DoxyCodeLine{00719 }
-\DoxyCodeLine{00725 \textcolor{keywordtype}{void} putsUart0(\textcolor{keywordtype}{char}* str )}
-\DoxyCodeLine{00726 \{}
+\DoxyCodeLine{00720 \textcolor{keywordtype}{void} putcUart0(\textcolor{keywordtype}{char} c )}
+\DoxyCodeLine{00721 \{}
+\DoxyCodeLine{00722 }
+\DoxyCodeLine{00723     \textcolor{keywordflow}{while} (UART0\_FR\_R \& UART\_FR\_TXFF)}
+\DoxyCodeLine{00724         ;               \textcolor{comment}{// wait if uart0 tx fifo full}}
+\DoxyCodeLine{00725     UART0\_DR\_R = c;                                  \textcolor{comment}{// write character to fifo}}
+\DoxyCodeLine{00726 \}}
 \DoxyCodeLine{00727 }
-\DoxyCodeLine{00728     uint8\_t i;}
-\DoxyCodeLine{00729     \textcolor{keywordflow}{for} (i = 0; i < strlen(str); i++)}
-\DoxyCodeLine{00730         putcUart0(str[i]);}
-\DoxyCodeLine{00731 \}}
-\DoxyCodeLine{00732 }
-\DoxyCodeLine{00738 \textcolor{keywordtype}{char} getcUart0()}
-\DoxyCodeLine{00739 \{}
+\DoxyCodeLine{00733 \textcolor{keywordtype}{void} putsUart0(\textcolor{keywordtype}{char}* str )}
+\DoxyCodeLine{00734 \{}
+\DoxyCodeLine{00735 }
+\DoxyCodeLine{00736     uint8\_t i;}
+\DoxyCodeLine{00737     \textcolor{keywordflow}{for} (i = 0; i < strlen(str); i++)}
+\DoxyCodeLine{00738         putcUart0(str[i]);}
+\DoxyCodeLine{00739 \}}
 \DoxyCodeLine{00740 }
-\DoxyCodeLine{00741     \textcolor{keywordflow}{if} (!(UART0\_FR\_R \& UART\_FR\_RXFE))             \textcolor{comment}{// wait if uart0 rx fifo empty}}
-\DoxyCodeLine{00742         \textcolor{keywordflow}{return} UART0\_DR\_R \& 0xFF;                     \textcolor{comment}{// get character from fifo}}
-\DoxyCodeLine{00743     \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00744         \textcolor{keywordflow}{return} \textcolor{charliteral}{'\(\backslash\)0'};}
-\DoxyCodeLine{00745 \}}
-\DoxyCodeLine{00746 }
-\DoxyCodeLine{00752 \textcolor{keywordtype}{void} getModeEE()}
-\DoxyCodeLine{00753 \{}
+\DoxyCodeLine{00746 \textcolor{keywordtype}{char} getcUart0()}
+\DoxyCodeLine{00747 \{}
+\DoxyCodeLine{00748 }
+\DoxyCodeLine{00749     \textcolor{keywordflow}{if} (!(UART0\_FR\_R \& UART\_FR\_RXFE))             \textcolor{comment}{// wait if uart0 rx fifo empty}}
+\DoxyCodeLine{00750         \textcolor{keywordflow}{return} UART0\_DR\_R \& 0xFF;                     \textcolor{comment}{// get character from fifo}}
+\DoxyCodeLine{00751     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00752         \textcolor{keywordflow}{return} \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{00753 \}}
 \DoxyCodeLine{00754 }
-\DoxyCodeLine{00755     \textcolor{keywordflow}{while} (EEPROM\_EEDONE\_R \& 0x01)}
-\DoxyCodeLine{00756         ;}
-\DoxyCodeLine{00757     delay6Cycles();}
-\DoxyCodeLine{00758     EEPROM\_EEBLOCK\_R = 0;}
-\DoxyCodeLine{00759     EEPROM\_EEOFFSET\_R = 2;}
-\DoxyCodeLine{00760     mode = (uint16\_t) EEPROM\_EERDWR\_R;}
-\DoxyCodeLine{00761     delay6Cycles();}
-\DoxyCodeLine{00762     EEPROM\_EEBLOCK\_R = 1;}
-\DoxyCodeLine{00763     EEPROM\_EEOFFSET\_R = 2;}
-\DoxyCodeLine{00764     deviceModeAddress = (uint16\_t) EEPROM\_EERDWR\_R;}
-\DoxyCodeLine{00765 \}}
-\DoxyCodeLine{00766 }
-\DoxyCodeLine{00772 \textcolor{keywordtype}{void} EEWRITE(uint16\_t B , uint16\_t offSet , uint16\_t val )}
-\DoxyCodeLine{00773 \{}
+\DoxyCodeLine{00760 \textcolor{keywordtype}{void} getModeEE()}
+\DoxyCodeLine{00761 \{}
+\DoxyCodeLine{00762 }
+\DoxyCodeLine{00763     \textcolor{keywordflow}{while} (EEPROM\_EEDONE\_R \& 0x01)}
+\DoxyCodeLine{00764         ;}
+\DoxyCodeLine{00765     delay6Cycles();}
+\DoxyCodeLine{00766     EEPROM\_EEBLOCK\_R = 0;}
+\DoxyCodeLine{00767     EEPROM\_EEOFFSET\_R = 2;}
+\DoxyCodeLine{00768     mode = (uint16\_t) EEPROM\_EERDWR\_R;}
+\DoxyCodeLine{00769     delay6Cycles();}
+\DoxyCodeLine{00770     EEPROM\_EEBLOCK\_R = 1;}
+\DoxyCodeLine{00771     EEPROM\_EEOFFSET\_R = 2;}
+\DoxyCodeLine{00772     deviceModeAddress = (uint16\_t) EEPROM\_EERDWR\_R;}
+\DoxyCodeLine{00773 \}}
 \DoxyCodeLine{00774 }
-\DoxyCodeLine{00775     EEPROM\_EEBLOCK\_R = B;}
-\DoxyCodeLine{00776     EEPROM\_EEOFFSET\_R = offSet;}
-\DoxyCodeLine{00777     EEPROM\_EERDWR\_R = val;}
-\DoxyCodeLine{00778 \}}
-\DoxyCodeLine{00779 }
-\DoxyCodeLine{00785 \textcolor{keywordtype}{void} clearDMX()}
-\DoxyCodeLine{00786 \{}
+\DoxyCodeLine{00780 \textcolor{keywordtype}{void} EEWRITE(uint16\_t B , uint16\_t offSet , uint16\_t val )}
+\DoxyCodeLine{00781 \{}
+\DoxyCodeLine{00782 }
+\DoxyCodeLine{00783     EEPROM\_EEBLOCK\_R = B;}
+\DoxyCodeLine{00784     EEPROM\_EEOFFSET\_R = offSet;}
+\DoxyCodeLine{00785     EEPROM\_EERDWR\_R = val;}
+\DoxyCodeLine{00786 \}}
 \DoxyCodeLine{00787 }
-\DoxyCodeLine{00788     uint16\_t i = 0;}
-\DoxyCodeLine{00789     \textcolor{keywordflow}{for} (i = 0; i < 512; ++i)}
-\DoxyCodeLine{00790     \{}
-\DoxyCodeLine{00791         dmxData[i] = 0;}
-\DoxyCodeLine{00792     \}}
-\DoxyCodeLine{00793 \}}
-\DoxyCodeLine{00794 }
-\DoxyCodeLine{00800 uint8\_t parseCommand()}
-\DoxyCodeLine{00801 \{}
+\DoxyCodeLine{00793 \textcolor{keywordtype}{void} clearDMX()}
+\DoxyCodeLine{00794 \{}
+\DoxyCodeLine{00795 }
+\DoxyCodeLine{00796     uint16\_t i = 0;}
+\DoxyCodeLine{00797     \textcolor{keywordflow}{for} (i = 0; i < 512; ++i)}
+\DoxyCodeLine{00798     \{}
+\DoxyCodeLine{00799         dmxData[i] = 0;}
+\DoxyCodeLine{00800     \}}
+\DoxyCodeLine{00801 \}}
 \DoxyCodeLine{00802 }
-\DoxyCodeLine{00803     \textcolor{keywordflow}{if} (mode == 1)}
-\DoxyCodeLine{00804     \{ \textcolor{comment}{//controller mode}}
-\DoxyCodeLine{00805         \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"device"}) == 0)}
-\DoxyCodeLine{00806         \{}
-\DoxyCodeLine{00807             TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{00808             UART1\_IFLS\_R = UART\_IFLS\_RX1\_8;}
-\DoxyCodeLine{00809             UART1\_IM\_R = UART\_IM\_RXIM;}
-\DoxyCodeLine{00810             GPIO\_PORTC\_AFSEL\_R |= 0x30;}
-\DoxyCodeLine{00811             GPIO\_PORTC\_DATA\_R \&= 0x9F;}
-\DoxyCodeLine{00812             UART1\_LCRH\_R = UART\_LCRH\_WLEN\_8 | UART\_LCRH\_STP2;}
-\DoxyCodeLine{00813             UART1\_CTL\_R = UART\_CTL\_RXE | UART\_CTL\_UARTEN;}
-\DoxyCodeLine{00814 }
-\DoxyCodeLine{00815             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rDevice Mode\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{00816             mode = 0;}
-\DoxyCodeLine{00817             EEWRITE(0, 2, 0);}
-\DoxyCodeLine{00818             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00819         \}}
-\DoxyCodeLine{00820         \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"seconds"}) == 0)}
-\DoxyCodeLine{00821         \{}
-\DoxyCodeLine{00822             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rSetting:"});}
-\DoxyCodeLine{00823             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r Seconds:"});}
-\DoxyCodeLine{00824 }
-\DoxyCodeLine{00825             putsUart0(arg1);}
-\DoxyCodeLine{00826             secondsTrigger = atoi(arg1);}
-\DoxyCodeLine{00827             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00828         \}}
-\DoxyCodeLine{00829         \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"startend"}) == 0)}
-\DoxyCodeLine{00830         \{}
-\DoxyCodeLine{00831             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rSetting:"});}
-\DoxyCodeLine{00832             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r Start:"});}
-\DoxyCodeLine{00833 }
-\DoxyCodeLine{00834             putsUart0(arg1);}
-\DoxyCodeLine{00835             dimStart = atoi(arg1);}
-\DoxyCodeLine{00836             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rSetting:"});}
-\DoxyCodeLine{00837             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r End:"});}
-\DoxyCodeLine{00838 }
-\DoxyCodeLine{00839             putsUart0(arg2);}
-\DoxyCodeLine{00840             dimEnd = atoi(arg2);}
-\DoxyCodeLine{00841             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00842         \}}
-\DoxyCodeLine{00843         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"woo"}) == 0)}
-\DoxyCodeLine{00844         \{}
-\DoxyCodeLine{00845             woo = atoi(arg1);}
-\DoxyCodeLine{00846             \textcolor{keywordflow}{if} (woo == 1)}
-\DoxyCodeLine{00847             \{}
-\DoxyCodeLine{00848                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nAll Addresses 255 :)\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{00849             \}}
-\DoxyCodeLine{00850             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (woo == 2)}
-\DoxyCodeLine{00851             \{}
-\DoxyCodeLine{00852                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nRamp Animation :D\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{00853             \}}
-\DoxyCodeLine{00854             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (woo == 3)}
+\DoxyCodeLine{00808 uint8\_t parseCommand()}
+\DoxyCodeLine{00809 \{}
+\DoxyCodeLine{00810 }
+\DoxyCodeLine{00811     \textcolor{keywordflow}{if} (mode == 1)}
+\DoxyCodeLine{00812     \{ \textcolor{comment}{//controller mode}}
+\DoxyCodeLine{00813         \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"device"}) == 0)}
+\DoxyCodeLine{00814         \{}
+\DoxyCodeLine{00815             TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{00816             UART1\_IFLS\_R = UART\_IFLS\_RX1\_8;}
+\DoxyCodeLine{00817             UART1\_IM\_R = UART\_IM\_RXIM;}
+\DoxyCodeLine{00818             GPIO\_PORTC\_AFSEL\_R |= 0x30;}
+\DoxyCodeLine{00819             GPIO\_PORTC\_DATA\_R \&= 0x9F;}
+\DoxyCodeLine{00820             UART1\_LCRH\_R = UART\_LCRH\_WLEN\_8 | UART\_LCRH\_STP2;}
+\DoxyCodeLine{00821             UART1\_CTL\_R = UART\_CTL\_RXE | UART\_CTL\_UARTEN;}
+\DoxyCodeLine{00822 }
+\DoxyCodeLine{00823             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rDevice Mode\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{00824             mode = 0;}
+\DoxyCodeLine{00825             EEWRITE(0, 2, 0);}
+\DoxyCodeLine{00826             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{00827         \}}
+\DoxyCodeLine{00828         \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"seconds"}) == 0)}
+\DoxyCodeLine{00829         \{}
+\DoxyCodeLine{00830             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rSetting:"});}
+\DoxyCodeLine{00831             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r Seconds:"});}
+\DoxyCodeLine{00832 }
+\DoxyCodeLine{00833             putsUart0(arg1);}
+\DoxyCodeLine{00834             secondsTrigger = atoi(arg1);}
+\DoxyCodeLine{00835             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{00836         \}}
+\DoxyCodeLine{00837         \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"startend"}) == 0)}
+\DoxyCodeLine{00838         \{}
+\DoxyCodeLine{00839             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rSetting:"});}
+\DoxyCodeLine{00840             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r Start:"});}
+\DoxyCodeLine{00841 }
+\DoxyCodeLine{00842             putsUart0(arg1);}
+\DoxyCodeLine{00843             dimStart = atoi(arg1);}
+\DoxyCodeLine{00844             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rSetting:"});}
+\DoxyCodeLine{00845             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r End:"});}
+\DoxyCodeLine{00846 }
+\DoxyCodeLine{00847             putsUart0(arg2);}
+\DoxyCodeLine{00848             dimEnd = atoi(arg2);}
+\DoxyCodeLine{00849             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{00850         \}}
+\DoxyCodeLine{00851         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"woo"}) == 0)}
+\DoxyCodeLine{00852         \{}
+\DoxyCodeLine{00853             woo = atoi(arg1);}
+\DoxyCodeLine{00854             \textcolor{keywordflow}{if} (woo == 1)}
 \DoxyCodeLine{00855             \{}
-\DoxyCodeLine{00856                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nServo Set :D\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{00856                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nAll Addresses 255 :)\(\backslash\)r\(\backslash\)n"});}
 \DoxyCodeLine{00857             \}}
-\DoxyCodeLine{00858             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (woo == 4)}
+\DoxyCodeLine{00858             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (woo == 2)}
 \DoxyCodeLine{00859             \{}
-\DoxyCodeLine{00860                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nServo Sweep :D\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{00860                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nRamp Animation :D\(\backslash\)r\(\backslash\)n"});}
 \DoxyCodeLine{00861             \}}
-\DoxyCodeLine{00862             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (woo == 5)}
+\DoxyCodeLine{00862             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (woo == 3)}
 \DoxyCodeLine{00863             \{}
-\DoxyCodeLine{00864                 TIMER2\_CTL\_R |= TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{00865                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nRamping\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{00866                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r Start:"});}
-\DoxyCodeLine{00867 }
-\DoxyCodeLine{00868                 putsUart0(intToChar(dimStart));}
-\DoxyCodeLine{00869 }
-\DoxyCodeLine{00870                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rSetting:"});}
-\DoxyCodeLine{00871                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r End:"});}
-\DoxyCodeLine{00872 }
-\DoxyCodeLine{00873                 putsUart0(intToChar(dimEnd));}
-\DoxyCodeLine{00874                 dimValue = dimStart;}
-\DoxyCodeLine{00875             \}}
-\DoxyCodeLine{00876             \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00877             \{}
-\DoxyCodeLine{00878                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nNo Woo :(\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{00879             \}}
-\DoxyCodeLine{00880             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00881         \}}
-\DoxyCodeLine{00882         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"clear"}) == 0)}
-\DoxyCodeLine{00883         \{}
-\DoxyCodeLine{00884 }
-\DoxyCodeLine{00885             clearDMX();}
-\DoxyCodeLine{00886 }
-\DoxyCodeLine{00887             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rCleared.\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{00864                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nServo Set :D\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{00865             \}}
+\DoxyCodeLine{00866             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (woo == 4)}
+\DoxyCodeLine{00867             \{}
+\DoxyCodeLine{00868                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nServo Sweep :D\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{00869             \}}
+\DoxyCodeLine{00870             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (woo == 5)}
+\DoxyCodeLine{00871             \{}
+\DoxyCodeLine{00872                 TIMER2\_CTL\_R |= TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{00873                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nRamping\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{00874                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r Start:"});}
+\DoxyCodeLine{00875 }
+\DoxyCodeLine{00876                 putsUart0(intToChar(dimStart));}
+\DoxyCodeLine{00877 }
+\DoxyCodeLine{00878                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rSetting:"});}
+\DoxyCodeLine{00879                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r End:"});}
+\DoxyCodeLine{00880 }
+\DoxyCodeLine{00881                 putsUart0(intToChar(dimEnd));}
+\DoxyCodeLine{00882                 dimValue = dimStart;}
+\DoxyCodeLine{00883             \}}
+\DoxyCodeLine{00884             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00885             \{}
+\DoxyCodeLine{00886                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nNo Woo :(\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{00887             \}}
 \DoxyCodeLine{00888             \textcolor{keywordflow}{return} 0;}
 \DoxyCodeLine{00889         \}}
-\DoxyCodeLine{00890 }
-\DoxyCodeLine{00891         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"set"}) == 0)}
-\DoxyCodeLine{00892         \{}
-\DoxyCodeLine{00893             uint16\_t addr = atoi(arg1);}
-\DoxyCodeLine{00894             \textcolor{keywordflow}{if} (addr > 0 \&\& addr < 513)}
-\DoxyCodeLine{00895             \{}
-\DoxyCodeLine{00896                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rSetting:"});}
-\DoxyCodeLine{00897                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r Address:"});}
-\DoxyCodeLine{00898                 putsUart0(intToChar(addr));}
-\DoxyCodeLine{00899                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r Value:"});}
-\DoxyCodeLine{00900                 putsUart0(arg2);}
-\DoxyCodeLine{00901                 dmxData[addr - 1] = atoi(arg2);}
-\DoxyCodeLine{00902             \}}
-\DoxyCodeLine{00903 }
-\DoxyCodeLine{00904             \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00905             \{}
-\DoxyCodeLine{00906                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rAddresses from 1 to 512 only.\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{00907             \}}
-\DoxyCodeLine{00908 }
-\DoxyCodeLine{00909             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00910         \}}
-\DoxyCodeLine{00911         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"get"}) == 0)}
-\DoxyCodeLine{00912         \{}
-\DoxyCodeLine{00913             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rGetting:"});}
-\DoxyCodeLine{00914             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rAddress:"});}
-\DoxyCodeLine{00915             putsUart0(arg1);}
-\DoxyCodeLine{00916             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rValue:"});}
-\DoxyCodeLine{00917             uint16\_t addr = atoi(arg1);}
-\DoxyCodeLine{00918             \textcolor{keywordflow}{if} (addr > 0)}
-\DoxyCodeLine{00919                 putsUart0(intToChar(dmxData[addr - 1]));}
-\DoxyCodeLine{00920             \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00921                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rAddresses from 1 to 512 only.\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{00922 }
-\DoxyCodeLine{00923             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00924         \}}
-\DoxyCodeLine{00925 }
-\DoxyCodeLine{00926         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"max"}) == 0)}
-\DoxyCodeLine{00927         \{}
-\DoxyCodeLine{00928             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rSetting Max to "});}
-\DoxyCodeLine{00929             putsUart0(arg1);}
-\DoxyCodeLine{00930             maxAddress = atoi(arg1);}
+\DoxyCodeLine{00890         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"clear"}) == 0)}
+\DoxyCodeLine{00891         \{}
+\DoxyCodeLine{00892 }
+\DoxyCodeLine{00893             clearDMX();}
+\DoxyCodeLine{00894 }
+\DoxyCodeLine{00895             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rCleared.\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{00896             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{00897         \}}
+\DoxyCodeLine{00898 }
+\DoxyCodeLine{00899         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"set"}) == 0)}
+\DoxyCodeLine{00900         \{}
+\DoxyCodeLine{00901             uint16\_t addr = atoi(arg1);}
+\DoxyCodeLine{00902             \textcolor{keywordflow}{if} (addr > 0 \&\& addr < 513)}
+\DoxyCodeLine{00903             \{}
+\DoxyCodeLine{00904                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rSetting:"});}
+\DoxyCodeLine{00905                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r Address:"});}
+\DoxyCodeLine{00906                 putsUart0(intToChar(addr));}
+\DoxyCodeLine{00907                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)r Value:"});}
+\DoxyCodeLine{00908                 putsUart0(arg2);}
+\DoxyCodeLine{00909                 dmxData[addr - 1] = atoi(arg2);}
+\DoxyCodeLine{00910             \}}
+\DoxyCodeLine{00911 }
+\DoxyCodeLine{00912             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00913             \{}
+\DoxyCodeLine{00914                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rAddresses from 1 to 512 only.\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{00915             \}}
+\DoxyCodeLine{00916 }
+\DoxyCodeLine{00917             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{00918         \}}
+\DoxyCodeLine{00919         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"get"}) == 0)}
+\DoxyCodeLine{00920         \{}
+\DoxyCodeLine{00921             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rGetting:"});}
+\DoxyCodeLine{00922             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rAddress:"});}
+\DoxyCodeLine{00923             putsUart0(arg1);}
+\DoxyCodeLine{00924             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rValue:"});}
+\DoxyCodeLine{00925             uint16\_t addr = atoi(arg1);}
+\DoxyCodeLine{00926             \textcolor{keywordflow}{if} (addr > 0)}
+\DoxyCodeLine{00927                 putsUart0(intToChar(dmxData[addr - 1]));}
+\DoxyCodeLine{00928             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00929                 putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rAddresses from 1 to 512 only.\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{00930 }
 \DoxyCodeLine{00931             \textcolor{keywordflow}{return} 0;}
 \DoxyCodeLine{00932         \}}
-\DoxyCodeLine{00933         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"on"}) == 0)}
-\DoxyCodeLine{00934         \{}
-\DoxyCodeLine{00935             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rContinuous On\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{00936             continuous = 1;}
-\DoxyCodeLine{00937             GPIO\_PORTC\_DATA\_R = 0x40;}
-\DoxyCodeLine{00938             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00939         \}}
-\DoxyCodeLine{00940         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"off"}) == 0)}
-\DoxyCodeLine{00941         \{}
-\DoxyCodeLine{00942             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rContinuous off\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{00943             continuous = 0;}
-\DoxyCodeLine{00944             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00945         \}}
-\DoxyCodeLine{00946         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"controller"}) == 0)}
-\DoxyCodeLine{00947         \{}
-\DoxyCodeLine{00948             UART1\_IM\_R = UART\_IM\_TXIM;}
-\DoxyCodeLine{00949             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rAlready in Controller Mode\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{00950 }
-\DoxyCodeLine{00951             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00952         \}}
-\DoxyCodeLine{00953         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00954         \{}
-\DoxyCodeLine{00955             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rInvalid Controller Mode Command\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{00956             printCommandList();}
-\DoxyCodeLine{00957             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00958         \}}
-\DoxyCodeLine{00959     \}}
-\DoxyCodeLine{00960 }
-\DoxyCodeLine{00961     \textcolor{comment}{//device Mode}}
-\DoxyCodeLine{00962     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (mode == 0)}
-\DoxyCodeLine{00963     \{}
-\DoxyCodeLine{00964         \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"address"}) == 0)}
-\DoxyCodeLine{00965         \{}
-\DoxyCodeLine{00966             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rDevice address set to: "});}
-\DoxyCodeLine{00967             putsUart0(arg1);}
-\DoxyCodeLine{00968             deviceModeAddress = atoi(arg1);}
-\DoxyCodeLine{00969             EEWRITE(1, 2, deviceModeAddress);}
-\DoxyCodeLine{00970             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00971         \}}
-\DoxyCodeLine{00972         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"device"}) == 0)}
+\DoxyCodeLine{00933 }
+\DoxyCodeLine{00934         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"max"}) == 0)}
+\DoxyCodeLine{00935         \{}
+\DoxyCodeLine{00936             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rSetting Max to "});}
+\DoxyCodeLine{00937             putsUart0(arg1);}
+\DoxyCodeLine{00938             maxAddress = atoi(arg1);}
+\DoxyCodeLine{00939             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{00940         \}}
+\DoxyCodeLine{00941         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"on"}) == 0)}
+\DoxyCodeLine{00942         \{}
+\DoxyCodeLine{00943             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rContinuous On\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{00944             continuous = 1;}
+\DoxyCodeLine{00945             GPIO\_PORTC\_DATA\_R = 0x40;}
+\DoxyCodeLine{00946             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{00947         \}}
+\DoxyCodeLine{00948         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"off"}) == 0)}
+\DoxyCodeLine{00949         \{}
+\DoxyCodeLine{00950             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rContinuous off\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{00951             continuous = 0;}
+\DoxyCodeLine{00952             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{00953         \}}
+\DoxyCodeLine{00954         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"controller"}) == 0)}
+\DoxyCodeLine{00955         \{}
+\DoxyCodeLine{00956             UART1\_IM\_R = UART\_IM\_TXIM;}
+\DoxyCodeLine{00957             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rAlready in Controller Mode\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{00958 }
+\DoxyCodeLine{00959             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{00960         \}}
+\DoxyCodeLine{00961         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{00962         \{}
+\DoxyCodeLine{00963             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rInvalid Controller Mode Command\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{00964             printCommandList();}
+\DoxyCodeLine{00965             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{00966         \}}
+\DoxyCodeLine{00967     \}}
+\DoxyCodeLine{00968 }
+\DoxyCodeLine{00969     \textcolor{comment}{//device Mode}}
+\DoxyCodeLine{00970     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (mode == 0)}
+\DoxyCodeLine{00971     \{}
+\DoxyCodeLine{00972         \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"address"}) == 0)}
 \DoxyCodeLine{00973         \{}
-\DoxyCodeLine{00974             UART1\_IFLS\_R = UART\_IFLS\_RX1\_8;}
-\DoxyCodeLine{00975             UART1\_IM\_R = UART\_IM\_RXIM;}
-\DoxyCodeLine{00976             GPIO\_PORTC\_AFSEL\_R |= 0x30;}
-\DoxyCodeLine{00977             GPIO\_PORTC\_DATA\_R \&= 0x9F;}
-\DoxyCodeLine{00978             UART1\_LCRH\_R = UART\_LCRH\_WLEN\_8 | UART\_LCRH\_STP2;}
-\DoxyCodeLine{00979             UART1\_CTL\_R = UART\_CTL\_RXE | UART\_CTL\_UARTEN;}
-\DoxyCodeLine{00980             TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{00981             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rAlready in Device Mode\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{00982             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00983         \}}
-\DoxyCodeLine{00984         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"controller"}) == 0)}
-\DoxyCodeLine{00985         \{}
-\DoxyCodeLine{00986             UART1\_IM\_R = UART\_IM\_TXIM;}
-\DoxyCodeLine{00987             GPIO\_PORTC\_DATA\_R \&= 0xDF;}
-\DoxyCodeLine{00988             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rController Mode\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{00989             mode = 1;}
-\DoxyCodeLine{00990             EEWRITE(0, 2, 1);}
-\DoxyCodeLine{00991             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00992         \}}
-\DoxyCodeLine{00993         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{00994         \{}
-\DoxyCodeLine{00995             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rInvalid Device Mode Command\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{00996             printCommandList();}
-\DoxyCodeLine{00997             \textcolor{keywordflow}{return} 0;}
-\DoxyCodeLine{00998         \}}
-\DoxyCodeLine{00999     \}}
-\DoxyCodeLine{01000     \textcolor{keywordflow}{else}}
-\DoxyCodeLine{01001     \{}
-\DoxyCodeLine{01002         putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rInvalid Mode\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{01003         \textcolor{keywordflow}{return} 1;}
-\DoxyCodeLine{01004     \}}
-\DoxyCodeLine{01005 \}}
-\DoxyCodeLine{01006 }
-\DoxyCodeLine{01012 \textcolor{keywordtype}{void} clearStr()}
-\DoxyCodeLine{01013 \{}
+\DoxyCodeLine{00974             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rDevice address set to: "});}
+\DoxyCodeLine{00975             putsUart0(arg1);}
+\DoxyCodeLine{00976             deviceModeAddress = atoi(arg1);}
+\DoxyCodeLine{00977             EEWRITE(1, 2, deviceModeAddress);}
+\DoxyCodeLine{00978             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{00979         \}}
+\DoxyCodeLine{00980         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"device"}) == 0)}
+\DoxyCodeLine{00981         \{}
+\DoxyCodeLine{00982             UART1\_IFLS\_R = UART\_IFLS\_RX1\_8;}
+\DoxyCodeLine{00983             UART1\_IM\_R = UART\_IM\_RXIM;}
+\DoxyCodeLine{00984             GPIO\_PORTC\_AFSEL\_R |= 0x30;}
+\DoxyCodeLine{00985             GPIO\_PORTC\_DATA\_R \&= 0x9F;}
+\DoxyCodeLine{00986             UART1\_LCRH\_R = UART\_LCRH\_WLEN\_8 | UART\_LCRH\_STP2;}
+\DoxyCodeLine{00987             UART1\_CTL\_R = UART\_CTL\_RXE | UART\_CTL\_UARTEN;}
+\DoxyCodeLine{00988             TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{00989             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rAlready in Device Mode\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{00990             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{00991         \}}
+\DoxyCodeLine{00992         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strcmp(command, \textcolor{stringliteral}{"controller"}) == 0)}
+\DoxyCodeLine{00993         \{}
+\DoxyCodeLine{00994             UART1\_IM\_R = UART\_IM\_TXIM;}
+\DoxyCodeLine{00995             GPIO\_PORTC\_DATA\_R \&= 0xDF;}
+\DoxyCodeLine{00996             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rController Mode\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{00997             mode = 1;}
+\DoxyCodeLine{00998             EEWRITE(0, 2, 1);}
+\DoxyCodeLine{00999             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{01000         \}}
+\DoxyCodeLine{01001         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01002         \{}
+\DoxyCodeLine{01003             putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rInvalid Device Mode Command\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{01004             printCommandList();}
+\DoxyCodeLine{01005             \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{01006         \}}
+\DoxyCodeLine{01007     \}}
+\DoxyCodeLine{01008     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01009     \{}
+\DoxyCodeLine{01010         putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rInvalid Mode\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{01011         \textcolor{keywordflow}{return} 1;}
+\DoxyCodeLine{01012     \}}
+\DoxyCodeLine{01013 \}}
 \DoxyCodeLine{01014 }
-\DoxyCodeLine{01015     uint8\_t i = 0;}
-\DoxyCodeLine{01016     \textcolor{keywordflow}{for} (; i < 20; ++i)}
-\DoxyCodeLine{01017     \{}
-\DoxyCodeLine{01018         command[i] = \textcolor{charliteral}{'\(\backslash\)0'};}
-\DoxyCodeLine{01019         arg1[i] = \textcolor{charliteral}{'\(\backslash\)0'};}
-\DoxyCodeLine{01020         arg2[i] = \textcolor{charliteral}{'\(\backslash\)0'};}
-\DoxyCodeLine{01021     \}}
-\DoxyCodeLine{01022     pos = 0;}
-\DoxyCodeLine{01023     enteringField = 0;}
-\DoxyCodeLine{01024 \}}
-\DoxyCodeLine{01025 }
-\DoxyCodeLine{01031 \textcolor{keywordtype}{bool} isLetter(\textcolor{keywordtype}{char} c )}
-\DoxyCodeLine{01032 \{}
+\DoxyCodeLine{01020 \textcolor{keywordtype}{void} clearStr()}
+\DoxyCodeLine{01021 \{}
+\DoxyCodeLine{01022 }
+\DoxyCodeLine{01023     uint8\_t i = 0;}
+\DoxyCodeLine{01024     \textcolor{keywordflow}{for} (; i < 20; ++i)}
+\DoxyCodeLine{01025     \{}
+\DoxyCodeLine{01026         command[i] = \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{01027         arg1[i] = \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{01028         arg2[i] = \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{01029     \}}
+\DoxyCodeLine{01030     pos = 0;}
+\DoxyCodeLine{01031     enteringField = 0;}
+\DoxyCodeLine{01032 \}}
 \DoxyCodeLine{01033 }
-\DoxyCodeLine{01034     \textcolor{keywordflow}{return} (c >= \textcolor{charliteral}{'a'} \&\& c <= \textcolor{charliteral}{'z'}) || (c >= \textcolor{charliteral}{'A'} \&\& c <= \textcolor{charliteral}{'Z'});}
-\DoxyCodeLine{01035 \}}
-\DoxyCodeLine{01036 }
-\DoxyCodeLine{01042 \textcolor{keywordtype}{bool} isNumber(\textcolor{keywordtype}{char} c )}
-\DoxyCodeLine{01043 \{}
+\DoxyCodeLine{01039 \textcolor{keywordtype}{bool} isLetter(\textcolor{keywordtype}{char} c )}
+\DoxyCodeLine{01040 \{}
+\DoxyCodeLine{01041 }
+\DoxyCodeLine{01042     \textcolor{keywordflow}{return} (c >= \textcolor{charliteral}{'a'} \&\& c <= \textcolor{charliteral}{'z'}) || (c >= \textcolor{charliteral}{'A'} \&\& c <= \textcolor{charliteral}{'Z'});}
+\DoxyCodeLine{01043 \}}
 \DoxyCodeLine{01044 }
-\DoxyCodeLine{01045     \textcolor{keywordflow}{return} (c >= \textcolor{charliteral}{'0'} \&\& c <= \textcolor{charliteral}{'9'});}
-\DoxyCodeLine{01046 \}}
-\DoxyCodeLine{01047 }
-\DoxyCodeLine{01053 \textcolor{keywordtype}{void} printCommandList()}
-\DoxyCodeLine{01054 \{}
+\DoxyCodeLine{01050 \textcolor{keywordtype}{bool} isNumber(\textcolor{keywordtype}{char} c )}
+\DoxyCodeLine{01051 \{}
+\DoxyCodeLine{01052 }
+\DoxyCodeLine{01053     \textcolor{keywordflow}{return} (c >= \textcolor{charliteral}{'0'} \&\& c <= \textcolor{charliteral}{'9'});}
+\DoxyCodeLine{01054 \}}
 \DoxyCodeLine{01055 }
-\DoxyCodeLine{01056     putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rAvailable Commands:\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01057     putsUart0(\textcolor{stringliteral}{"For Device Mode:\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01058     putsUart0(\textcolor{stringliteral}{"\(\backslash\)tcontroller\(\backslash\)n\(\backslash\)r"});}
-\DoxyCodeLine{01059     putsUart0(\textcolor{stringliteral}{"\(\backslash\)taddress <address of device>\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01060 }
-\DoxyCodeLine{01061     putsUart0(\textcolor{stringliteral}{"For Controller Mode:\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01062     putsUart0(\textcolor{stringliteral}{"\(\backslash\)tdevice\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01063     putsUart0(\textcolor{stringliteral}{"\(\backslash\)tset <address>,<value>\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01064     putsUart0(\textcolor{stringliteral}{"\(\backslash\)tget <address>,<value>\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01065     putsUart0(}
-\DoxyCodeLine{01066             \textcolor{stringliteral}{"\(\backslash\)twoo < 0 for no woo :( \(\backslash\)r\(\backslash\)n\(\backslash\)t    | 1 for all addresses 255 \(\backslash\)r\(\backslash\)n\(\backslash\)t    | 2 for ramp animation >\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01067     putsUart0(}
-\DoxyCodeLine{01068             \textcolor{stringliteral}{"\(\backslash\)twoo < 3 for servo angle set \(\backslash\)r\(\backslash\)n\(\backslash\)t    | 4 for servo sweep \(\backslash\)r\(\backslash\)n\(\backslash\)t    | 5 for special ramping function >\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01069     putsUart0(\textcolor{stringliteral}{"\(\backslash\)tmax <number of addresses>\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01070 }
-\DoxyCodeLine{01071 \}}
-\DoxyCodeLine{01072 }
-\DoxyCodeLine{01078 \textcolor{keywordtype}{void} waitMicrosecond(uint32\_t us )}
-\DoxyCodeLine{01079 \{}
+\DoxyCodeLine{01061 \textcolor{keywordtype}{void} printCommandList()}
+\DoxyCodeLine{01062 \{}
+\DoxyCodeLine{01063 }
+\DoxyCodeLine{01064     putsUart0(\textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)rAvailable Commands:\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01065     putsUart0(\textcolor{stringliteral}{"For Device Mode:\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01066     putsUart0(\textcolor{stringliteral}{"\(\backslash\)tcontroller\(\backslash\)n\(\backslash\)r"});}
+\DoxyCodeLine{01067     putsUart0(\textcolor{stringliteral}{"\(\backslash\)taddress <address of device>\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01068 }
+\DoxyCodeLine{01069     putsUart0(\textcolor{stringliteral}{"For Controller Mode:\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01070     putsUart0(\textcolor{stringliteral}{"\(\backslash\)tdevice\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01071     putsUart0(\textcolor{stringliteral}{"\(\backslash\)tset <address>,<value>\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01072     putsUart0(\textcolor{stringliteral}{"\(\backslash\)tget <address>,<value>\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01073     putsUart0(}
+\DoxyCodeLine{01074             \textcolor{stringliteral}{"\(\backslash\)twoo < 0 for no woo :( \(\backslash\)r\(\backslash\)n\(\backslash\)t    | 1 for all addresses 255 \(\backslash\)r\(\backslash\)n\(\backslash\)t    | 2 for ramp animation >\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01075     putsUart0(}
+\DoxyCodeLine{01076             \textcolor{stringliteral}{"\(\backslash\)twoo < 3 for servo angle set \(\backslash\)r\(\backslash\)n\(\backslash\)t    | 4 for servo sweep \(\backslash\)r\(\backslash\)n\(\backslash\)t    | 5 for special ramping function >\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01077     putsUart0(\textcolor{stringliteral}{"\(\backslash\)tmax <number of addresses>\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01078 }
+\DoxyCodeLine{01079 \}}
 \DoxyCodeLine{01080 }
-\DoxyCodeLine{01081     \_\_asm(\textcolor{stringliteral}{"WMS\_LOOP0:   MOV  R1, \#6"});}
-\DoxyCodeLine{01082     \textcolor{comment}{// 1}}
-\DoxyCodeLine{01083     \_\_asm(\textcolor{stringliteral}{"WMS\_LOOP1:   SUB  R1, \#1"});}
-\DoxyCodeLine{01084     \textcolor{comment}{// 6}}
-\DoxyCodeLine{01085     \_\_asm(\textcolor{stringliteral}{"             CBZ  R1, WMS\_DONE1"});}
-\DoxyCodeLine{01086     \textcolor{comment}{// 5+1*3}}
-\DoxyCodeLine{01087     \_\_asm(\textcolor{stringliteral}{"             NOP"});}
-\DoxyCodeLine{01088     \textcolor{comment}{// 5}}
-\DoxyCodeLine{01089     \_\_asm(\textcolor{stringliteral}{"             NOP"});}
-\DoxyCodeLine{01090     \textcolor{comment}{// 5}}
-\DoxyCodeLine{01091     \_\_asm(\textcolor{stringliteral}{"             B    WMS\_LOOP1"});}
-\DoxyCodeLine{01092     \textcolor{comment}{// 5*2 (speculative, so P=1)}}
-\DoxyCodeLine{01093     \_\_asm(\textcolor{stringliteral}{"WMS\_DONE1:   SUB  R0, \#1"});}
-\DoxyCodeLine{01094     \textcolor{comment}{// 1}}
-\DoxyCodeLine{01095     \_\_asm(\textcolor{stringliteral}{"             CBZ  R0, WMS\_DONE0"});}
-\DoxyCodeLine{01096     \textcolor{comment}{// 1}}
+\DoxyCodeLine{01086 \textcolor{keywordtype}{void} waitMicrosecond(uint32\_t us )}
+\DoxyCodeLine{01087 \{}
+\DoxyCodeLine{01088 }
+\DoxyCodeLine{01089     \_\_asm(\textcolor{stringliteral}{"WMS\_LOOP0:   MOV  R1, \#6"});}
+\DoxyCodeLine{01090     \textcolor{comment}{// 1}}
+\DoxyCodeLine{01091     \_\_asm(\textcolor{stringliteral}{"WMS\_LOOP1:   SUB  R1, \#1"});}
+\DoxyCodeLine{01092     \textcolor{comment}{// 6}}
+\DoxyCodeLine{01093     \_\_asm(\textcolor{stringliteral}{"             CBZ  R1, WMS\_DONE1"});}
+\DoxyCodeLine{01094     \textcolor{comment}{// 5+1*3}}
+\DoxyCodeLine{01095     \_\_asm(\textcolor{stringliteral}{"             NOP"});}
+\DoxyCodeLine{01096     \textcolor{comment}{// 5}}
 \DoxyCodeLine{01097     \_\_asm(\textcolor{stringliteral}{"             NOP"});}
-\DoxyCodeLine{01098     \textcolor{comment}{// 1}}
-\DoxyCodeLine{01099     \_\_asm(\textcolor{stringliteral}{"             B    WMS\_LOOP0"});}
-\DoxyCodeLine{01100     \textcolor{comment}{// 1*2 (speculative, so P=1)}}
-\DoxyCodeLine{01101     \_\_asm(\textcolor{stringliteral}{"WMS\_DONE0:"});}
-\DoxyCodeLine{01102     \textcolor{comment}{// ---}}
-\DoxyCodeLine{01103     \textcolor{comment}{// 40 clocks/us + error}}
-\DoxyCodeLine{01104 \}}
-\DoxyCodeLine{01105 }
-\DoxyCodeLine{01111 \textcolor{keywordtype}{void} Uart0Isr()}
-\DoxyCodeLine{01112 \{}
+\DoxyCodeLine{01098     \textcolor{comment}{// 5}}
+\DoxyCodeLine{01099     \_\_asm(\textcolor{stringliteral}{"             B    WMS\_LOOP1"});}
+\DoxyCodeLine{01100     \textcolor{comment}{// 5*2 (speculative, so P=1)}}
+\DoxyCodeLine{01101     \_\_asm(\textcolor{stringliteral}{"WMS\_DONE1:   SUB  R0, \#1"});}
+\DoxyCodeLine{01102     \textcolor{comment}{// 1}}
+\DoxyCodeLine{01103     \_\_asm(\textcolor{stringliteral}{"             CBZ  R0, WMS\_DONE0"});}
+\DoxyCodeLine{01104     \textcolor{comment}{// 1}}
+\DoxyCodeLine{01105     \_\_asm(\textcolor{stringliteral}{"             NOP"});}
+\DoxyCodeLine{01106     \textcolor{comment}{// 1}}
+\DoxyCodeLine{01107     \_\_asm(\textcolor{stringliteral}{"             B    WMS\_LOOP0"});}
+\DoxyCodeLine{01108     \textcolor{comment}{// 1*2 (speculative, so P=1)}}
+\DoxyCodeLine{01109     \_\_asm(\textcolor{stringliteral}{"WMS\_DONE0:"});}
+\DoxyCodeLine{01110     \textcolor{comment}{// ---}}
+\DoxyCodeLine{01111     \textcolor{comment}{// 40 clocks/us + error}}
+\DoxyCodeLine{01112 \}}
 \DoxyCodeLine{01113 }
-\DoxyCodeLine{01114     \textcolor{keywordtype}{char} c = getcUart0();}
-\DoxyCodeLine{01115 }
-\DoxyCodeLine{01116     \textcolor{keywordflow}{if} (c == \textcolor{charliteral}{'\(\backslash\)0'})}
-\DoxyCodeLine{01117     \{}
-\DoxyCodeLine{01118         \textcolor{keywordflow}{return};}
-\DoxyCodeLine{01119     \}}
-\DoxyCodeLine{01120     \textcolor{keywordflow}{if} (!(isLetter(c) || isNumber(c) || c == \textcolor{charliteral}{' '} || c == \textcolor{charliteral}{'\(\backslash\)n'} || c == \textcolor{charliteral}{'\(\backslash\)r'}}
-\DoxyCodeLine{01121             || c == 8 || c == \textcolor{charliteral}{','}))}
-\DoxyCodeLine{01122     \{}
-\DoxyCodeLine{01123         \textcolor{keywordflow}{return};}
-\DoxyCodeLine{01124     \}}
-\DoxyCodeLine{01125     \textcolor{keywordflow}{if} (isLetter(c) \&\& enteringField == 0)}
-\DoxyCodeLine{01126     \{}
-\DoxyCodeLine{01127         command[pos++] = tolower(c);}
-\DoxyCodeLine{01128         putcUart0(c);}
-\DoxyCodeLine{01129     \}}
-\DoxyCodeLine{01130     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 0 \&\& c == \textcolor{charliteral}{' '})}
-\DoxyCodeLine{01131     \{}
-\DoxyCodeLine{01132         putcUart0(\textcolor{charliteral}{' '});}
-\DoxyCodeLine{01133         ++enteringField;}
-\DoxyCodeLine{01134         pos = 0;}
-\DoxyCodeLine{01135     \}}
-\DoxyCodeLine{01136     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 1 \&\& c == \textcolor{charliteral}{','})}
-\DoxyCodeLine{01137     \{}
-\DoxyCodeLine{01138         putcUart0(\textcolor{charliteral}{','});}
-\DoxyCodeLine{01139         ++enteringField;}
-\DoxyCodeLine{01140         pos = 0;}
-\DoxyCodeLine{01141     \}}
-\DoxyCodeLine{01142     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 0 \&\& isNumber(c))}
-\DoxyCodeLine{01143     \{}
-\DoxyCodeLine{01144         putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nInvalid Command. Resetting...\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01145         printCommandList();}
-\DoxyCodeLine{01146         putcUart0(\textcolor{charliteral}{'>'});}
-\DoxyCodeLine{01147         clearStr();}
-\DoxyCodeLine{01148     \}}
-\DoxyCodeLine{01149     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 1 \&\& (isNumber(c) || isLetter(c)))}
-\DoxyCodeLine{01150     \{}
-\DoxyCodeLine{01151         arg1[pos++] = c;}
-\DoxyCodeLine{01152         putcUart0(c);}
-\DoxyCodeLine{01153     \}}
-\DoxyCodeLine{01154     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 2 \&\& (isNumber(c) || isLetter(c)))}
-\DoxyCodeLine{01155     \{}
-\DoxyCodeLine{01156         arg2[pos++] = c;}
-\DoxyCodeLine{01157         putcUart0(c);}
-\DoxyCodeLine{01158     \}}
-\DoxyCodeLine{01159     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (c == \textcolor{charliteral}{'\(\backslash\)n'} || c == \textcolor{charliteral}{'\(\backslash\)r'})}
-\DoxyCodeLine{01160     \{}
-\DoxyCodeLine{01161         putcUart0(c);}
-\DoxyCodeLine{01162         GREEN\_LED = 1;}
-\DoxyCodeLine{01163         uint8\_t ret = parseCommand();}
-\DoxyCodeLine{01164         \textcolor{keywordflow}{if} (ret != 0)}
-\DoxyCodeLine{01165         \{}
-\DoxyCodeLine{01166             putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nInvalid Command\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01167             printCommandList();}
-\DoxyCodeLine{01168             putcUart0(\textcolor{charliteral}{'>'});}
-\DoxyCodeLine{01169             clearStr();}
-\DoxyCodeLine{01170         \}}
-\DoxyCodeLine{01171         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{01172         \{}
-\DoxyCodeLine{01173             putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01174             putcUart0(\textcolor{charliteral}{'>'});}
-\DoxyCodeLine{01175             clearStr();}
-\DoxyCodeLine{01176         \}}
-\DoxyCodeLine{01177 }
-\DoxyCodeLine{01178         GREEN\_LED = 0;}
-\DoxyCodeLine{01179     \}}
-\DoxyCodeLine{01180     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (c == 8)}
-\DoxyCodeLine{01181     \{}
-\DoxyCodeLine{01182         \textcolor{keywordflow}{if} (pos > 0)}
-\DoxyCodeLine{01183         \{}
-\DoxyCodeLine{01184             \textcolor{keywordflow}{if} (enteringField == 2)}
-\DoxyCodeLine{01185             \{}
-\DoxyCodeLine{01186                 arg2[--pos] = \textcolor{charliteral}{'\(\backslash\)0'};}
-\DoxyCodeLine{01187 }
-\DoxyCodeLine{01188             \}}
-\DoxyCodeLine{01189             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 1)}
-\DoxyCodeLine{01190             \{}
-\DoxyCodeLine{01191                 arg1[--pos] = \textcolor{charliteral}{'\(\backslash\)0'};}
-\DoxyCodeLine{01192             \}}
-\DoxyCodeLine{01193             \textcolor{keywordflow}{else}}
-\DoxyCodeLine{01194             \{}
-\DoxyCodeLine{01195                 command[--pos] = \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{01119 \textcolor{keywordtype}{void} Uart0Isr()}
+\DoxyCodeLine{01120 \{}
+\DoxyCodeLine{01121 }
+\DoxyCodeLine{01122     \textcolor{keywordtype}{char} c = getcUart0();}
+\DoxyCodeLine{01123 }
+\DoxyCodeLine{01124     \textcolor{keywordflow}{if} (c == \textcolor{charliteral}{'\(\backslash\)0'})}
+\DoxyCodeLine{01125     \{}
+\DoxyCodeLine{01126         \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01127     \}}
+\DoxyCodeLine{01128     \textcolor{keywordflow}{if} (!(isLetter(c) || isNumber(c) || c == \textcolor{charliteral}{' '} || c == \textcolor{charliteral}{'\(\backslash\)n'} || c == \textcolor{charliteral}{'\(\backslash\)r'}}
+\DoxyCodeLine{01129             || c == 8 || c == \textcolor{charliteral}{','}))}
+\DoxyCodeLine{01130     \{}
+\DoxyCodeLine{01131         \textcolor{keywordflow}{return};}
+\DoxyCodeLine{01132     \}}
+\DoxyCodeLine{01133     \textcolor{keywordflow}{if} (isLetter(c) \&\& enteringField == 0)}
+\DoxyCodeLine{01134     \{}
+\DoxyCodeLine{01135         command[pos++] = tolower(c);}
+\DoxyCodeLine{01136         putcUart0(c);}
+\DoxyCodeLine{01137     \}}
+\DoxyCodeLine{01138     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 0 \&\& c == \textcolor{charliteral}{' '})}
+\DoxyCodeLine{01139     \{}
+\DoxyCodeLine{01140         putcUart0(\textcolor{charliteral}{' '});}
+\DoxyCodeLine{01141         ++enteringField;}
+\DoxyCodeLine{01142         pos = 0;}
+\DoxyCodeLine{01143     \}}
+\DoxyCodeLine{01144     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 1 \&\& c == \textcolor{charliteral}{','})}
+\DoxyCodeLine{01145     \{}
+\DoxyCodeLine{01146         putcUart0(\textcolor{charliteral}{','});}
+\DoxyCodeLine{01147         ++enteringField;}
+\DoxyCodeLine{01148         pos = 0;}
+\DoxyCodeLine{01149     \}}
+\DoxyCodeLine{01150     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 0 \&\& isNumber(c))}
+\DoxyCodeLine{01151     \{}
+\DoxyCodeLine{01152         putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nInvalid Command. Resetting...\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01153         printCommandList();}
+\DoxyCodeLine{01154         putcUart0(\textcolor{charliteral}{'>'});}
+\DoxyCodeLine{01155         clearStr();}
+\DoxyCodeLine{01156     \}}
+\DoxyCodeLine{01157     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 1 \&\& (isNumber(c) || isLetter(c)))}
+\DoxyCodeLine{01158     \{}
+\DoxyCodeLine{01159         arg1[pos++] = c;}
+\DoxyCodeLine{01160         putcUart0(c);}
+\DoxyCodeLine{01161     \}}
+\DoxyCodeLine{01162     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 2 \&\& (isNumber(c) || isLetter(c)))}
+\DoxyCodeLine{01163     \{}
+\DoxyCodeLine{01164         arg2[pos++] = c;}
+\DoxyCodeLine{01165         putcUart0(c);}
+\DoxyCodeLine{01166     \}}
+\DoxyCodeLine{01167     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (c == \textcolor{charliteral}{'\(\backslash\)n'} || c == \textcolor{charliteral}{'\(\backslash\)r'})}
+\DoxyCodeLine{01168     \{}
+\DoxyCodeLine{01169         putcUart0(c);}
+\DoxyCodeLine{01170         GREEN\_LED = 1;}
+\DoxyCodeLine{01171         uint8\_t ret = parseCommand();}
+\DoxyCodeLine{01172         \textcolor{keywordflow}{if} (ret != 0)}
+\DoxyCodeLine{01173         \{}
+\DoxyCodeLine{01174             putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nInvalid Command\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01175             printCommandList();}
+\DoxyCodeLine{01176             putcUart0(\textcolor{charliteral}{'>'});}
+\DoxyCodeLine{01177             clearStr();}
+\DoxyCodeLine{01178         \}}
+\DoxyCodeLine{01179         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01180         \{}
+\DoxyCodeLine{01181             putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01182             putcUart0(\textcolor{charliteral}{'>'});}
+\DoxyCodeLine{01183             clearStr();}
+\DoxyCodeLine{01184         \}}
+\DoxyCodeLine{01185 }
+\DoxyCodeLine{01186         GREEN\_LED = 0;}
+\DoxyCodeLine{01187     \}}
+\DoxyCodeLine{01188     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (c == 8)}
+\DoxyCodeLine{01189     \{}
+\DoxyCodeLine{01190         \textcolor{keywordflow}{if} (pos > 0)}
+\DoxyCodeLine{01191         \{}
+\DoxyCodeLine{01192             \textcolor{keywordflow}{if} (enteringField == 2)}
+\DoxyCodeLine{01193             \{}
+\DoxyCodeLine{01194                 arg2[--pos] = \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{01195 }
 \DoxyCodeLine{01196             \}}
-\DoxyCodeLine{01197             putcUart0(\textcolor{charliteral}{'\(\backslash\)b'});}
-\DoxyCodeLine{01198             putcUart0(\textcolor{charliteral}{' '});}
-\DoxyCodeLine{01199             putcUart0(\textcolor{charliteral}{'\(\backslash\)b'});}
-\DoxyCodeLine{01200 }
-\DoxyCodeLine{01201         \}}
-\DoxyCodeLine{01202         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (pos == 0)}
-\DoxyCodeLine{01203         \{}
-\DoxyCodeLine{01204             enteringField--;}
-\DoxyCodeLine{01205             \textcolor{keywordflow}{if} (enteringField == 1)}
-\DoxyCodeLine{01206             \{}
-\DoxyCodeLine{01207                 pos = strlen(arg1);}
-\DoxyCodeLine{01208             \}}
-\DoxyCodeLine{01209             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 0)}
-\DoxyCodeLine{01210             \{}
-\DoxyCodeLine{01211                 pos = strlen(command);}
-\DoxyCodeLine{01212             \}}
-\DoxyCodeLine{01213             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01197             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 1)}
+\DoxyCodeLine{01198             \{}
+\DoxyCodeLine{01199                 arg1[--pos] = \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{01200             \}}
+\DoxyCodeLine{01201             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01202             \{}
+\DoxyCodeLine{01203                 command[--pos] = \textcolor{charliteral}{'\(\backslash\)0'};}
+\DoxyCodeLine{01204             \}}
+\DoxyCodeLine{01205             putcUart0(\textcolor{charliteral}{'\(\backslash\)b'});}
+\DoxyCodeLine{01206             putcUart0(\textcolor{charliteral}{' '});}
+\DoxyCodeLine{01207             putcUart0(\textcolor{charliteral}{'\(\backslash\)b'});}
+\DoxyCodeLine{01208 }
+\DoxyCodeLine{01209         \}}
+\DoxyCodeLine{01210         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (pos == 0)}
+\DoxyCodeLine{01211         \{}
+\DoxyCodeLine{01212             enteringField--;}
+\DoxyCodeLine{01213             \textcolor{keywordflow}{if} (enteringField == 1)}
 \DoxyCodeLine{01214             \{}
-\DoxyCodeLine{01215                 enteringField = 0;}
-\DoxyCodeLine{01216                 pos = 0;}
-\DoxyCodeLine{01217             \}}
-\DoxyCodeLine{01218 }
-\DoxyCodeLine{01219         \}}
-\DoxyCodeLine{01220         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{01221         \{}
-\DoxyCodeLine{01222             \textcolor{keywordflow}{if} (enteringField < 0)}
-\DoxyCodeLine{01223             \{}
-\DoxyCodeLine{01224                 enteringField = 0;}
+\DoxyCodeLine{01215                 pos = strlen(arg1);}
+\DoxyCodeLine{01216             \}}
+\DoxyCodeLine{01217             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (enteringField == 0)}
+\DoxyCodeLine{01218             \{}
+\DoxyCodeLine{01219                 pos = strlen(command);}
+\DoxyCodeLine{01220             \}}
+\DoxyCodeLine{01221             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01222             \{}
+\DoxyCodeLine{01223                 enteringField = 0;}
+\DoxyCodeLine{01224                 pos = 0;}
 \DoxyCodeLine{01225             \}}
-\DoxyCodeLine{01226         \}}
-\DoxyCodeLine{01227     \}}
-\DoxyCodeLine{01228     \textcolor{keywordflow}{else}}
-\DoxyCodeLine{01229     \{}
-\DoxyCodeLine{01230         putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nInvalid Command. Resetting...\(\backslash\)r\(\backslash\)n"});}
-\DoxyCodeLine{01231         printCommandList();}
-\DoxyCodeLine{01232         putcUart0(\textcolor{charliteral}{'>'});}
-\DoxyCodeLine{01233         clearStr();}
-\DoxyCodeLine{01234     \}}
-\DoxyCodeLine{01235 }
-\DoxyCodeLine{01236     \textcolor{keywordflow}{if} (mode == 1 \&\& continuous == 1)}
+\DoxyCodeLine{01226 }
+\DoxyCodeLine{01227         \}}
+\DoxyCodeLine{01228         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01229         \{}
+\DoxyCodeLine{01230             \textcolor{keywordflow}{if} (enteringField < 0)}
+\DoxyCodeLine{01231             \{}
+\DoxyCodeLine{01232                 enteringField = 0;}
+\DoxyCodeLine{01233             \}}
+\DoxyCodeLine{01234         \}}
+\DoxyCodeLine{01235     \}}
+\DoxyCodeLine{01236     \textcolor{keywordflow}{else}}
 \DoxyCodeLine{01237     \{}
-\DoxyCodeLine{01238         RED\_LED = 1;}
-\DoxyCodeLine{01239     \}}
-\DoxyCodeLine{01240     \textcolor{keywordflow}{else}}
-\DoxyCodeLine{01241     \{}
-\DoxyCodeLine{01242         RED\_LED = 0;}
-\DoxyCodeLine{01243     \}}
-\DoxyCodeLine{01244 }
-\DoxyCodeLine{01245 \}}
-\DoxyCodeLine{01246 }
-\DoxyCodeLine{01252 \textcolor{keywordtype}{void} wooone()}
-\DoxyCodeLine{01253 \{}
+\DoxyCodeLine{01238         putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nInvalid Command. Resetting...\(\backslash\)r\(\backslash\)n"});}
+\DoxyCodeLine{01239         printCommandList();}
+\DoxyCodeLine{01240         putcUart0(\textcolor{charliteral}{'>'});}
+\DoxyCodeLine{01241         clearStr();}
+\DoxyCodeLine{01242     \}}
+\DoxyCodeLine{01243 }
+\DoxyCodeLine{01244     \textcolor{keywordflow}{if} (mode == 1 \&\& continuous == 1)}
+\DoxyCodeLine{01245     \{}
+\DoxyCodeLine{01246         RED\_LED = 1;}
+\DoxyCodeLine{01247     \}}
+\DoxyCodeLine{01248     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01249     \{}
+\DoxyCodeLine{01250         RED\_LED = 0;}
+\DoxyCodeLine{01251     \}}
+\DoxyCodeLine{01252 }
+\DoxyCodeLine{01253 \}}
 \DoxyCodeLine{01254 }
-\DoxyCodeLine{01255     \textcolor{keywordtype}{int} x = 0;}
-\DoxyCodeLine{01256     \textcolor{keywordflow}{for} (x = 0; x < 512; x += 1)}
-\DoxyCodeLine{01257     \{}
-\DoxyCodeLine{01258         dmxData[x] = 255;}
-\DoxyCodeLine{01259     \}}
-\DoxyCodeLine{01260 }
-\DoxyCodeLine{01261 \}}
+\DoxyCodeLine{01260 \textcolor{keywordtype}{void} wooone()}
+\DoxyCodeLine{01261 \{}
 \DoxyCodeLine{01262 }
-\DoxyCodeLine{01268 \textcolor{keywordtype}{void} sweepServo()}
-\DoxyCodeLine{01269 \{}
+\DoxyCodeLine{01263     \textcolor{keywordtype}{int} x = 0;}
+\DoxyCodeLine{01264     \textcolor{keywordflow}{for} (x = 0; x < 512; x += 1)}
+\DoxyCodeLine{01265     \{}
+\DoxyCodeLine{01266         dmxData[x] = 255;}
+\DoxyCodeLine{01267     \}}
+\DoxyCodeLine{01268 }
+\DoxyCodeLine{01269 \}}
 \DoxyCodeLine{01270 }
-\DoxyCodeLine{01271     \textcolor{keywordflow}{if} (woo == 3)}
-\DoxyCodeLine{01272     \{}
-\DoxyCodeLine{01273         GPIO\_PORTF\_AFSEL\_R |= 0x0F;}
-\DoxyCodeLine{01274         SYSCTL\_RCGCPWM\_R |= SYSCTL\_RCGCPWM\_R1;}
-\DoxyCodeLine{01275         TIMER2\_CTL\_R |= TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{01276         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 0 - 1] * 100 >= 1400}
-\DoxyCodeLine{01277                 \&\& dmxData[deviceModeAddress + 0 - 1] * 100 <= 5800)}
-\DoxyCodeLine{01278         \{}
-\DoxyCodeLine{01279             PWM1\_2\_CMPB\_R = dmxData[deviceModeAddress + 0 - 1] * 100;}
-\DoxyCodeLine{01280         \}}
-\DoxyCodeLine{01281 }
-\DoxyCodeLine{01282     \}}
-\DoxyCodeLine{01283     \textcolor{keywordflow}{if} (woo == 4)}
-\DoxyCodeLine{01284     \{}
-\DoxyCodeLine{01285         GPIO\_PORTF\_AFSEL\_R |= 0x0F;}
-\DoxyCodeLine{01286         SYSCTL\_RCGCPWM\_R |= SYSCTL\_RCGCPWM\_R1;}
-\DoxyCodeLine{01287         TIMER2\_CTL\_R |= TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{01288         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 0 - 1] * 100 >= 1400}
-\DoxyCodeLine{01289                 \&\& dmxData[deviceModeAddress + 0 - 1] * 100 <= 5800)}
-\DoxyCodeLine{01290         \{}
-\DoxyCodeLine{01291             PWM1\_2\_CMPB\_R = dmxData[deviceModeAddress + 0 - 1] * 100;}
-\DoxyCodeLine{01292         \}}
-\DoxyCodeLine{01293         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 0 - 1] * 100 < 1400)}
-\DoxyCodeLine{01294         \{}
-\DoxyCodeLine{01295             servoDir = 1;}
-\DoxyCodeLine{01296         \}}
-\DoxyCodeLine{01297         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 0 - 1] * 100 > 5800)}
+\DoxyCodeLine{01276 \textcolor{keywordtype}{void} sweepServo()}
+\DoxyCodeLine{01277 \{}
+\DoxyCodeLine{01278 }
+\DoxyCodeLine{01279     \textcolor{keywordflow}{if} (woo == 3)}
+\DoxyCodeLine{01280     \{}
+\DoxyCodeLine{01281         GPIO\_PORTF\_AFSEL\_R |= 0x0F;}
+\DoxyCodeLine{01282         SYSCTL\_RCGCPWM\_R |= SYSCTL\_RCGCPWM\_R1;}
+\DoxyCodeLine{01283         TIMER2\_CTL\_R |= TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{01284         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 0 - 1] * 100 >= 1400}
+\DoxyCodeLine{01285                 \&\& dmxData[deviceModeAddress + 0 - 1] * 100 <= 5800)}
+\DoxyCodeLine{01286         \{}
+\DoxyCodeLine{01287             PWM1\_2\_CMPB\_R = dmxData[deviceModeAddress + 0 - 1] * 100;}
+\DoxyCodeLine{01288         \}}
+\DoxyCodeLine{01289 }
+\DoxyCodeLine{01290     \}}
+\DoxyCodeLine{01291     \textcolor{keywordflow}{if} (woo == 4)}
+\DoxyCodeLine{01292     \{}
+\DoxyCodeLine{01293         GPIO\_PORTF\_AFSEL\_R |= 0x0F;}
+\DoxyCodeLine{01294         SYSCTL\_RCGCPWM\_R |= SYSCTL\_RCGCPWM\_R1;}
+\DoxyCodeLine{01295         TIMER2\_CTL\_R |= TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{01296         \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 0 - 1] * 100 >= 1400}
+\DoxyCodeLine{01297                 \&\& dmxData[deviceModeAddress + 0 - 1] * 100 <= 5800)}
 \DoxyCodeLine{01298         \{}
-\DoxyCodeLine{01299             servoDir = 0;}
+\DoxyCodeLine{01299             PWM1\_2\_CMPB\_R = dmxData[deviceModeAddress + 0 - 1] * 100;}
 \DoxyCodeLine{01300         \}}
-\DoxyCodeLine{01301 }
-\DoxyCodeLine{01302     \}}
-\DoxyCodeLine{01303 }
-\DoxyCodeLine{01304     \textcolor{keywordflow}{else}}
-\DoxyCodeLine{01305     \{}
-\DoxyCodeLine{01306         TIMER1\_CTL\_R \&= ~TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{01307     \}}
-\DoxyCodeLine{01308 \}}
+\DoxyCodeLine{01301         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 0 - 1] * 100 < 1400)}
+\DoxyCodeLine{01302         \{}
+\DoxyCodeLine{01303             servoDir = 1;}
+\DoxyCodeLine{01304         \}}
+\DoxyCodeLine{01305         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (dmxData[deviceModeAddress + 0 - 1] * 100 > 5800)}
+\DoxyCodeLine{01306         \{}
+\DoxyCodeLine{01307             servoDir = 0;}
+\DoxyCodeLine{01308         \}}
 \DoxyCodeLine{01309 }
-\DoxyCodeLine{01315 \textcolor{keywordtype}{void} animationRamp()}
-\DoxyCodeLine{01316 \{}
+\DoxyCodeLine{01310     \}}
+\DoxyCodeLine{01311 }
+\DoxyCodeLine{01312     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01313     \{}
+\DoxyCodeLine{01314         TIMER1\_CTL\_R \&= ~TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{01315     \}}
+\DoxyCodeLine{01316 \}}
 \DoxyCodeLine{01317 }
-\DoxyCodeLine{01318     TIMER2\_CTL\_R = TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{01319 \}}
-\DoxyCodeLine{01320 }
-\DoxyCodeLine{01326 uint8\_t main()}
-\DoxyCodeLine{01327 \{}
+\DoxyCodeLine{01323 \textcolor{keywordtype}{void} animationRamp()}
+\DoxyCodeLine{01324 \{}
+\DoxyCodeLine{01325 }
+\DoxyCodeLine{01326     TIMER2\_CTL\_R = TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{01327 \}}
 \DoxyCodeLine{01328 }
-\DoxyCodeLine{01329     \textcolor{comment}{// Initialize hardware}}
-\DoxyCodeLine{01330     initHw();}
-\DoxyCodeLine{01331 }
-\DoxyCodeLine{01332     getModeEE();}
-\DoxyCodeLine{01333     putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)nCurrent Mode: "});}
-\DoxyCodeLine{01334     \textcolor{keywordflow}{if} (mode == 0)}
-\DoxyCodeLine{01335     \{}
-\DoxyCodeLine{01336         mode = 0;}
-\DoxyCodeLine{01337         putsUart0(\textcolor{stringliteral}{"Device"});}
-\DoxyCodeLine{01338         TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{01339         UART1\_IFLS\_R = UART\_IFLS\_RX1\_8;}
-\DoxyCodeLine{01340         UART1\_IM\_R = UART\_IM\_RXIM;}
-\DoxyCodeLine{01341         GPIO\_PORTC\_AFSEL\_R |= 0x30;}
-\DoxyCodeLine{01342         GPIO\_PORTC\_DATA\_R \&= 0x9F;}
-\DoxyCodeLine{01343         UART1\_LCRH\_R = UART\_LCRH\_WLEN\_8 | UART\_LCRH\_STP2;}
-\DoxyCodeLine{01344         UART1\_CTL\_R = UART\_CTL\_RXE | UART\_CTL\_UARTEN;}
-\DoxyCodeLine{01345     \}}
-\DoxyCodeLine{01346     \textcolor{keywordflow}{else}}
-\DoxyCodeLine{01347     \{}
-\DoxyCodeLine{01348         mode = 1;}
-\DoxyCodeLine{01349         putsUart0(\textcolor{stringliteral}{"Controller"});}
-\DoxyCodeLine{01350         UART1\_IM\_R = UART\_IM\_TXIM;}
-\DoxyCodeLine{01351         GPIO\_PORTC\_DATA\_R \&= 0xDF;}
-\DoxyCodeLine{01352 }
+\DoxyCodeLine{01334 uint8\_t main()}
+\DoxyCodeLine{01335 \{}
+\DoxyCodeLine{01336 }
+\DoxyCodeLine{01337     \textcolor{comment}{// Initialize hardware}}
+\DoxyCodeLine{01338     initHw();}
+\DoxyCodeLine{01339 }
+\DoxyCodeLine{01340     getModeEE();}
+\DoxyCodeLine{01341     putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)n\(\backslash\)r\(\backslash\)nCurrent Mode: "});}
+\DoxyCodeLine{01342     \textcolor{keywordflow}{if} (mode == 0)}
+\DoxyCodeLine{01343     \{}
+\DoxyCodeLine{01344         mode = 0;}
+\DoxyCodeLine{01345         putsUart0(\textcolor{stringliteral}{"Device"});}
+\DoxyCodeLine{01346         TIMER1\_CTL\_R |= TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{01347         UART1\_IFLS\_R = UART\_IFLS\_RX1\_8;}
+\DoxyCodeLine{01348         UART1\_IM\_R = UART\_IM\_RXIM;}
+\DoxyCodeLine{01349         GPIO\_PORTC\_AFSEL\_R |= 0x30;}
+\DoxyCodeLine{01350         GPIO\_PORTC\_DATA\_R \&= 0x9F;}
+\DoxyCodeLine{01351         UART1\_LCRH\_R = UART\_LCRH\_WLEN\_8 | UART\_LCRH\_STP2;}
+\DoxyCodeLine{01352         UART1\_CTL\_R = UART\_CTL\_RXE | UART\_CTL\_UARTEN;}
 \DoxyCodeLine{01353     \}}
-\DoxyCodeLine{01354 }
-\DoxyCodeLine{01355     putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nCurrent Device Mode Address: "});}
-\DoxyCodeLine{01356     putsUart0(intToChar(deviceModeAddress));}
-\DoxyCodeLine{01357     printCommandList();}
-\DoxyCodeLine{01358     putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)n>"});}
-\DoxyCodeLine{01359 }
-\DoxyCodeLine{01360     GREEN\_LED = 1;}
-\DoxyCodeLine{01361     waitMicrosecond(250000);}
-\DoxyCodeLine{01362     GREEN\_LED = 0;}
-\DoxyCodeLine{01363     waitMicrosecond(250000);}
-\DoxyCodeLine{01364     BLUE\_LED = 0;}
-\DoxyCodeLine{01365 }
-\DoxyCodeLine{01366     \textcolor{comment}{//Setting initial values for dmx for testing}}
-\DoxyCodeLine{01367     uint16\_t x = 0;}
-\DoxyCodeLine{01368 }
-\DoxyCodeLine{01369     \textcolor{keywordflow}{for} (x = 0; x < 512; ++x)}
-\DoxyCodeLine{01370     \{}
-\DoxyCodeLine{01371         dmxData[x] = x \% 256;}
-\DoxyCodeLine{01372     \}}
+\DoxyCodeLine{01354     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01355     \{}
+\DoxyCodeLine{01356         mode = 1;}
+\DoxyCodeLine{01357         putsUart0(\textcolor{stringliteral}{"Controller"});}
+\DoxyCodeLine{01358         UART1\_IM\_R = UART\_IM\_TXIM;}
+\DoxyCodeLine{01359         GPIO\_PORTC\_DATA\_R \&= 0xDF;}
+\DoxyCodeLine{01360 }
+\DoxyCodeLine{01361     \}}
+\DoxyCodeLine{01362 }
+\DoxyCodeLine{01363     putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)nCurrent Device Mode Address: "});}
+\DoxyCodeLine{01364     putsUart0(intToChar(deviceModeAddress));}
+\DoxyCodeLine{01365     printCommandList();}
+\DoxyCodeLine{01366     putsUart0(\textcolor{stringliteral}{"\(\backslash\)r\(\backslash\)n>"});}
+\DoxyCodeLine{01367 }
+\DoxyCodeLine{01368     GREEN\_LED = 1;}
+\DoxyCodeLine{01369     waitMicrosecond(250000);}
+\DoxyCodeLine{01370     GREEN\_LED = 0;}
+\DoxyCodeLine{01371     waitMicrosecond(250000);}
+\DoxyCodeLine{01372     BLUE\_LED = 0;}
 \DoxyCodeLine{01373 }
-\DoxyCodeLine{01374     \textcolor{keywordflow}{while} (1)}
-\DoxyCodeLine{01375     \{}
+\DoxyCodeLine{01374     \textcolor{comment}{//Setting initial values for dmx for testing}}
+\DoxyCodeLine{01375     uint16\_t x = 0;}
 \DoxyCodeLine{01376 }
-\DoxyCodeLine{01377         \textcolor{comment}{//to read values from mux from DIP switch}}
-\DoxyCodeLine{01378         \textcolor{comment}{//NOT TESTED with DIP SWITCH}}
-\DoxyCodeLine{01379         \textcolor{keywordflow}{if} (!PUSH\_BUTTON2)}
-\DoxyCodeLine{01380         \{}
-\DoxyCodeLine{01381             uint8\_t ix = 0;}
-\DoxyCodeLine{01382             deviceModeAddress = 0;}
-\DoxyCodeLine{01383             \textcolor{keywordflow}{for} (ix = 0; ix < 8; ++ix)}
-\DoxyCodeLine{01384             \{}
-\DoxyCodeLine{01385                 GPIO\_PORTD\_DATA\_R = ix;}
-\DoxyCodeLine{01386                 waitMicrosecond(10000);}
-\DoxyCodeLine{01387                 uint8\_t d = GPIO\_PORTD\_DATA\_R \& 0x8;}
-\DoxyCodeLine{01388 }
-\DoxyCodeLine{01389                 deviceModeAddress += (d >> 4);}
-\DoxyCodeLine{01390 }
-\DoxyCodeLine{01391             \}}
-\DoxyCodeLine{01392             putsUart0(intToChar(deviceModeAddress));}
-\DoxyCodeLine{01393 }
-\DoxyCodeLine{01394             putcUart0(\textcolor{charliteral}{'\(\backslash\)n'});}
-\DoxyCodeLine{01395             putcUart0(\textcolor{charliteral}{'\(\backslash\)r'});}
-\DoxyCodeLine{01396             waitMicrosecond(250000);}
-\DoxyCodeLine{01397             \textcolor{keywordflow}{if} (deviceModeAddress == 0)}
-\DoxyCodeLine{01398             \{}
-\DoxyCodeLine{01399                 deviceModeAddress++;}
-\DoxyCodeLine{01400             \}}
-\DoxyCodeLine{01401         \}}
-\DoxyCodeLine{01402 }
-\DoxyCodeLine{01403         \textcolor{keywordflow}{if} (!PUSH\_BUTTON)}
-\DoxyCodeLine{01404         \{}
-\DoxyCodeLine{01405             RGBMode \string^= 1;}
-\DoxyCodeLine{01406             \textcolor{keywordflow}{if} (RGBMode)}
-\DoxyCodeLine{01407             \{}
-\DoxyCodeLine{01408                 GPIO\_PORTF\_AFSEL\_R = 0;}
-\DoxyCodeLine{01409 }
-\DoxyCodeLine{01410                 GREEN\_LED = 1;}
-\DoxyCodeLine{01411                 waitMicrosecond(200000);}
-\DoxyCodeLine{01412                 BLUE\_LED = 1;}
-\DoxyCodeLine{01413                 waitMicrosecond(200000);}
-\DoxyCodeLine{01414                 RED\_LED = 1;}
-\DoxyCodeLine{01415                 waitMicrosecond(250000);}
-\DoxyCodeLine{01416                 GREEN\_LED = 0;}
-\DoxyCodeLine{01417                 waitMicrosecond(200000);}
-\DoxyCodeLine{01418                 BLUE\_LED = 0;}
+\DoxyCodeLine{01377     \textcolor{keywordflow}{for} (x = 0; x < 512; ++x)}
+\DoxyCodeLine{01378     \{}
+\DoxyCodeLine{01379         dmxData[x] = x \% 256;}
+\DoxyCodeLine{01380     \}}
+\DoxyCodeLine{01381 }
+\DoxyCodeLine{01382     \textcolor{keywordflow}{while} (1)}
+\DoxyCodeLine{01383     \{}
+\DoxyCodeLine{01384 }
+\DoxyCodeLine{01385         \textcolor{comment}{//to read values from mux from DIP switch}}
+\DoxyCodeLine{01386         \textcolor{comment}{//NOT TESTED with DIP SWITCH}}
+\DoxyCodeLine{01387         \textcolor{keywordflow}{if} (!PUSH\_BUTTON2)}
+\DoxyCodeLine{01388         \{}
+\DoxyCodeLine{01389             uint8\_t ix = 0;}
+\DoxyCodeLine{01390             deviceModeAddress = 0;}
+\DoxyCodeLine{01391             \textcolor{keywordflow}{for} (ix = 0; ix < 8; ++ix)}
+\DoxyCodeLine{01392             \{}
+\DoxyCodeLine{01393                 GPIO\_PORTD\_DATA\_R = ix;}
+\DoxyCodeLine{01394                 waitMicrosecond(10000);}
+\DoxyCodeLine{01395                 uint8\_t d = GPIO\_PORTD\_DATA\_R \& 0x8;}
+\DoxyCodeLine{01396 }
+\DoxyCodeLine{01397                 deviceModeAddress += (d >> 4);}
+\DoxyCodeLine{01398 }
+\DoxyCodeLine{01399             \}}
+\DoxyCodeLine{01400             putsUart0(intToChar(deviceModeAddress));}
+\DoxyCodeLine{01401 }
+\DoxyCodeLine{01402             putcUart0(\textcolor{charliteral}{'\(\backslash\)n'});}
+\DoxyCodeLine{01403             putcUart0(\textcolor{charliteral}{'\(\backslash\)r'});}
+\DoxyCodeLine{01404             waitMicrosecond(250000);}
+\DoxyCodeLine{01405             \textcolor{keywordflow}{if} (deviceModeAddress == 0)}
+\DoxyCodeLine{01406             \{}
+\DoxyCodeLine{01407                 deviceModeAddress++;}
+\DoxyCodeLine{01408             \}}
+\DoxyCodeLine{01409         \}}
+\DoxyCodeLine{01410 }
+\DoxyCodeLine{01411         \textcolor{keywordflow}{if} (!PUSH\_BUTTON)}
+\DoxyCodeLine{01412         \{}
+\DoxyCodeLine{01413             RGBMode \string^= 1;}
+\DoxyCodeLine{01414             \textcolor{keywordflow}{if} (RGBMode)}
+\DoxyCodeLine{01415             \{}
+\DoxyCodeLine{01416                 GPIO\_PORTF\_AFSEL\_R = 0;}
+\DoxyCodeLine{01417 }
+\DoxyCodeLine{01418                 GREEN\_LED = 1;}
 \DoxyCodeLine{01419                 waitMicrosecond(200000);}
-\DoxyCodeLine{01420                 RED\_LED = 0;}
-\DoxyCodeLine{01421                 SYSCTL\_RCGCPWM\_R |= SYSCTL\_RCGCPWM\_R1;}
-\DoxyCodeLine{01422 }
-\DoxyCodeLine{01423             \}}
-\DoxyCodeLine{01424             \textcolor{keywordflow}{else}}
-\DoxyCodeLine{01425             \{}
-\DoxyCodeLine{01426                 GPIO\_PORTF\_AFSEL\_R \&= 0;}
-\DoxyCodeLine{01427                 SYSCTL\_RCGCPWM\_R \&= ~SYSCTL\_RCGCPWM\_R1;}
-\DoxyCodeLine{01428                 GREEN\_LED = 1;}
-\DoxyCodeLine{01429                 BLUE\_LED = 1;}
-\DoxyCodeLine{01430                 RED\_LED = 1;}
-\DoxyCodeLine{01431                 waitMicrosecond(250000);}
-\DoxyCodeLine{01432                 GREEN\_LED = 0;}
-\DoxyCodeLine{01433                 BLUE\_LED = 0;}
-\DoxyCodeLine{01434                 RED\_LED = 0;}
-\DoxyCodeLine{01435                 waitMicrosecond(250000);}
+\DoxyCodeLine{01420                 BLUE\_LED = 1;}
+\DoxyCodeLine{01421                 waitMicrosecond(200000);}
+\DoxyCodeLine{01422                 RED\_LED = 1;}
+\DoxyCodeLine{01423                 waitMicrosecond(250000);}
+\DoxyCodeLine{01424                 GREEN\_LED = 0;}
+\DoxyCodeLine{01425                 waitMicrosecond(200000);}
+\DoxyCodeLine{01426                 BLUE\_LED = 0;}
+\DoxyCodeLine{01427                 waitMicrosecond(200000);}
+\DoxyCodeLine{01428                 RED\_LED = 0;}
+\DoxyCodeLine{01429                 SYSCTL\_RCGCPWM\_R |= SYSCTL\_RCGCPWM\_R1;}
+\DoxyCodeLine{01430 }
+\DoxyCodeLine{01431             \}}
+\DoxyCodeLine{01432             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01433             \{}
+\DoxyCodeLine{01434                 GPIO\_PORTF\_AFSEL\_R \&= 0;}
+\DoxyCodeLine{01435                 SYSCTL\_RCGCPWM\_R \&= ~SYSCTL\_RCGCPWM\_R1;}
 \DoxyCodeLine{01436                 GREEN\_LED = 1;}
 \DoxyCodeLine{01437                 BLUE\_LED = 1;}
 \DoxyCodeLine{01438                 RED\_LED = 1;}
@@ -1220,60 +1212,68 @@
 \DoxyCodeLine{01441                 BLUE\_LED = 0;}
 \DoxyCodeLine{01442                 RED\_LED = 0;}
 \DoxyCodeLine{01443                 waitMicrosecond(250000);}
-\DoxyCodeLine{01444             \}}
-\DoxyCodeLine{01445 }
-\DoxyCodeLine{01446         \}}
-\DoxyCodeLine{01447 }
-\DoxyCodeLine{01448         \textcolor{keywordflow}{if} (woo == 3 || woo == 4)}
-\DoxyCodeLine{01449         \{}
-\DoxyCodeLine{01450 }
-\DoxyCodeLine{01451             SYSCTL\_RCGCPWM\_R |= SYSCTL\_RCGCPWM\_R1;}
-\DoxyCodeLine{01452             sweepServo();}
+\DoxyCodeLine{01444                 GREEN\_LED = 1;}
+\DoxyCodeLine{01445                 BLUE\_LED = 1;}
+\DoxyCodeLine{01446                 RED\_LED = 1;}
+\DoxyCodeLine{01447                 waitMicrosecond(250000);}
+\DoxyCodeLine{01448                 GREEN\_LED = 0;}
+\DoxyCodeLine{01449                 BLUE\_LED = 0;}
+\DoxyCodeLine{01450                 RED\_LED = 0;}
+\DoxyCodeLine{01451                 waitMicrosecond(250000);}
+\DoxyCodeLine{01452             \}}
 \DoxyCodeLine{01453 }
 \DoxyCodeLine{01454         \}}
 \DoxyCodeLine{01455 }
-\DoxyCodeLine{01456         \textcolor{keywordflow}{if} (woo == 2)}
-\DoxyCodeLine{01457             animationRamp();}
-\DoxyCodeLine{01458         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{01459         \{}
-\DoxyCodeLine{01460             TIMER2\_CTL\_R \&= ~TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{01461         \}}
-\DoxyCodeLine{01462         \textcolor{keywordflow}{if} (woo == 1)}
-\DoxyCodeLine{01463             wooone();}
-\DoxyCodeLine{01464         \textcolor{keywordflow}{if} (woo == 5)}
-\DoxyCodeLine{01465         \{}
-\DoxyCodeLine{01466             TIMER2\_CTL\_R |= TIMER\_CTL\_TAEN;}
-\DoxyCodeLine{01467         \}}
-\DoxyCodeLine{01468 }
-\DoxyCodeLine{01469         \textcolor{keywordflow}{if} (RGBMode \&\& woo != 3 \&\& woo != 4 \&\& mode == 0)}
-\DoxyCodeLine{01470         \{}
-\DoxyCodeLine{01471 }
-\DoxyCodeLine{01472             GPIO\_PORTF\_AFSEL\_R |= 0x0F;}
-\DoxyCodeLine{01473             SYSCTL\_RCGCPWM\_R |= SYSCTL\_RCGCPWM\_R1;}
-\DoxyCodeLine{01474             PWM1\_2\_CMPB\_R = dmxData[deviceModeAddress + 0 - 1] * 100; \textcolor{comment}{//red}}
-\DoxyCodeLine{01475 }
-\DoxyCodeLine{01476             PWM1\_3\_CMPB\_R = dmxData[deviceModeAddress + 1 - 1] * 100;    \textcolor{comment}{//green}}
-\DoxyCodeLine{01477 }
-\DoxyCodeLine{01478             PWM1\_3\_CMPA\_R = dmxData[deviceModeAddress + 2 - 1] * 100; \textcolor{comment}{//blue}}
+\DoxyCodeLine{01456         \textcolor{keywordflow}{if} (woo == 3 || woo == 4)}
+\DoxyCodeLine{01457         \{}
+\DoxyCodeLine{01458 }
+\DoxyCodeLine{01459             SYSCTL\_RCGCPWM\_R |= SYSCTL\_RCGCPWM\_R1;}
+\DoxyCodeLine{01460             sweepServo();}
+\DoxyCodeLine{01461 }
+\DoxyCodeLine{01462         \}}
+\DoxyCodeLine{01463 }
+\DoxyCodeLine{01464         \textcolor{keywordflow}{if} (woo == 2)}
+\DoxyCodeLine{01465             animationRamp();}
+\DoxyCodeLine{01466         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01467         \{}
+\DoxyCodeLine{01468             TIMER2\_CTL\_R \&= ~TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{01469         \}}
+\DoxyCodeLine{01470         \textcolor{keywordflow}{if} (woo == 1)}
+\DoxyCodeLine{01471             wooone();}
+\DoxyCodeLine{01472         \textcolor{keywordflow}{if} (woo == 5)}
+\DoxyCodeLine{01473         \{}
+\DoxyCodeLine{01474             TIMER2\_CTL\_R |= TIMER\_CTL\_TAEN;}
+\DoxyCodeLine{01475         \}}
+\DoxyCodeLine{01476 }
+\DoxyCodeLine{01477         \textcolor{keywordflow}{if} (RGBMode \&\& woo != 3 \&\& woo != 4 \&\& mode == 0)}
+\DoxyCodeLine{01478         \{}
 \DoxyCodeLine{01479 }
-\DoxyCodeLine{01480         \}}
-\DoxyCodeLine{01481         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{01482         \{}
-\DoxyCodeLine{01483             SYSCTL\_RCGCPWM\_R |= ~SYSCTL\_RCGCPWM\_R1;}
-\DoxyCodeLine{01484             GPIO\_PORTF\_AFSEL\_R = 0;}
-\DoxyCodeLine{01485             \textcolor{keywordflow}{if} (mode == 0)}
-\DoxyCodeLine{01486             \{}
-\DoxyCodeLine{01487                 \textcolor{keywordflow}{if} (dmxData[deviceModeAddress - 1] != 0)}
-\DoxyCodeLine{01488                 \{}
-\DoxyCodeLine{01489                     BLUE\_LED = 1;}
-\DoxyCodeLine{01490                 \}}
-\DoxyCodeLine{01491                 \textcolor{keywordflow}{else}}
-\DoxyCodeLine{01492                 \{}
-\DoxyCodeLine{01493                     BLUE\_LED = 0;}
-\DoxyCodeLine{01494                 \}}
-\DoxyCodeLine{01495             \}}
-\DoxyCodeLine{01496         \}}
-\DoxyCodeLine{01497     \}}
-\DoxyCodeLine{01498 \}}
+\DoxyCodeLine{01480             GPIO\_PORTF\_AFSEL\_R |= 0x0F;}
+\DoxyCodeLine{01481             SYSCTL\_RCGCPWM\_R |= SYSCTL\_RCGCPWM\_R1;}
+\DoxyCodeLine{01482             PWM1\_2\_CMPB\_R = dmxData[deviceModeAddress + 0 - 1] * 100; \textcolor{comment}{//red}}
+\DoxyCodeLine{01483 }
+\DoxyCodeLine{01484             PWM1\_3\_CMPB\_R = dmxData[deviceModeAddress + 1 - 1] * 100;    \textcolor{comment}{//green}}
+\DoxyCodeLine{01485 }
+\DoxyCodeLine{01486             PWM1\_3\_CMPA\_R = dmxData[deviceModeAddress + 2 - 1] * 100; \textcolor{comment}{//blue}}
+\DoxyCodeLine{01487 }
+\DoxyCodeLine{01488         \}}
+\DoxyCodeLine{01489         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01490         \{}
+\DoxyCodeLine{01491             SYSCTL\_RCGCPWM\_R |= ~SYSCTL\_RCGCPWM\_R1;}
+\DoxyCodeLine{01492             GPIO\_PORTF\_AFSEL\_R = 0;}
+\DoxyCodeLine{01493             \textcolor{keywordflow}{if} (mode == 0)}
+\DoxyCodeLine{01494             \{}
+\DoxyCodeLine{01495                 \textcolor{keywordflow}{if} (dmxData[deviceModeAddress - 1] != 0)}
+\DoxyCodeLine{01496                 \{}
+\DoxyCodeLine{01497                     BLUE\_LED = 1;}
+\DoxyCodeLine{01498                 \}}
+\DoxyCodeLine{01499                 \textcolor{keywordflow}{else}}
+\DoxyCodeLine{01500                 \{}
+\DoxyCodeLine{01501                     BLUE\_LED = 0;}
+\DoxyCodeLine{01502                 \}}
+\DoxyCodeLine{01503             \}}
+\DoxyCodeLine{01504         \}}
+\DoxyCodeLine{01505     \}}
+\DoxyCodeLine{01506 \}}
 
 \end{DoxyCode}
