@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['maein',['maein',['../pwmtest_8c.html#a318e1cba2e294d6cc5be9f5eb176644b',1,'pwmtest.c']]],
-  ['main',['main',['../satej__matthew_8c.html#a922afd31fa147cb51a9b28ce18b3e30e',1,'satej_matthew.c']]],
-  ['maxaddress',['maxAddress',['../satej__matthew_8c.html#a00e6b200308fbb690bdc114e3ba5616b',1,'satej_matthew.c']]],
-  ['mode',['mode',['../satej__matthew_8c.html#a37e90f5e3bd99fac2021fb3a326607d4',1,'satej_matthew.c']]]
+  ['incr',['incr',['../satej__matthew_8c.html#adbd7138430ce795e6dd1d4534fccfc13',1,'satej_matthew.c']]],
+  ['inithw',['initHw',['../satej__matthew_8c.html#ae5e20c90f0611c1fd09fad99cc3a30a6',1,'satej_matthew.c']]],
+  ['inttochar',['intToChar',['../satej__matthew_8c.html#a48ff33038777eac27bf41ff14b9368bf',1,'satej_matthew.c']]],
+  ['isletter',['isLetter',['../satej__matthew_8c.html#a19ec769227acc123bfe1e2d225a211cb',1,'satej_matthew.c']]],
+  ['isnumber',['isNumber',['../satej__matthew_8c.html#a65b1640156c68ea7687a41428022c1d8',1,'satej_matthew.c']]]
 ];
