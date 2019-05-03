@@ -1,0 +1,312 @@
+\section{tm4c123gh6pm\+\_\+startup\+\_\+ccs.\+c}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001 }
+\DoxyCodeLine{00011 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00012 \textcolor{comment}{//}}
+\DoxyCodeLine{00013 \textcolor{comment}{// Startup code for use with TI's Code Composer Studio.}}
+\DoxyCodeLine{00014 \textcolor{comment}{//}}
+\DoxyCodeLine{00015 \textcolor{comment}{// Copyright (c) 2011-2014 Texas Instruments Incorporated.  All rights reserved.}}
+\DoxyCodeLine{00016 \textcolor{comment}{// Software License Agreement}}
+\DoxyCodeLine{00017 \textcolor{comment}{// }}
+\DoxyCodeLine{00018 \textcolor{comment}{// Software License Agreement}}
+\DoxyCodeLine{00019 \textcolor{comment}{//}}
+\DoxyCodeLine{00020 \textcolor{comment}{// Texas Instruments (TI) is supplying this software for use solely and}}
+\DoxyCodeLine{00021 \textcolor{comment}{// exclusively on TI's microcontroller products. The software is owned by}}
+\DoxyCodeLine{00022 \textcolor{comment}{// TI and/or its suppliers, and is protected under applicable copyright}}
+\DoxyCodeLine{00023 \textcolor{comment}{// laws. You may not combine this software with "viral" open-source}}
+\DoxyCodeLine{00024 \textcolor{comment}{// software in order to form a larger program.}}
+\DoxyCodeLine{00025 \textcolor{comment}{//}}
+\DoxyCodeLine{00026 \textcolor{comment}{// THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.}}
+\DoxyCodeLine{00027 \textcolor{comment}{// NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT}}
+\DoxyCodeLine{00028 \textcolor{comment}{// NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR}}
+\DoxyCodeLine{00029 \textcolor{comment}{// A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY}}
+\DoxyCodeLine{00030 \textcolor{comment}{// CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL}}
+\DoxyCodeLine{00031 \textcolor{comment}{// DAMAGES, FOR ANY REASON WHATSOEVER.}}
+\DoxyCodeLine{00032 \textcolor{comment}{//}}
+\DoxyCodeLine{00033 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00034 }
+\DoxyCodeLine{00035 \textcolor{preprocessor}{\#include <stdint.h>}}
+\DoxyCodeLine{00036 }
+\DoxyCodeLine{00037 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00038 \textcolor{comment}{//}}
+\DoxyCodeLine{00039 \textcolor{comment}{// Forward declaration of the default fault handlers.}}
+\DoxyCodeLine{00040 \textcolor{comment}{//}}
+\DoxyCodeLine{00041 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00042 \textcolor{keywordtype}{void} ResetISR(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00043 \textcolor{keyword}{static} \textcolor{keywordtype}{void} NmiSR(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00044 \textcolor{keyword}{static} \textcolor{keywordtype}{void} FaultISR(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00045 \textcolor{keyword}{static} \textcolor{keywordtype}{void} IntDefaultHandler(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00046 }
+\DoxyCodeLine{00047 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00048 \textcolor{comment}{//}}
+\DoxyCodeLine{00049 \textcolor{comment}{// External declaration for the reset handler that is to be called when the}}
+\DoxyCodeLine{00050 \textcolor{comment}{// processor is started}}
+\DoxyCodeLine{00051 \textcolor{comment}{//}}
+\DoxyCodeLine{00052 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00053 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} \_c\_int00(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00054 }
+\DoxyCodeLine{00055 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00056 \textcolor{comment}{//}}
+\DoxyCodeLine{00057 \textcolor{comment}{// Linker variable that marks the top of the stack.}}
+\DoxyCodeLine{00058 \textcolor{comment}{//}}
+\DoxyCodeLine{00059 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00060 \textcolor{keyword}{extern} uint32\_t \_\_STACK\_TOP;}
+\DoxyCodeLine{00061 }
+\DoxyCodeLine{00062 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00063 \textcolor{comment}{//}}
+\DoxyCodeLine{00064 \textcolor{comment}{// External declarations for the interrupt handlers used by the application.}}
+\DoxyCodeLine{00065 \textcolor{comment}{//}}
+\DoxyCodeLine{00066 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00067 \textcolor{comment}{// To be added by user}}
+\DoxyCodeLine{00068 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} Uart0Isr(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00069 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} Uart1Isr(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00070 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} Timer1ISR(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00071 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} Timer2ISR(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00072 \textcolor{comment}{//extern void}}
+\DoxyCodeLine{00073 }
+\DoxyCodeLine{00074 }
+\DoxyCodeLine{00075 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00076 \textcolor{comment}{//}}
+\DoxyCodeLine{00077 \textcolor{comment}{// The vector table.  Note that the proper constructs must be placed on this to}}
+\DoxyCodeLine{00078 \textcolor{comment}{// ensure that it ends up at physical address 0x0000.0000 or at the start of}}
+\DoxyCodeLine{00079 \textcolor{comment}{// the program if located at a start address other than 0.}}
+\DoxyCodeLine{00080 \textcolor{comment}{//}}
+\DoxyCodeLine{00081 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00082 \textcolor{preprocessor}{\#pragma DATA\_SECTION(g\_pfnVectors, ".intvecs")}}
+\DoxyCodeLine{00083 void (* \textcolor{keyword}{const} g\_pfnVectors[])(void) =}
+\DoxyCodeLine{00084 \{}
+\DoxyCodeLine{00085     (void (*)(void))((uint32\_t)\&\_\_STACK\_TOP),}
+\DoxyCodeLine{00086                                             \textcolor{comment}{// The initial stack pointer}}
+\DoxyCodeLine{00087     ResetISR,                               \textcolor{comment}{// The reset handler}}
+\DoxyCodeLine{00088     NmiSR,                                  \textcolor{comment}{// The NMI handler}}
+\DoxyCodeLine{00089     FaultISR,                               \textcolor{comment}{// The hard fault handler}}
+\DoxyCodeLine{00090     IntDefaultHandler,                      \textcolor{comment}{// The MPU fault handler}}
+\DoxyCodeLine{00091     IntDefaultHandler,                      \textcolor{comment}{// The bus fault handler}}
+\DoxyCodeLine{00092     IntDefaultHandler,                      \textcolor{comment}{// The usage fault handler}}
+\DoxyCodeLine{00093     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00094     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00095     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00096     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00097     IntDefaultHandler,                      \textcolor{comment}{// SVCall handler}}
+\DoxyCodeLine{00098     IntDefaultHandler,                      \textcolor{comment}{// Debug monitor handler}}
+\DoxyCodeLine{00099     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00100     IntDefaultHandler,                      \textcolor{comment}{// The PendSV handler}}
+\DoxyCodeLine{00101     IntDefaultHandler,                      \textcolor{comment}{// The SysTick handler}}
+\DoxyCodeLine{00102     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port A}}
+\DoxyCodeLine{00103     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port B}}
+\DoxyCodeLine{00104     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port C}}
+\DoxyCodeLine{00105     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port D}}
+\DoxyCodeLine{00106     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port E}}
+\DoxyCodeLine{00107     Uart0Isr,                               \textcolor{comment}{// UART0 Rx and Tx}}
+\DoxyCodeLine{00108     Uart1Isr,                               \textcolor{comment}{// UART1 Rx and Tx}}
+\DoxyCodeLine{00109     IntDefaultHandler,                      \textcolor{comment}{// SSI0 Rx and Tx}}
+\DoxyCodeLine{00110     IntDefaultHandler,                      \textcolor{comment}{// I2C0 Master and Slave}}
+\DoxyCodeLine{00111     IntDefaultHandler,                      \textcolor{comment}{// PWM Fault}}
+\DoxyCodeLine{00112     IntDefaultHandler,                      \textcolor{comment}{// PWM Generator 0}}
+\DoxyCodeLine{00113     IntDefaultHandler,                      \textcolor{comment}{// PWM Generator 1}}
+\DoxyCodeLine{00114     IntDefaultHandler,                      \textcolor{comment}{// PWM Generator 2}}
+\DoxyCodeLine{00115     IntDefaultHandler,                      \textcolor{comment}{// Quadrature Encoder 0}}
+\DoxyCodeLine{00116     IntDefaultHandler,                      \textcolor{comment}{// ADC Sequence 0}}
+\DoxyCodeLine{00117     IntDefaultHandler,                      \textcolor{comment}{// ADC Sequence 1}}
+\DoxyCodeLine{00118     IntDefaultHandler,                      \textcolor{comment}{// ADC Sequence 2}}
+\DoxyCodeLine{00119     IntDefaultHandler,                      \textcolor{comment}{// ADC Sequence 3}}
+\DoxyCodeLine{00120     IntDefaultHandler,                      \textcolor{comment}{// Watchdog timer}}
+\DoxyCodeLine{00121     IntDefaultHandler,                      \textcolor{comment}{// Timer 0 subtimer A}}
+\DoxyCodeLine{00122     IntDefaultHandler,                      \textcolor{comment}{// Timer 0 subtimer B}}
+\DoxyCodeLine{00123     Timer1ISR,                      \textcolor{comment}{// Timer 1 subtimer A}}
+\DoxyCodeLine{00124     IntDefaultHandler,                      \textcolor{comment}{// Timer 1 subtimer B}}
+\DoxyCodeLine{00125     Timer2ISR,                      \textcolor{comment}{// Timer 2 subtimer A}}
+\DoxyCodeLine{00126     IntDefaultHandler,                      \textcolor{comment}{// Timer 2 subtimer B}}
+\DoxyCodeLine{00127     IntDefaultHandler,                      \textcolor{comment}{// Analog Comparator 0}}
+\DoxyCodeLine{00128     IntDefaultHandler,                      \textcolor{comment}{// Analog Comparator 1}}
+\DoxyCodeLine{00129     IntDefaultHandler,                      \textcolor{comment}{// Analog Comparator 2}}
+\DoxyCodeLine{00130     IntDefaultHandler,                      \textcolor{comment}{// System Control (PLL, OSC, BO)}}
+\DoxyCodeLine{00131     IntDefaultHandler,                      \textcolor{comment}{// FLASH Control}}
+\DoxyCodeLine{00132     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port F}}
+\DoxyCodeLine{00133     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port G}}
+\DoxyCodeLine{00134     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port H}}
+\DoxyCodeLine{00135     IntDefaultHandler,                      \textcolor{comment}{// UART2 Rx and Tx}}
+\DoxyCodeLine{00136     IntDefaultHandler,                      \textcolor{comment}{// SSI1 Rx and Tx}}
+\DoxyCodeLine{00137     IntDefaultHandler,                      \textcolor{comment}{// Timer 3 subtimer A}}
+\DoxyCodeLine{00138     IntDefaultHandler,                      \textcolor{comment}{// Timer 3 subtimer B}}
+\DoxyCodeLine{00139     IntDefaultHandler,                      \textcolor{comment}{// I2C1 Master and Slave}}
+\DoxyCodeLine{00140     IntDefaultHandler,                      \textcolor{comment}{// Quadrature Encoder 1}}
+\DoxyCodeLine{00141     IntDefaultHandler,                      \textcolor{comment}{// CAN0}}
+\DoxyCodeLine{00142     IntDefaultHandler,                      \textcolor{comment}{// CAN1}}
+\DoxyCodeLine{00143     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00144     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00145     IntDefaultHandler,                      \textcolor{comment}{// Hibernate}}
+\DoxyCodeLine{00146     IntDefaultHandler,                      \textcolor{comment}{// USB0}}
+\DoxyCodeLine{00147     IntDefaultHandler,                      \textcolor{comment}{// PWM Generator 3}}
+\DoxyCodeLine{00148     IntDefaultHandler,                      \textcolor{comment}{// uDMA Software Transfer}}
+\DoxyCodeLine{00149     IntDefaultHandler,                      \textcolor{comment}{// uDMA Error}}
+\DoxyCodeLine{00150     IntDefaultHandler,                      \textcolor{comment}{// ADC1 Sequence 0}}
+\DoxyCodeLine{00151     IntDefaultHandler,                      \textcolor{comment}{// ADC1 Sequence 1}}
+\DoxyCodeLine{00152     IntDefaultHandler,                      \textcolor{comment}{// ADC1 Sequence 2}}
+\DoxyCodeLine{00153     IntDefaultHandler,                      \textcolor{comment}{// ADC1 Sequence 3}}
+\DoxyCodeLine{00154     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00155     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00156     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port J}}
+\DoxyCodeLine{00157     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port K}}
+\DoxyCodeLine{00158     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port L}}
+\DoxyCodeLine{00159     IntDefaultHandler,                      \textcolor{comment}{// SSI2 Rx and Tx}}
+\DoxyCodeLine{00160     IntDefaultHandler,                      \textcolor{comment}{// SSI3 Rx and Tx}}
+\DoxyCodeLine{00161     IntDefaultHandler,                      \textcolor{comment}{// UART3 Rx and Tx}}
+\DoxyCodeLine{00162     IntDefaultHandler,                      \textcolor{comment}{// UART4 Rx and Tx}}
+\DoxyCodeLine{00163     IntDefaultHandler,                      \textcolor{comment}{// UART5 Rx and Tx}}
+\DoxyCodeLine{00164     IntDefaultHandler,                      \textcolor{comment}{// UART6 Rx and Tx}}
+\DoxyCodeLine{00165     IntDefaultHandler,                      \textcolor{comment}{// UART7 Rx and Tx}}
+\DoxyCodeLine{00166     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00167     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00168     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00169     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00170     IntDefaultHandler,                      \textcolor{comment}{// I2C2 Master and Slave}}
+\DoxyCodeLine{00171     IntDefaultHandler,                      \textcolor{comment}{// I2C3 Master and Slave}}
+\DoxyCodeLine{00172     IntDefaultHandler,                      \textcolor{comment}{// Timer 4 subtimer A}}
+\DoxyCodeLine{00173     IntDefaultHandler,                      \textcolor{comment}{// Timer 4 subtimer B}}
+\DoxyCodeLine{00174     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00175     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00176     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00177     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00178     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00179     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00180     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00181     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00182     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00183     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00184     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00185     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00186     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00187     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00188     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00189     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00190     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00191     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00192     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00193     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00194     IntDefaultHandler,                      \textcolor{comment}{// Timer 5 subtimer A}}
+\DoxyCodeLine{00195     IntDefaultHandler,                      \textcolor{comment}{// Timer 5 subtimer B}}
+\DoxyCodeLine{00196     IntDefaultHandler,                      \textcolor{comment}{// Wide Timer 0 subtimer A}}
+\DoxyCodeLine{00197     IntDefaultHandler,                      \textcolor{comment}{// Wide Timer 0 subtimer B}}
+\DoxyCodeLine{00198     IntDefaultHandler,                      \textcolor{comment}{// Wide Timer 1 subtimer A}}
+\DoxyCodeLine{00199     IntDefaultHandler,                      \textcolor{comment}{// Wide Timer 1 subtimer B}}
+\DoxyCodeLine{00200     IntDefaultHandler,                      \textcolor{comment}{// Wide Timer 2 subtimer A}}
+\DoxyCodeLine{00201     IntDefaultHandler,                      \textcolor{comment}{// Wide Timer 2 subtimer B}}
+\DoxyCodeLine{00202     IntDefaultHandler,                      \textcolor{comment}{// Wide Timer 3 subtimer A}}
+\DoxyCodeLine{00203     IntDefaultHandler,                      \textcolor{comment}{// Wide Timer 3 subtimer B}}
+\DoxyCodeLine{00204     IntDefaultHandler,                      \textcolor{comment}{// Wide Timer 4 subtimer A}}
+\DoxyCodeLine{00205     IntDefaultHandler,                      \textcolor{comment}{// Wide Timer 4 subtimer B}}
+\DoxyCodeLine{00206     IntDefaultHandler,                      \textcolor{comment}{// Wide Timer 5 subtimer A}}
+\DoxyCodeLine{00207     IntDefaultHandler,                      \textcolor{comment}{// Wide Timer 5 subtimer B}}
+\DoxyCodeLine{00208     IntDefaultHandler,                      \textcolor{comment}{// FPU}}
+\DoxyCodeLine{00209     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00210     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00211     IntDefaultHandler,                      \textcolor{comment}{// I2C4 Master and Slave}}
+\DoxyCodeLine{00212     IntDefaultHandler,                      \textcolor{comment}{// I2C5 Master and Slave}}
+\DoxyCodeLine{00213     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port M}}
+\DoxyCodeLine{00214     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port N}}
+\DoxyCodeLine{00215     IntDefaultHandler,                      \textcolor{comment}{// Quadrature Encoder 2}}
+\DoxyCodeLine{00216     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00217     0,                                      \textcolor{comment}{// Reserved}}
+\DoxyCodeLine{00218     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port P (Summary or P0)}}
+\DoxyCodeLine{00219     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port P1}}
+\DoxyCodeLine{00220     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port P2}}
+\DoxyCodeLine{00221     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port P3}}
+\DoxyCodeLine{00222     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port P4}}
+\DoxyCodeLine{00223     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port P5}}
+\DoxyCodeLine{00224     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port P6}}
+\DoxyCodeLine{00225     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port P7}}
+\DoxyCodeLine{00226     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port Q (Summary or Q0)}}
+\DoxyCodeLine{00227     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port Q1}}
+\DoxyCodeLine{00228     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port Q2}}
+\DoxyCodeLine{00229     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port Q3}}
+\DoxyCodeLine{00230     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port Q4}}
+\DoxyCodeLine{00231     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port Q5}}
+\DoxyCodeLine{00232     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port Q6}}
+\DoxyCodeLine{00233     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port Q7}}
+\DoxyCodeLine{00234     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port R}}
+\DoxyCodeLine{00235     IntDefaultHandler,                      \textcolor{comment}{// GPIO Port S}}
+\DoxyCodeLine{00236     IntDefaultHandler,                      \textcolor{comment}{// PWM 1 Generator 0}}
+\DoxyCodeLine{00237     IntDefaultHandler,                      \textcolor{comment}{// PWM 1 Generator 1}}
+\DoxyCodeLine{00238     IntDefaultHandler,                      \textcolor{comment}{// PWM 1 Generator 2}}
+\DoxyCodeLine{00239     IntDefaultHandler,                      \textcolor{comment}{// PWM 1 Generator 3}}
+\DoxyCodeLine{00240     IntDefaultHandler                       \textcolor{comment}{// PWM 1 Fault}}
+\DoxyCodeLine{00241 \};}
+\DoxyCodeLine{00242 }
+\DoxyCodeLine{00243 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00244 \textcolor{comment}{//}}
+\DoxyCodeLine{00245 \textcolor{comment}{// This is the code that gets called when the processor first starts execution}}
+\DoxyCodeLine{00246 \textcolor{comment}{// following a reset event.  Only the absolutely necessary set is performed,}}
+\DoxyCodeLine{00247 \textcolor{comment}{// after which the application supplied entry() routine is called.  Any fancy}}
+\DoxyCodeLine{00248 \textcolor{comment}{// actions (such as making decisions based on the reset cause register, and}}
+\DoxyCodeLine{00249 \textcolor{comment}{// resetting the bits in that register) are left solely in the hands of the}}
+\DoxyCodeLine{00250 \textcolor{comment}{// application.}}
+\DoxyCodeLine{00251 \textcolor{comment}{//}}
+\DoxyCodeLine{00252 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00253 \textcolor{keywordtype}{void}}
+\DoxyCodeLine{00254 ResetISR(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{00255 \{}
+\DoxyCodeLine{00256     \textcolor{comment}{//}}
+\DoxyCodeLine{00257     \textcolor{comment}{// Jump to the CCS C initialization routine.  This will enable the}}
+\DoxyCodeLine{00258     \textcolor{comment}{// floating-point unit as well, so that does not need to be done here.}}
+\DoxyCodeLine{00259     \textcolor{comment}{//}}
+\DoxyCodeLine{00260     \_\_asm(\textcolor{stringliteral}{"    .global \_c\_int00\(\backslash\)n"}}
+\DoxyCodeLine{00261           \textcolor{stringliteral}{"    b.w     \_c\_int00"});}
+\DoxyCodeLine{00262 \}}
+\DoxyCodeLine{00263 }
+\DoxyCodeLine{00264 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00265 \textcolor{comment}{//}}
+\DoxyCodeLine{00266 \textcolor{comment}{// This is the code that gets called when the processor receives a NMI.  This}}
+\DoxyCodeLine{00267 \textcolor{comment}{// simply enters an infinite loop, preserving the system state for examination}}
+\DoxyCodeLine{00268 \textcolor{comment}{// by a debugger.}}
+\DoxyCodeLine{00269 \textcolor{comment}{//}}
+\DoxyCodeLine{00270 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00271 \textcolor{keyword}{static} \textcolor{keywordtype}{void}}
+\DoxyCodeLine{00272 NmiSR(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{00273 \{}
+\DoxyCodeLine{00274     \textcolor{comment}{//}}
+\DoxyCodeLine{00275     \textcolor{comment}{// Enter an infinite loop.}}
+\DoxyCodeLine{00276     \textcolor{comment}{//}}
+\DoxyCodeLine{00277     \textcolor{keywordflow}{while}(1)}
+\DoxyCodeLine{00278     \{}
+\DoxyCodeLine{00279     \}}
+\DoxyCodeLine{00280 \}}
+\DoxyCodeLine{00281 }
+\DoxyCodeLine{00282 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00283 \textcolor{comment}{//}}
+\DoxyCodeLine{00284 \textcolor{comment}{// This is the code that gets called when the processor receives a fault}}
+\DoxyCodeLine{00285 \textcolor{comment}{// interrupt.  This simply enters an infinite loop, preserving the system state}}
+\DoxyCodeLine{00286 \textcolor{comment}{// for examination by a debugger.}}
+\DoxyCodeLine{00287 \textcolor{comment}{//}}
+\DoxyCodeLine{00288 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00289 \textcolor{keyword}{static} \textcolor{keywordtype}{void}}
+\DoxyCodeLine{00290 FaultISR(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{00291 \{}
+\DoxyCodeLine{00292     \textcolor{comment}{//}}
+\DoxyCodeLine{00293     \textcolor{comment}{// Enter an infinite loop.}}
+\DoxyCodeLine{00294     \textcolor{comment}{//}}
+\DoxyCodeLine{00295     \textcolor{keywordflow}{while}(1)}
+\DoxyCodeLine{00296     \{}
+\DoxyCodeLine{00297     \}}
+\DoxyCodeLine{00298 \}}
+\DoxyCodeLine{00299 }
+\DoxyCodeLine{00300 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00301 \textcolor{comment}{//}}
+\DoxyCodeLine{00302 \textcolor{comment}{// This is the code that gets called when the processor receives an unexpected}}
+\DoxyCodeLine{00303 \textcolor{comment}{// interrupt.  This simply enters an infinite loop, preserving the system state}}
+\DoxyCodeLine{00304 \textcolor{comment}{// for examination by a debugger.}}
+\DoxyCodeLine{00305 \textcolor{comment}{//}}
+\DoxyCodeLine{00306 \textcolor{comment}{//*****************************************************************************}}
+\DoxyCodeLine{00307 \textcolor{keyword}{static} \textcolor{keywordtype}{void}}
+\DoxyCodeLine{00308 IntDefaultHandler(\textcolor{keywordtype}{void})}
+\DoxyCodeLine{00309 \{}
+\DoxyCodeLine{00310     \textcolor{comment}{//}}
+\DoxyCodeLine{00311     \textcolor{comment}{// Go into an infinite loop.}}
+\DoxyCodeLine{00312     \textcolor{comment}{//}}
+\DoxyCodeLine{00313     \textcolor{keywordflow}{while}(1)}
+\DoxyCodeLine{00314     \{}
+\DoxyCodeLine{00315     \}}
+\DoxyCodeLine{00316 \}}
+
+\end{DoxyCode}

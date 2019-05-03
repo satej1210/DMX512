@@ -1,0 +1,4 @@
+<map id="getcUart0" name="getcUart0">
+<area shape="rect" id="node1" title="Blocking function that returns with serial data once the buffer is not empty." alt="" coords="120,5,199,32"/>
+<area shape="rect" id="node2" href="$tm4c123gh6pm__startup__ccs_8c.html#affa7c2cc09d04fc57b05c5644b1c8a68" title="Function to handle UART0 interrupts." alt="" coords="5,5,72,32"/>
+</map>
