@@ -1,0 +1,179 @@
+\section{tm4c123gh6pm\+\_\+startup\+\_\+ccs.\+c File Reference}
+\label{tm4c123gh6pm__startup__ccs_8c}\index{tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}}
+
+
+Startup File for Project.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for tm4c123gh6pm\+\_\+startup\+\_\+ccs.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=163pt]{tm4c123gh6pm__startup__ccs_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_a516ff8924be921fa3a1bb7754b1f5734}{Reset\+I\+SR}} (void)
+\item 
+void \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_a3c8534f5781f4cf53ffbeb6d35880b27}{\+\_\+c\+\_\+int00}} (void)
+\item 
+void \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_affa7c2cc09d04fc57b05c5644b1c8a68}{Uart0\+Isr}} (void)
+\begin{DoxyCompactList}\small\item\em Function to handle U\+A\+R\+T0 interrupts. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_af19c26d9a6dc91ca0e5358bef906f61f}{Uart1\+Isr}} (void)
+\begin{DoxyCompactList}\small\item\em Function to Handle Interrupts from U\+A\+R\+T1. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_afdad67070c699e644b8ddae35b29347b}{Timer1\+I\+SR}} (void)
+\begin{DoxyCompactList}\small\item\em Function to handle T\+I\+M\+E\+R1 interrupts. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_a424b9010ddc61d3484dca1b6af5af5b0}{Timer2\+I\+SR}} (void)
+\begin{DoxyCompactList}\small\item\em Function to Handle Interrupts from Timer2. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_ac1f2b7c32de8681c4f4184ca6efca568}{\+\_\+\+\_\+\+S\+T\+A\+C\+K\+\_\+\+T\+OP}}
+\item 
+void($\ast$const \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_a28c770c8f2522f11e2a95f7486620c5b}{g\+\_\+pfn\+Vectors}} \mbox{[}$\,$\mbox{]})(void)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Startup File for Project. 
+
+\begin{DoxyAuthor}{Author}
+Satej Mhatre, Matthew Hilliard 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+1 May 2019 For C\+SE 4342\+: Embedded II Spring 2019 Instructor\+: Dr. Jason Losh 
+\end{DoxyDate}
+
+
+Definition in file \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_source}{tm4c123gh6pm\+\_\+startup\+\_\+ccs.\+c}}.
+
+
+
+\subsection{Function Documentation}
+\mbox{\label{tm4c123gh6pm__startup__ccs_8c_a3c8534f5781f4cf53ffbeb6d35880b27}} 
+\index{tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}!\_c\_int00@{\_c\_int00}}
+\index{\_c\_int00@{\_c\_int00}!tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}}
+\subsubsection{\texorpdfstring{\_c\_int00()}{\_c\_int00()}}
+{\footnotesize\ttfamily void \+\_\+c\+\_\+int00 (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+\mbox{\label{tm4c123gh6pm__startup__ccs_8c_a516ff8924be921fa3a1bb7754b1f5734}} 
+\index{tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}!ResetISR@{ResetISR}}
+\index{ResetISR@{ResetISR}!tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}}
+\subsubsection{\texorpdfstring{ResetISR()}{ResetISR()}}
+{\footnotesize\ttfamily void Reset\+I\+SR (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_source_l00254}{254}} of file \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_source}{tm4c123gh6pm\+\_\+startup\+\_\+ccs.\+c}}.
+
+\mbox{\label{tm4c123gh6pm__startup__ccs_8c_afdad67070c699e644b8ddae35b29347b}} 
+\index{tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}!Timer1ISR@{Timer1ISR}}
+\index{Timer1ISR@{Timer1ISR}!tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}}
+\subsubsection{\texorpdfstring{Timer1ISR()}{Timer1ISR()}}
+{\footnotesize\ttfamily void Timer1\+I\+SR (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Function to handle T\+I\+M\+E\+R1 interrupts. 
+
+
+
+Definition at line \mbox{\hyperlink{satej__matthew_8c_source_l00617}{617}} of file \mbox{\hyperlink{satej__matthew_8c_source}{satej\+\_\+matthew.\+c}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{tm4c123gh6pm__startup__ccs_8c_afdad67070c699e644b8ddae35b29347b_cgraph}
+\end{center}
+\end{figure}
+\mbox{\label{tm4c123gh6pm__startup__ccs_8c_a424b9010ddc61d3484dca1b6af5af5b0}} 
+\index{tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}!Timer2ISR@{Timer2ISR}}
+\index{Timer2ISR@{Timer2ISR}!tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}}
+\subsubsection{\texorpdfstring{Timer2ISR()}{Timer2ISR()}}
+{\footnotesize\ttfamily void Timer2\+I\+SR (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Function to Handle Interrupts from Timer2. 
+
+
+
+Definition at line \mbox{\hyperlink{satej__matthew_8c_source_l00483}{483}} of file \mbox{\hyperlink{satej__matthew_8c_source}{satej\+\_\+matthew.\+c}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{tm4c123gh6pm__startup__ccs_8c_a424b9010ddc61d3484dca1b6af5af5b0_cgraph}
+\end{center}
+\end{figure}
+\mbox{\label{tm4c123gh6pm__startup__ccs_8c_affa7c2cc09d04fc57b05c5644b1c8a68}} 
+\index{tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}!Uart0Isr@{Uart0Isr}}
+\index{Uart0Isr@{Uart0Isr}!tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}}
+\subsubsection{\texorpdfstring{Uart0Isr()}{Uart0Isr()}}
+{\footnotesize\ttfamily void Uart0\+Isr (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Function to handle U\+A\+R\+T0 interrupts. 
+
+
+
+Definition at line \mbox{\hyperlink{satej__matthew_8c_source_l01111}{1111}} of file \mbox{\hyperlink{satej__matthew_8c_source}{satej\+\_\+matthew.\+c}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tm4c123gh6pm__startup__ccs_8c_affa7c2cc09d04fc57b05c5644b1c8a68_cgraph}
+\end{center}
+\end{figure}
+\mbox{\label{tm4c123gh6pm__startup__ccs_8c_af19c26d9a6dc91ca0e5358bef906f61f}} 
+\index{tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}!Uart1Isr@{Uart1Isr}}
+\index{Uart1Isr@{Uart1Isr}!tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}}
+\subsubsection{\texorpdfstring{Uart1Isr()}{Uart1Isr()}}
+{\footnotesize\ttfamily void Uart1\+Isr (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Function to Handle Interrupts from U\+A\+R\+T1. 
+
+
+
+Definition at line \mbox{\hyperlink{satej__matthew_8c_source_l00368}{368}} of file \mbox{\hyperlink{satej__matthew_8c_source}{satej\+\_\+matthew.\+c}}.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=232pt]{tm4c123gh6pm__startup__ccs_8c_af19c26d9a6dc91ca0e5358bef906f61f_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsection{Variable Documentation}
+\mbox{\label{tm4c123gh6pm__startup__ccs_8c_ac1f2b7c32de8681c4f4184ca6efca568}} 
+\index{tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}!\_\_STACK\_TOP@{\_\_STACK\_TOP}}
+\index{\_\_STACK\_TOP@{\_\_STACK\_TOP}!tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}}
+\subsubsection{\texorpdfstring{\_\_STACK\_TOP}{\_\_STACK\_TOP}}
+{\footnotesize\ttfamily uint32\+\_\+t \+\_\+\+\_\+\+S\+T\+A\+C\+K\+\_\+\+T\+OP}
+
+\mbox{\label{tm4c123gh6pm__startup__ccs_8c_a28c770c8f2522f11e2a95f7486620c5b}} 
+\index{tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}!g\_pfnVectors@{g\_pfnVectors}}
+\index{g\_pfnVectors@{g\_pfnVectors}!tm4c123gh6pm\_startup\_ccs.c@{tm4c123gh6pm\_startup\_ccs.c}}
+\subsubsection{\texorpdfstring{g\_pfnVectors}{g\_pfnVectors}}
+{\footnotesize\ttfamily void($\ast$ const g\+\_\+pfn\+Vectors\mbox{[}$\,$\mbox{]})(void)}
+
+
+
+Definition at line \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_source_l00083}{83}} of file \mbox{\hyperlink{tm4c123gh6pm__startup__ccs_8c_source}{tm4c123gh6pm\+\_\+startup\+\_\+ccs.\+c}}.
+

@@ -1,0 +1,4 @@
+<map id="putsUart0" name="putsUart0">
+<area shape="rect" id="node1" title="Blocking function that writes a string when the UART buffer is not full." alt="" coords="5,5,84,32"/>
+<area shape="rect" id="node2" href="$satej__matthew_8c.html#a27ebab6950bfb65d641dd04feb03906f" title="Blocking function that writes a serial character when the UART buffer is not full." alt="" coords="132,5,211,32"/>
+</map>

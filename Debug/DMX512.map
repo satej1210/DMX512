@@ -1,7 +1,7 @@
 ******************************************************************************
                   TI ARM Linker PC v18.1.4                     
 ******************************************************************************
->> Linked Thu May  2 00:38:42 2019
+>> Linked Thu May  2 01:11:17 2019
 
 OUTPUT FILE NAME:   <DMX512.out>
 ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 000024f1
@@ -11,7 +11,7 @@ MEMORY CONFIGURATION
 
          name            origin    length      used     unused   attr    fill
 ----------------------  --------  ---------  --------  --------  ----  --------
-  FLASH                 00000000   00040000  00002713  0003d8ed  R  X
+  FLASH                 00000000   00040000  0000271b  0003d8e5  R  X
   SRAM                  20000000   00008000  00000484  00007b7c  RW X
 
 
@@ -19,11 +19,11 @@ SEGMENT ALLOCATION MAP
 
 run origin  load origin   length   init length attrs members
 ----------  ----------- ---------- ----------- ----- -------
-00000000    00000000    00002718   00002718    r-x
+00000000    00000000    00002720   00002720    r-x
   00000000    00000000    0000026c   0000026c    r-- .intvecs
   0000026c    0000026c    00002366   00002366    r-x .text
   000025d2    000025d2    00000101   00000101    r-- .const
-  000026d8    000026d8    00000040   00000040    r-- .cinit
+  000026d8    000026d8    00000048   00000048    r-- .cinit
 20000000    20000000    00000484   00000000    rw-
   20000000    20000000    00000258   00000000    rw- .bss
   20000258    20000258    00000200   00000000    rw- .stack
@@ -61,12 +61,13 @@ section   page    origin      length       input sections
 .const     0    000025d2    00000101     
                   000025d2    00000101     rtsv7M4_T_le_v4SPD16_eabi.lib : ctype.c.obj (.const:.string:_ctypes_)
 
-.cinit     0    000026d8    00000040     
-                  000026d8    00000018     (.cinit..data.load) [load image, compression = lzss]
-                  000026f0    0000000c     (__TI_handler_table)
-                  000026fc    00000004     --HOLE-- [fill = 0]
-                  00002700    00000008     (.cinit..bss.load) [load image, compression = zero_init]
-                  00002708    00000010     (__TI_cinit_table)
+.cinit     0    000026d8    00000048     
+                  000026d8    0000001e     (.cinit..data.load) [load image, compression = lzss]
+                  000026f6    00000002     --HOLE-- [fill = 0]
+                  000026f8    0000000c     (__TI_handler_table)
+                  00002704    00000004     --HOLE-- [fill = 0]
+                  00002708    00000008     (.cinit..bss.load) [load image, compression = zero_init]
+                  00002710    00000010     (__TI_cinit_table)
 
 .init_array 
 *          0    00000000    00000000     UNINITIALIZED
@@ -122,21 +123,21 @@ MODULE SUMMARY
        Total:                         1164   257       0      
                                                               
        Stack:                         0      0         512    
-       Linker Generated:              0      60        0      
+       Linker Generated:              0      66        0      
     +--+------------------------------+------+---------+---------+
-       Grand Total:                   9060   937       1156   
+       Grand Total:                   9060   943       1156   
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 00002708 records: 2, size/record: 8, table size: 16
-	.data: load addr=000026d8, load size=00000018 bytes, run addr=20000458, run size=0000002c bytes, compression=lzss
-	.bss: load addr=00002700, load size=00000008 bytes, run addr=20000000, run size=00000258 bytes, compression=zero_init
+__TI_cinit_table @ 00002710 records: 2, size/record: 8, table size: 16
+	.data: load addr=000026d8, load size=0000001e bytes, run addr=20000458, run size=0000002c bytes, compression=lzss
+	.bss: load addr=00002708, load size=00000008 bytes, run addr=20000000, run size=00000258 bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 000026f0 records: 3, size/record: 4, table size: 12
+__TI_handler_table @ 000026f8 records: 3, size/record: 4, table size: 12
 	index: 0, handler: __TI_decompress_lzss
 	index: 1, handler: __TI_decompress_none
 	index: 2, handler: __TI_zero_init
@@ -147,7 +148,7 @@ GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name
 address   name                          
 -------   ----                          
 000025cf  C$$EXIT                       
-20000460  DMXMode                       
+2000045e  DMXMode                       
 00000e2f  EEWRITE                       
 20000483  RGBMode                       
 000025bf  ResetISR                      
@@ -158,10 +159,10 @@ address   name
 20000458  __STACK_END                   
 00000200  __STACK_SIZE                  
 20000458  __STACK_TOP                   
-00002708  __TI_CINIT_Base               
-00002718  __TI_CINIT_Limit              
-000026f0  __TI_Handler_Table_Base       
-000026fc  __TI_Handler_Table_Limit      
+00002710  __TI_CINIT_Base               
+00002720  __TI_CINIT_Limit              
+000026f8  __TI_Handler_Table_Base       
+00002704  __TI_Handler_Table_Limit      
 000024ad  __TI_auto_init_nobinit_nopinit
 000023f9  __TI_decompress_lzss          
 000025b1  __TI_decompress_none          
@@ -196,39 +197,37 @@ ffffffff  binit
 00000e71  clearDMX                      
 00001475  clearStr                      
 20000228  command                       
-2000045e  continuous                    
-20000459  dec                           
-20000462  deviceModeAddress             
+2000045c  continuous                    
+20000460  deviceModeAddress             
 20000472  dimEnd                        
 20000470  dimStart                      
 20000474  dimValue                      
 20000000  dmxData                       
-2000045a  enteringField                 
+20000458  enteringField                 
 00000000  g_pfnVectors                  
 00000de5  getModeEE                     
 00000db5  getcUart0                     
 20000240  goB                           
 20000244  goG                           
 20000248  goR                           
-20000458  i                             
 20000481  incr                          
 0000026d  initHw                        
 00000d05  intToChar                     
 00001505  isLetter                      
 000015a5  isNumber                      
 00001d0d  main                          
-2000045c  maxAddress                    
+2000045a  maxAddress                    
 000022ef  memcpy                        
 20000482  mode                          
 00000ef5  parseCommand                  
-2000045b  pos                           
-20000464  prevRX                        
+20000459  pos                           
+20000462  prevRX                        
 00001611  printCommandList              
 00000d5d  putcUart0                     
 00000761  putcUart1                     
 00000d7d  putsUart0                     
-20000465  rxError                       
-20000466  rxState                       
+20000463  rxError                       
+20000464  rxState                       
 20000468  seconds                       
 2000046c  secondsTrigger                
 2000047c  servoDir                      
@@ -298,10 +297,10 @@ address   name
 000025cf  C$$EXIT                       
 000025cf  abort                         
 000025d2  _ctypes_                      
-000026f0  __TI_Handler_Table_Base       
-000026fc  __TI_Handler_Table_Limit      
-00002708  __TI_CINIT_Base               
-00002718  __TI_CINIT_Limit              
+000026f8  __TI_Handler_Table_Base       
+00002704  __TI_Handler_Table_Limit      
+00002710  __TI_CINIT_Base               
+00002720  __TI_CINIT_Limit              
 20000000  dmxData                       
 20000200  arg1                          
 20000214  arg2                          
@@ -316,17 +315,15 @@ address   name
 20000258  __stack                       
 20000458  __STACK_END                   
 20000458  __STACK_TOP                   
-20000458  i                             
-20000459  dec                           
-2000045a  enteringField                 
-2000045b  pos                           
-2000045c  maxAddress                    
-2000045e  continuous                    
-20000460  DMXMode                       
-20000462  deviceModeAddress             
-20000464  prevRX                        
-20000465  rxError                       
-20000466  rxState                       
+20000458  enteringField                 
+20000459  pos                           
+2000045a  maxAddress                    
+2000045c  continuous                    
+2000045e  DMXMode                       
+20000460  deviceModeAddress             
+20000462  prevRX                        
+20000463  rxError                       
+20000464  rxState                       
 20000468  seconds                       
 2000046c  secondsTrigger                
 20000470  dimStart                      
@@ -347,4 +344,4 @@ ffffffff  binit
 UNDEFED   __mpu_init                    
 UNDEFED   _system_post_cinit            
 
-[97 symbols]
+[95 symbols]

@@ -1,0 +1,4 @@
+<map id="putcUart1" name="putcUart1">
+<area shape="rect" id="node1" title="Function to send characters to UART0." alt="" coords="136,5,215,32"/>
+<area shape="rect" id="node2" href="$tm4c123gh6pm__startup__ccs_8c.html#afdad67070c699e644b8ddae35b29347b" title="Function to handle TIMER1 interrupts." alt="" coords="5,5,88,32"/>
+</map>

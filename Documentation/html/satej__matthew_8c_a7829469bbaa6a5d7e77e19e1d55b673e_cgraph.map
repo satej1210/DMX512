@@ -1,0 +1,5 @@
+<map id="Timer1ISR" name="Timer1ISR">
+<area shape="rect" id="node1" title="Function to handle TIMER1 interrupts." alt="" coords="5,31,88,57"/>
+<area shape="rect" id="node2" href="$satej__matthew_8c.html#ae0e2b59e29ecdbadeb6bfa1a9efa5a85" title="Function to change load value of Timer1." alt="" coords="136,5,272,32"/>
+<area shape="rect" id="node3" href="$satej__matthew_8c.html#a6c61bcdd147e256a7e6b05b34fb783bc" title="Function to send characters to UART0." alt="" coords="165,56,243,83"/>
+</map>

@@ -57,7 +57,6 @@
 #define PUSH_BUTTON2  (*((volatile uint32_t *)(0x42000000 + (0x400253FC-0x40000000)*32 + 0*4)))
 /*!< Bit banding for PORTF0 PushButton 0 */
 
-
 #define GREEN_LED_MASK 8
 /*!< GPIO PORTF Green LED Mask */
 
@@ -73,19 +72,12 @@
 #define PUSH_BUTTON2_MASK 1
 /*!< GPIO PORTF Push Button 2 Mask */
 
+#define delay4Cycles() __asm(" NOP\n NOP\n NOP\n NOP") /*!< Delaying for 4 cycles */
 
-#define delay4Cycles() __asm(" NOP\n NOP\n NOP\n NOP")
-/*!< Delaying for 4 cycles */
+#define delay1Cycle() __asm(" NOP\n") /*!< Delaying for 1 cycle  */
 
-#define delay1Cycle() __asm(" NOP\n")
-/*!< Delaying for 1 cycle */
+#define delay6Cycles() __asm(" NOP\n NOP\n NOP\n NOP\n NOP\n NOP\n") /*!< Delaying for 6 cycles */
 
-#define delay6Cycles() __asm(" NOP\n NOP\n NOP\n NOP\n NOP\n NOP\n")
-/*!< Delaying for 6 cycles */
-
-uint8_t i = 0;
-uint8_t dec = 0;
-uint8_t up;
 
 /*
  * UART0 Global Variables
@@ -137,7 +129,10 @@ int servoDir = 0; /*!< Used by servoSweep to indicate direction of sweep. */
 char ch[3]; /*!< For storing integer to character */
 uint8_t vall = 8; /*!< For EEPROM Data */
 uint8_t incr = 1; /*!< For EEPROM Data */
-uint16_t program, Address, opMode, setval; /*!< For EEPROM Data */
+uint16_t program; /*!< For EEPROM Data */
+uint16_t Address; /*!< For EEPROM Data */
+uint16_t opMode; /*!< For EEPROM Data */
+uint16_t setval; /*!< For EEPROM Data */
 
 /*
  * Launchpad Control Global Variables
@@ -458,7 +453,7 @@ void Uart1Isr()
  *
  * Function to send characters to UART0
  */
-void putcUart1(uint8_t i)
+void putcUart1(uint8_t i /**< [in] character to send to UART1 */)
 {
 
     while (UART1_FR_R & UART_FR_TXFF);               // wait if uart0 tx fifo full
@@ -470,7 +465,7 @@ void putcUart1(uint8_t i)
  *
  * Function to change load value of Timer1
  */
-void changeTimer1Value(uint32_t us)
+void changeTimer1Value(uint32_t us /**< [in] time in microseconds to convert to load value */)
 {
 
     TIMER1_CTL_R &= ~TIMER_CTL_TAEN;
@@ -485,7 +480,7 @@ void changeTimer1Value(uint32_t us)
  *
  * Function to Handle Interrupts from Timer2
  */
-void Timer2ISR(void)
+void Timer2ISR()
 {
 
     if (woo == 2)
@@ -619,7 +614,7 @@ void Timer2ISR(void)
  *
  * Function to handle TIMER1 interrupts
  */
-void Timer1ISR(void)
+void Timer1ISR()
 {
 
     if (mode == 3 && GREEN_LED == 0)
@@ -695,7 +690,7 @@ void Timer1ISR(void)
  *
  * Function to convert integer to character for UART0
  */
-char* intToChar(uint16_t x)
+char* intToChar(uint16_t x /**< [in] integer to convert to char*/)
 {
 
     int8_t i = 2;
@@ -714,7 +709,7 @@ char* intToChar(uint16_t x)
  *
  * Blocking function that writes a serial character when the UART buffer is not full
  */
-void putcUart0(char c)
+void putcUart0(char c /**< [in] character to send to UART0*/)
 {
 
     while (UART0_FR_R & UART_FR_TXFF)
@@ -727,7 +722,7 @@ void putcUart0(char c)
  *
  * Blocking function that writes a string when the UART buffer is not full
  */
-void putsUart0(char* str)
+void putsUart0(char* str /**< [in] character array to write to UART0 */)
 {
 
     uint8_t i;
@@ -774,7 +769,7 @@ void getModeEE()
  *
  * Function to write to EEPROM to set address
  */
-void EEWRITE(uint16_t B, uint16_t offSet, uint16_t val)
+void EEWRITE(uint16_t B /**< [in] block address */, uint16_t offSet /**< [in] offset address */, uint16_t val /**< [in]value to write */)
 {
 
     EEPROM_EEBLOCK_R = B;
@@ -1033,7 +1028,7 @@ void clearStr()
  *
  * Function to check if character is letter
  */
-bool isLetter(char c)
+bool isLetter(char c /**< character to check */)
 {
 
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
@@ -1044,7 +1039,7 @@ bool isLetter(char c)
  *
  * Function to check if character is number
  */
-bool isNumber(char c)
+bool isNumber(char c /**< character to check */)
 {
 
     return (c >= '0' && c <= '9');
@@ -1080,7 +1075,7 @@ void printCommandList()
  *
  * Function to wait for specified microseconds
  */
-void waitMicrosecond(uint32_t us)
+void waitMicrosecond(uint32_t us /**< time to wait in microseconds */)
 {
 
     __asm("WMS_LOOP0:   MOV  R1, #6");
@@ -1113,7 +1108,7 @@ void waitMicrosecond(uint32_t us)
  *
  * Function to handle UART0 interrupts
  */
-void Uart0Isr(void)
+void Uart0Isr()
 {
 
     char c = getcUart0();
@@ -1328,7 +1323,7 @@ void animationRamp()
  *
  * Runs everything
  */
-uint8_t main(void)
+uint8_t main()
 {
 
     // Initialize hardware
