@@ -1,0 +1,70 @@
+\begin{theindex}
+
+  \item {BLUE\_LED}
+    \subitem {satej\_matthew.c}, \hyperpage{12}
+  \item {BLUE\_LED\_MASK}
+    \subitem {satej\_matthew.c}, \hyperpage{12}
+
+  \indexspace
+
+  \item {delay1Cycle}
+    \subitem {satej\_matthew.c}, \hyperpage{12}
+  \item {delay4Cycles}
+    \subitem {satej\_matthew.c}, \hyperpage{13}
+  \item {delay6Cycles}
+    \subitem {satej\_matthew.c}, \hyperpage{13}
+
+  \indexspace
+
+  \item {GREEN\_LED}
+    \subitem {satej\_matthew.c}, \hyperpage{13}
+  \item {GREEN\_LED\_MASK}
+    \subitem {satej\_matthew.c}, \hyperpage{13}
+
+  \indexspace
+
+  \item {maein}
+    \subitem {pwmtest.c}, \hyperpage{8}
+
+  \indexspace
+
+  \item {PUSH\_BUTTON}
+    \subitem {satej\_matthew.c}, \hyperpage{13}
+  \item {PUSH\_BUTTON2}
+    \subitem {satej\_matthew.c}, \hyperpage{14}
+  \item {PUSH\_BUTTON2\_MASK}
+    \subitem {satej\_matthew.c}, \hyperpage{14}
+  \item {PUSH\_BUTTON\_MASK}
+    \subitem {satej\_matthew.c}, \hyperpage{14}
+  \item {PWM\_FREQUENCY}
+    \subitem {pwmtest.c}, \hyperpage{7}
+  \item {pwmtest.c}, \hyperpage{7}
+    \subitem {maein}, \hyperpage{8}
+    \subitem {PWM\_FREQUENCY}, \hyperpage{7}
+
+  \indexspace
+
+  \item {README.md}, \hyperpage{9}
+  \item {RED\_LED}
+    \subitem {satej\_matthew.c}, \hyperpage{14}
+  \item {RED\_LED\_MASK}
+    \subitem {satej\_matthew.c}, \hyperpage{14}
+
+  \indexspace
+
+  \item {satej\_matthew.c}, \hyperpage{9}
+    \subitem {BLUE\_LED}, \hyperpage{12}
+    \subitem {BLUE\_LED\_MASK}, \hyperpage{12}
+    \subitem {delay1Cycle}, \hyperpage{12}
+    \subitem {delay4Cycles}, \hyperpage{13}
+    \subitem {delay6Cycles}, \hyperpage{13}
+    \subitem {GREEN\_LED}, \hyperpage{13}
+    \subitem {GREEN\_LED\_MASK}, \hyperpage{13}
+    \subitem {PUSH\_BUTTON}, \hyperpage{13}
+    \subitem {PUSH\_BUTTON2}, \hyperpage{14}
+    \subitem {PUSH\_BUTTON2\_MASK}, \hyperpage{14}
+    \subitem {PUSH\_BUTTON\_MASK}, \hyperpage{14}
+    \subitem {RED\_LED}, \hyperpage{14}
+    \subitem {RED\_LED\_MASK}, \hyperpage{14}
+
+\end{theindex}
